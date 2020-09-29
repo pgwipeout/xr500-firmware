@@ -16,7 +16,7 @@
 <script>
 var ts="<% cfg_get("failover") %>";
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 
 function loadvalue()
 {

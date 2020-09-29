@@ -8,7 +8,7 @@
 
 <script>
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 var hour_24_flag=((gui_region == "German" &&  (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "GR") ? 1 : 0;
 var master="<% cfg_get("http_loginname") %>";
 </script>

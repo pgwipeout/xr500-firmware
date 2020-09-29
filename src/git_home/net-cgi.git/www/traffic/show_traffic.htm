@@ -1,10 +1,8 @@
 <% http_header("style/form.css", "/funcs.js", "/traffic.js") %>
+<% nobody_header("show_traffic.htm","show_traffic_reset") %>
 <style>
 html, body{ margin: 0; border:none; background-color:#120203;background-image: url(../images/svg/bg.svg); background-attachment: fixed; background-size: cover; background-repeat: no-repeat; width:100%; height:100%}
 </style>
-<body>
-<form method="POST" action="/apply.cgi?/show_traffic.htm timestamp=626459749261">
-<input type=hidden name=submit_flag value="show_traffic_reset">
 <div class="page_title">$traffic_status</div>
 <div id="main" class="main">
 <script>

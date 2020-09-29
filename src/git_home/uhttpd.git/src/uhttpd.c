@@ -452,7 +452,9 @@ static void uh_dispatch_dumaos_static_request(
 		".html",
 		".htm",
 		".js",
-		"poll.json"
+		"poll.json",
+		"services.json",
+		"clusters.json"
 	};
 	char* argv[] = {
 		"/usr/bin/haserl",
@@ -580,7 +582,7 @@ static void uh_process_client( struct config *conf, struct client *cl, int cur_f
 		if(httphost != NULL && strcmp(httphost, "www.msftncsi.com") == 0 && strcmp(req->url,"/ncsi.txt")==0)
 			goto cleanup;
 
-		if((strcasecmp(httphost, "mywifiext.net")==0 || strcasecmp(httphost, "mywifiext.com")==0 || strcasecmp(httphost, "www.mywifiext.com")==0 || strcasecmp(httphost, "www.mywifiext.net")==0) && strcmp(req->url,"/wifiSettings.htm")==0){
+		if(httphost != NULL && (strcasecmp(httphost, "mywifiext.net")==0 || strcasecmp(httphost, "mywifiext.com")==0 || strcasecmp(httphost, "www.mywifiext.com")==0 || strcasecmp(httphost, "www.mywifiext.net")==0) && strcmp(req->url,"/wifiSettings.htm")==0) {
 			req->url="/";
 		}
 

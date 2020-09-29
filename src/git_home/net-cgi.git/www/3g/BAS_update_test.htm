@@ -1,4 +1,4 @@
-<% http_header("style/form.css") %>
+<% http_header("/funcs.js", "style/form.css") %>
 <BODY bgcolor="#ffffff" onLoad="updateProgress()">
 <div class="page_title">$update_head</div>
 <div id="black_over_lay" class="black_overlay">
@@ -14,8 +14,8 @@ var delay_time = 2000; // msecs
 var charcount = 0; 
 var percent = parseFloat(100/maxchars);
 <% cfg_set("dango_det_wan_type", "multiDetc")%>
-top.broadband_mode = "<% cfg_get("dango_det_wan_type") %>";
-top.enabledItemsClass_basic();
+getTop(window).broadband_mode = "<% cfg_get("dango_det_wan_type") %>";
+getTop(window).enabledItemsClass_basic();
 
 function makeStr(strsize)
 {

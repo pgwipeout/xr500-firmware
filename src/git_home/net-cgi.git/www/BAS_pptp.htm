@@ -21,15 +21,16 @@ var russian_ppp_flag=parent.russian_ppp_flag;
 var gui_region="<% cfg_get("GUI_Region") %>";
 var lan_ip="<% cfg_get("lan_ipaddr") %>";
 var lan_subnet="<% cfg_get("lan_netmask") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 
 var vpn_enable = "<% cfg_get("vpn_enable") %>";
 var old_endis_ddns="<% cfg_get("endis_ddns") %>";
 
 //Add a new checkbox 'Enable automatic Internet connection reset at'
 var bas_auto_conn_flag="<% cfg_get("bas_auto_conn_flag") %>";
-var bas_conn_time_num="<% cfg_get("bas_conn_time_num") %>";
-if ( bas_conn_time_num == "" ) // to fix bug 23294
+var bas_conn_time_num="<% cfg_sed_xss("bas_conn_time_num") %>";
+bas_conn_time_num=parseInt(bas_conn_time_num,10);
+if ( bas_conn_time_num>47||bas_conn_time_num<0||isNaN(bas_conn_time_num))
 	bas_conn_time_num="0";
 var auto_conn_flag=parent.auto_conn_flag;
 var autoconn_flag=(auto_conn_flag == 1 && ((gui_region == "German" &&  (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "GR")) ? 1 : 0;
@@ -81,7 +82,7 @@ function loadvalue()
  		document.getElementById("auto_conn_play").style.display="";
  	else
  		document.getElementById("auto_conn_play").style.display="none";
-	form.auto_conn_time.options[eval(bas_conn_time_num)].selected =true;
+	form.auto_conn_time.options[bas_conn_time_num].selected =true;
 	
 	if( pptp_empty == "0" )
 	{
@@ -212,7 +213,7 @@ function show_idleout(form,time)
 var old_wan_type="<% cfg_get("wan_proto") %>";
 function click_jump()
 {
-   if(top.dsl_enable_flag == 0)
+   if(getTop(window).dsl_enable_flag == 0)
       goto_formframe("BAS_ether.htm");
    else
       goto_formframe("BAS_ether_dsl.htm");

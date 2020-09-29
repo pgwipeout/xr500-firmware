@@ -1,6 +1,6 @@
 function BlockAllClickCheck(cf)
 {
-	if(top.enable_ap_flag == 1 || enable_extender_flag == "1") //for bug 30286,grey this when ap mode is on
+	if(getTop(window).enable_ap_flag == 1 || enable_extender_flag == "1") //for bug 30286,grey this when ap mode is on
 	{
 		cf.checkboxNameAll.disabled = true;
 		
@@ -51,7 +51,7 @@ function BlockAllClickCheck(cf)
 
 function BlockPeriodClick(cf)
 {
-	if(top.enable_ap_flag == 1 || enable_extender_flag == "1") // for bug 30286,grey this when ap mode is on
+	if(getTop(window).enable_ap_flag == 1 || enable_extender_flag == "1") // for bug 30286,grey this when ap mode is on
 	{
 		cf.checkboxNamehours.disabled = true;
 		cf.start_hour.disabled = true;

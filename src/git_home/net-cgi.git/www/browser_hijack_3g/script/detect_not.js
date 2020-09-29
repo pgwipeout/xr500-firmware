@@ -45,7 +45,7 @@ function genieHelpChecking()
 
 	if(choices[0].checked)
 	{
-		if(top.have_lte_flag=="1")
+		if(getTop(window).have_lte_flag=="1")
 			cf.submit_flag.value="wizard_lte_detwan";
 		cf.submit();
 	}

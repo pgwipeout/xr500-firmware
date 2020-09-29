@@ -97,7 +97,7 @@ $bluebar
 	<TD nowrap align=center><span class="subhead">$sta_routes_gateway</span></TD>			
 	</TR>
 <script>
-if (top.ipv6_static_route && ipv6_array_num != 0)
+if (getTop(window).ipv6_static_route && ipv6_array_num != 0)
 {
 
 	for(i=0,j=1;i<ipv6_array_num;i++,j++)
@@ -136,7 +136,7 @@ $bluebar
 </TABLE>
 </FORM>
 <script>
-if (top.ipv6_static_route)
+if (getTop(window).ipv6_static_route)
 	document.forms[1].style.display="";
 else
 	document.forms[1].style.display="none";

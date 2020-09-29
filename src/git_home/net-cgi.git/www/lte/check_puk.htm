@@ -1,4 +1,4 @@
-<% http_header("style/form.css") %>
+<% http_header("/funcs.js", "style/form.css") %>
 <body>
 <div id="black_over_lay" class="black_overlay">
 </div>
@@ -18,7 +18,7 @@
 var action_ret="<% cfg_get("lte_sim_action_ret") %>";
 function goback()
 {
-	if(top.click_lte_sim==0)
+	if(getTop(window).click_lte_sim==0)
 		location.href="check_mobile_internet_wait.htm";
 	else
 		location.href="check_sim_wait.htm";

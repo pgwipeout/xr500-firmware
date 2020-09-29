@@ -57,7 +57,7 @@ function manuallyConfig()
 {
 	if(confirm(bh_no_genie_help_confirm) == false)
 		return false;
-        if(top.dsl_enable_flag == 1)
+        if(getTop(window).dsl_enable_flag == 1)
 		this.location.href="BRS_log12_incorrect_go_to_internet.html";
 	else{
 		var forms = document.getElementsByTagName("form");

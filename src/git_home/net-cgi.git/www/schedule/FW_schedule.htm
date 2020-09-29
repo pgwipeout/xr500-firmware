@@ -29,7 +29,7 @@ var old_ntpadjust="<% cfg_get("ntpadjust") %>";
 
 var cur_time="<% cur_time() %>";
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 cur_time=change_cur_time(cur_time,gui_region);
 
 var enable_ap_flag="<% cfg_get("ap_mode") %>"; //for bug 30286 add this

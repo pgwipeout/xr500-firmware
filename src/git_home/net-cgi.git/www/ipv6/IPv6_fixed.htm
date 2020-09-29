@@ -39,7 +39,7 @@ var ipv6_lan_prefix_len = "<% cfg_get("ipv6_fixed_lan_prefix_len") %>";
 var ipv6_cone_fitering = "<% cfg_get("wan_ipv6_cone_fitering") %>";
 
 /*------ mapt --------------------*/
-var have_mapt=top.have_mapt;
+var have_mapt=getTop(window).have_mapt;
 var enable_value="<% cfg_get("mapt_enable") %>";
 var type_value="<% cfg_get("mapt_type") %>";
 var local_ipv6="<% cfg_get("mapt_loc_ip6pre") %>";
@@ -50,7 +50,7 @@ var local_ea="<% cfg_get("mapt_loc_ealen") %>";
 var remote_ipv6="<% cfg_get("mapt_rmt_ip6pre") %>";
 var remote_ipv6_pre_len="<% cfg_get("mapt_rmt_ip6pre_len") %>";
 var loc_psidoffset="<% cfg_get("mapt_loc_psidoffset") %>";
-top.enable_mapt=enable_value;
+getTop(window).enable_mapt=enable_value;
 
 function loadvalue()
 {

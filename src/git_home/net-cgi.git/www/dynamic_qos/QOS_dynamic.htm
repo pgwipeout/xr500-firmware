@@ -93,7 +93,7 @@ var uplink_detect="<% cfg_get("ookla_uplimit") %>";
 var downlink_detect="<% cfg_get("ookla_downlimit") %>";
 var bandwidth_type="<% cfg_get("bandwidth_type") %>";
 var first_flag="<% cfg_get("first_flag") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 update_version=format_version(update_version);
 var update_tag="<% cfg_get("update_tag") %>";
 <% reset_update_tag() %>
@@ -155,7 +155,7 @@ function updateProgress()
                  if(first_flag == "1") {
 			cf.hid_streamboost_enable.value=0;
 			cf.hid_first_flag.value="0";
-			if(top.have_advanced_qos == "1")
+			if(getTop(window).have_advanced_qos == "1")
 				check_confirm(cf, "QOS_basic_dynamic.htm", ts);
 			else
 				check_confirm(cf, "QOS_dynamic.htm", ts);
@@ -218,7 +218,7 @@ function submitSpeedtestResult(){
                                                 var cf = document.forms[0];
                                                 cf.hid_streamboost_enable.value=0;
                                                 cf.hid_first_flag.value="0";
-						if(top.have_advanced_qos == "1")
+						if(getTop(window).have_advanced_qos == "1")
                                                 	check_confirm(cf, "QOS_basic_dynamic.htm", ts);
 						else
 							check_confirm(cf, "QOS_dynamic.htm", ts);
@@ -255,8 +255,8 @@ function fillValue(updata,downdata)
 
 function goto_attached()
 {
-	if(top.location.href.indexOf("adv_index") > -1){
-		top.open_or_close_sub('admin');
+	if(getTop(window).location.href.indexOf("adv_index") > -1){
+		getTop(window).open_or_close_sub('admin');
 		menu_color_change('attached');
 	}else
 		basic_menu_color_change('attached');
@@ -276,7 +276,7 @@ function loadvalue()
 		$$(".main_top_button").css("top", "185px");
 	else if(parent.type == "basic")
 		$$(".main_top_button").css("top", "155px");
-	if(top.have_advanced_qos == 1){
+	if(getTop(window).have_advanced_qos == 1){
 		$$(".manual_qos_tr").css("display", "");
 		$$(".dynamic_qos_tr").css("display", "none");
 	}else{
@@ -319,7 +319,7 @@ function loadvalue()
 		document.getElementById("apply").className="new_greyapply_bt  ui-corner-all";
 		cf.qosSetting[0].checked = true;
 		document.getElementById("speedtest").className="new_greyspeed_test ui-corner-all";
-		if(top.is_gr_version == 1)
+		if(getTop(window).is_gr_version == 1)
 			 document.getElementById("speedtest").className = "new_greyspeed_test ui-corner-all";
                 cf.speedtest.disabled = true;
 		document.getElementById("define_radio1").style.display = "none";

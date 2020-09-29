@@ -309,7 +309,7 @@ void get_streamboost_nodes_info(int state)
 		priority_for_unknow_dev = 0;
 	setenv("REQUEST_METHOD", "GET", 1);
 	setenv("REQUEST_URI", "/cgi-bin/ozker/api/nodes", 1);
-	fp = popen("/usr/bin/cgi-fcgi -bind -connect 127.0.0.1:9000 | sed \'1,2d\' | jq \'.nodes[] | .Pipeline.mac_addr, .Pipeline.ip_addr, .Pipeline.name, .Pipeline.type, .Pipeline.default_prio, .Pipeline.down, .Pipeline.up, .Pipeline.epoch, .UI.priority\'", "r");
+	fp = popen("/usr/bin/cgi-fcgi -bind -connect 127.0.0.1:9000 | sed \'1,2d\' | jq -r \'.nodes[] | .Pipeline.mac_addr, .Pipeline.ip_addr, .Pipeline.name, .Pipeline.type, .Pipeline.default_prio, .Pipeline.down, .Pipeline.up, .Pipeline.epoch, .UI.priority\'", "r");
 	if (fp) {
 		while (1) {
 			down = 0;
@@ -450,49 +450,6 @@ struct arp_struct
 struct arp_struct *arp_tbl[NEIGH_HASHMASK + 1];
 
 static struct arpmsg arpreq;
-
-int init_arp_request(char *ifname)
-{
-	int s, i;
-	struct ifreq ifr;
-	struct arpmsg *arp;
-	
-	s = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
-	if (s < 0)
-		return 0;
-	
-	arp = &arpreq;
-	memset(arp, 0, sizeof(struct arpmsg));
-
-	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
-
-	/*judge whether ARP_IFNAME has an IP,if not sleep 5s*/
-	for (i=5; i >= 0; i--){
-		if (i == 0)
-			return 0;
-		if (ioctl(s, SIOCGIFADDR, &ifr) != 0)
-			sleep(5);	
-		else
-			break;
-	}
-	memcpy(arp->ar_sip, &((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr, 4);
-	
-	if (ioctl(s, SIOCGIFHWADDR, &ifr) != 0)
-		return 0;
-	memset(arp->h_dest, 0xFF, 6);
-	memcpy(arp->h_source, ifr.ifr_hwaddr.sa_data, 6);
-	arp->h_proto = htons(ETH_P_ARP);
-	arp->ar_hrd = htons(ARPHRD_ETHER);
-	arp->ar_pro = htons(ETH_P_IP);
-	arp->ar_hln = 6;
-	arp->ar_pln = 4;
-	arp->ar_op = htons(ARPOP_REQUEST);
-	memcpy(arp->ar_sha, ifr.ifr_hwaddr.sa_data, 6);
-	
-	close(s);
-	return 1;
-}
 
 /* modified from "linux-2.4.18/net/ipv4/arp.c" */
 static uint32 arp_hash(uint8 *pkey)
@@ -776,8 +733,6 @@ int open_arp_socket(struct sockaddr *me)
 	me->sa_family = PF_PACKET;
 	strncpy(me->sa_data, ARP_IFNAME, 14);
 	if (bind(s, me, sizeof(*me)) < 0)
-		return -1;
-	if (init_arp_request(ARP_IFNAME) == 0)
 		return -1;
 	
 	return s;
@@ -1120,35 +1075,99 @@ void reset_arp_table()
 #endif
 }
 
-void scan_arp_table(int sock, struct sockaddr *me)
+struct ether_arp *fill_arp_packet(const unsigned char *src_mac_addr, const char *src_ip_addr, const unsigned char *dst_mac_addr, const char *dst_ip_addr)
+{
+    struct ether_arp *arp_packet;
+    struct in_addr src_in_addr, dst_in_addr;
+
+	inet_pton(AF_INET, src_ip_addr, &src_in_addr);
+	inet_pton(AF_INET, dst_ip_addr, &dst_in_addr);
+
+    arp_packet = (struct ether_arp *)malloc(ETHER_ARP_LEN);
+    arp_packet->arp_hrd = htons(ARPHRD_ETHER);
+    arp_packet->arp_pro = htons(ETHERTYPE_IP);
+    arp_packet->arp_hln = ETH_ALEN;
+    arp_packet->arp_pln = IP_ADDR_LEN;
+    arp_packet->arp_op = htons(ARPOP_REQUEST);
+    memcpy(arp_packet->arp_sha, src_mac_addr, ETH_ALEN);
+    memcpy(arp_packet->arp_tha, dst_mac_addr, ETH_ALEN);
+	memcpy(arp_packet->arp_spa, &src_in_addr, IP_ADDR_LEN);
+	memcpy(arp_packet->arp_tpa, &dst_in_addr, IP_ADDR_LEN);
+    return arp_packet;
+}
+
+void arp_request(const char *dst_ip_addr, const unsigned char *dst_mac_addr)
+{
+    struct sockaddr_ll saddr_ll;
+    struct ether_header *eth_header;
+    struct ether_arp *arp_packet;
+    struct ifreq ifr;
+    char buf[ETHER_ARP_PACKET_LEN];
+    unsigned char src_mac_addr[ETH_ALEN];
+    char *src_ip_addr;
+    int sock_raw_fd, ret_len, i;
+
+    if ((sock_raw_fd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ARP))) == -1)
+        return;
+
+    bzero(&saddr_ll, sizeof(struct sockaddr_ll));
+    bzero(&ifr, sizeof(struct ifreq));
+    memcpy(ifr.ifr_name, ARP_IFNAME, strlen(ARP_IFNAME));
+
+    if (ioctl(sock_raw_fd, SIOCGIFINDEX, &ifr) == -1)
+        return;
+    saddr_ll.sll_ifindex = ifr.ifr_ifindex;
+    saddr_ll.sll_family = PF_PACKET;
+
+    if (ioctl(sock_raw_fd, SIOCGIFADDR, &ifr) == -1)
+        return;
+    src_ip_addr = inet_ntoa(((struct sockaddr_in *)&(ifr.ifr_addr))->sin_addr);
+
+    if (ioctl(sock_raw_fd, SIOCGIFHWADDR, &ifr))
+		return;
+    memcpy(src_mac_addr, ifr.ifr_hwaddr.sa_data, ETH_ALEN);
+
+    bzero(buf, ETHER_ARP_PACKET_LEN);
+    eth_header = (struct ether_header *)buf;
+    memcpy(eth_header->ether_shost, src_mac_addr, ETH_ALEN);
+    memcpy(eth_header->ether_dhost, dst_mac_addr, ETH_ALEN);
+    eth_header->ether_type = htons(ETHERTYPE_ARP);
+    arp_packet = fill_arp_packet(src_mac_addr, src_ip_addr, dst_mac_addr, dst_ip_addr);
+    memcpy(buf + ETHER_HEADER_LEN, arp_packet, ETHER_ARP_LEN);
+
+    ret_len = sendto(sock_raw_fd, buf, ETHER_ARP_PACKET_LEN, 0, (struct sockaddr *)&saddr_ll, sizeof(struct sockaddr_ll));
+    if ( ret_len < 0)
+        DEBUGP("sendto() error!\n");
+
+    close(sock_raw_fd);
+}
+
+void scan_arp_table(void)
 {
 	int i;
-	int count = 0, sum = 0;
+	int count = 0;
 	struct itimerval tv;
 	struct arpmsg *req;
 	struct arp_struct *u;
 	char *ipaddr;
+	char ipaddr_t[32];
 	char buffer[512];
 	struct in_addr addr;
 	FILE *fp;
 	pid_t pid;
-
+	unsigned char br_addr[ETH_ALEN] = BROADCAST_ADDR;
+	
 	pid = fork();
 	if(pid < 0)
 		DEBUGP("[%s][%d]error in fork!\n", __FILE__, __LINE__);
 	else if(pid == 0) {
-	while (count != 2) {
+	while (count != 3) {
 		count++;
 		req = &arpreq;
 		for (i = 0; i < (NEIGH_HASHMASK + 1); i++) {
 			for (u = arp_tbl[i]; u; u = u->next) {
-				memcpy(req->ar_tip, &u->ip, 4);
-				sendto(sock, req, sizeof(struct arpmsg), 0, me, sizeof(struct sockaddr));
-				sum++;
-				if(sum == 128) {
-					usleep(500000);
-					sum = 0;
-				}
+				strcpy(ipaddr_t, inet_ntoa(u->ip));
+				arp_request(ipaddr_t, u->mac);
 			}
 		}
 		/**
@@ -1167,25 +1186,19 @@ void scan_arp_table(int sock, struct sockaddr *me)
 						if (u) break;
 					}
 					if (u) continue;
-					memcpy(req->ar_tip, &addr, 4);
-					sendto(sock, req, sizeof(struct arpmsg), 0, me, sizeof(struct sockaddr));
-					sum++;
-					if(sum == 128) {
-						usleep(500000);
-						sum = 0;
-					}
+					arp_request(ipaddr_t, u->mac);
 				}
 			}
 			fclose(fp);
 		}
-	//	if(count < 3)
-	//		usleep(500000);
+		if(count < 3)
+			usleep(500000);
+		_exit(0);
 	}
-		 _exit(0);
 	}
 	
 	/* show the result after 3s */
-	tv.it_value.tv_sec = 3;
+	tv.it_value.tv_sec = 1;
 	tv.it_value.tv_usec = 0;
 	tv.it_interval.tv_sec = 0;
 	tv.it_interval.tv_usec = 0;

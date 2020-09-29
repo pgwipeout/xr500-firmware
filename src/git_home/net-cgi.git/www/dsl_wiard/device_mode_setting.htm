@@ -65,11 +65,11 @@ function check_devmode(cf)
 
 function load_adv_menu()
 {
-	top.device_mode = dev_mode;
-	top.menu_class_default();
+	getTop(window).device_mode = dev_mode;
+	getTop(window).menu_class_default();
 	if(dev_mode == "0" && dev_mode_change == "1"){//afert apply dev_mode=0, the advanced_sub items still grey, but it should be black.
-		top.open_or_close_sub("advanced");
-		top.open_or_close_sub("advanced");
+		getTop(window).open_or_close_sub("advanced");
+		getTop(window).open_or_close_sub("advanced");
 	}
 }
 </script>

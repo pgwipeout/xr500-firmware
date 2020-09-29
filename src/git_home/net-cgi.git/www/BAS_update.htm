@@ -1,7 +1,8 @@
 <HTML>
 <HEAD>
 <META http-equiv="content-type" content='text/html; charset=UTF-8'>
-<LINK rel="stylesheet" type="text/css" href="style/formframe_wait.css">
+<LINK rel="stylesheet" type="text/css" href="/style/formframe_wait.css">
+<script language=javascript type=text/javascript src=/funcs.js></script>
 </HEAD>
 <BODY bgcolor=#000>
 <% refresh_timestamp("l2tp","ether", "pppoe", "pptp") %>
@@ -24,7 +25,7 @@ xmlhttp.onreadystatechange = function()
 	{
 		var result = xmlhttp.responseText;
 		if ( result == 1 ) {
-			if(top.dsl_enable_flag == 0)
+			if(getTop(window).dsl_enable_flag == 0)
 				location.href='BAS_basic.htm';
 			else
 				location.href='BAS_basic_dsl.htm';

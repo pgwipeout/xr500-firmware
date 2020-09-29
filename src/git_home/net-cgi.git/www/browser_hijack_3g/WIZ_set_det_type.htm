@@ -5,6 +5,8 @@
 <head>
 <% hijack_title() %>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script language="javascript" type="text/javascript" src="script/brs_hijack.js"></script>
+
 </head>
 
 <body>
@@ -17,20 +19,20 @@ var det_wan_type="<% cfg_get("dango_det_wan_type") %>";
 var cf= document.forms[0];
 if(det_wan_type == "AutoDetc")
 {
-	if( top.is_ru_version == 1)
+	if( getTop(window).is_ru_version == 1)
 		this.location.href="RU_check_wan_port.html";
 	else
 		cf.submit();
 }
 else if (det_wan_type == "failover")
 {
-	top.multi_wan_mode="multi";
+	getTop(window).multi_wan_mode="multi";
 	this.location.href="WIZ_failover_01.htm";
 }
 else
 {
 	cf.action="/apply.cgi?/config_3g_wait_page.htm timestamp="+ts;
-	if(top.have_lte_flag=="1")
+	if(getTop(window).have_lte_flag=="1")
 		cf.submit_flag.value="wizard_lte_detwan";
 	else
 		cf.submit_flag.value="wizard_3g_detwan";

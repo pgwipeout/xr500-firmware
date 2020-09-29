@@ -5,6 +5,8 @@
 <% hijack_title() %>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="style/hijack_style.css" />
+<script language="javascript" type="text/javascript" src="script/brs_hijack.js"></script>
+
 <% hijack_language() %>
 <script language="javascript" type="text/javascript">
 <% ap_autodetection() %>
@@ -12,7 +14,7 @@ var internet_type="";
 var delay_time=1000;
 var n=0;
 var port_status = "<% cat_file("/tmp/port_status") %>";
-var wanport=top.wan_port;
+var wanport=getTop(window).wan_port;
 function loadvalue()
 {
         setTimeout("check_internet_type()",delay_time);
@@ -20,7 +22,7 @@ function loadvalue()
 
 function check_internet_type()
 {
-	if(port_status == "0" && top.wan_port == 0)
+	if(port_status == "0" && getTop(window).wan_port == 0)
 	{	
 		this.location.href = "BRS_00_01_noWan.html";
 	}
@@ -33,7 +35,7 @@ function check_internet_type()
 		}
 		else if(internet_type == "1")
 		{
-			if(top.dsl_enable_flag == "1")
+			if(getTop(window).dsl_enable_flag == "1")
 				location.href="BRS_01_checkNet_ideth_ping.html";
 			else
 				location.href="BRS_01_checkNet_ping.html";
@@ -44,7 +46,7 @@ function check_internet_type()
 	}
 	else
 	{
-			if(top.dsl_enable_flag == "1")
+			if(getTop(window).dsl_enable_flag == "1")
 				location.href="BRS_01_checkNet_ideth_ping.html";
 			else
 				location.href="BRS_01_checkNet_ping.html";

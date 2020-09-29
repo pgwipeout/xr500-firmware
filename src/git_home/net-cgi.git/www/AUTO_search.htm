@@ -25,18 +25,18 @@ function detec_status()
 	if (wan_status == 1)
 	{
 		if( is_in_cd_less)
-			status = top.content_frame.auto_search_frame.status;
+			status = getTop(window).content_frame.auto_search_frame.status;
 		else
-			status = top.formframe.auto_search_frame.status;
+			status = getTop(window).formframe.auto_search_frame.status;
 		if (status == 9999)
 		{
 			location.href="UPG_check_version.htm";
-			top.topframe.location.href="top.html";	
+			getTop(window).topframe.location.href="top.html";	
 		}
 		else if (status >= 10000)
 		{
 			location.href="AUTO_upgrade_noversion.htm";
-			top.topframe.location.href="top.html";
+			getTop(window).topframe.location.href="top.html";
 		}
 		else
 		{

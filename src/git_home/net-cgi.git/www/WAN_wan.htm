@@ -29,7 +29,7 @@ var nat_fitering='<% cfg_get("wan_nat_fitering") %>';
 var vpn_enable = '<% cfg_get("vpn_enable") %>';
 
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 var show_vpn = (parent.vpn_show_flag == 1 && ( parent.is_pr_version == 1 || parent.is_ru_version == 1 )) ? 1 : 0;
 
 var enable_ipsec = '<% cfg_get("wan_enable_ipsec") %>';
@@ -41,9 +41,9 @@ var ppp_login_type="<% cfg_get("internet_ppp_type") %>";
 var lan_ip="<% cfg_get("lan_ipaddr") %>";
 var lan_mask="<% cfg_get("lan_netmask") %>";
 var endis_sipalg="<% cfg_get("wan_endis_sipalg") %>";
-var have_igmp= (top.igmp_flag == 1)?1:0;
+var have_igmp= (getTop(window).igmp_flag == 1)?1:0;
 var endis_igmp="<% cfg_get("wan_endis_igmp") %>";
-var have_bt_igmp= (top.bt_igmp_flag == 1)?1:0;
+var have_bt_igmp= (getTop(window).bt_igmp_flag == 1)?1:0;
 var endis_bt_igmp="<% cfg_get("enable_bt_igmp") %>";
 var bri_lan_tag1="<% cfg_get("wan_bri_lan1") %>";//bug 24622:add a new function "IPTV Port Support"
 var bri_lan_tag2="<% cfg_get("wan_bri_lan2") %>";
@@ -53,7 +53,7 @@ var brig_ssid_tag1="<% cfg_get("wan_brig_ssid1") %>";
 var brig_ssid_tag2="<% cfg_get("wan_brig_ssid2") %>";
 var brig_guest_ssid_tag1="<% cfg_get("wan_brig_guest_ssid1") %>";
 var brig_guest_ssid_tag2="<% cfg_get("wan_brig_guest_ssid2") %>";
-var have_bridge_iptv=( top.bridge_iptv_flag == 1 &&((gui_region == "Russian") && (netgear_region == "" || netgear_region.toUpperCase() == "WW") || netgear_region.toUpperCase() == "RU")) ? 1 : 0;
+var have_bridge_iptv=( getTop(window).bridge_iptv_flag == 1 &&((gui_region == "Russian") && (netgear_region == "" || netgear_region.toUpperCase() == "WW") || netgear_region.toUpperCase() == "RU")) ? 1 : 0;
 var old_endis_ssid_broadcast='<% cfg_get("endis_ssid_broadcast") %>';
 var old_wla_endis_ssid_broadcast='<% cfg_get("wla_endis_ssid_broadcast") %>';
 var an_router_flag = parent.an_router_flag;
@@ -82,7 +82,7 @@ function loadvalue()
 
 	change_web_format();
     
-	if(top.dsl_enable_flag == 1){
+	if(getTop(window).dsl_enable_flag == 1){
 	    if(have_ethernet_wan_flag != "0"){
 		document.getElementById("wan_select").style.display="";
 		document.getElementById("wan_line").style.display="";
@@ -301,11 +301,11 @@ $bluebar
         <td nowrap colspan=2>
 <script>
 	if(have_bt_igmp == 1)
-		document.write('<input type="checkbox" name="disable_igmp" id="disable_igmp" onClick="change_bt_igmp_status();"><label for="disable_igmp"></label>');
+		document.write('<input type="checkbox" name="disable_igmp" id="disable_igmp" onClick="change_bt_igmp_status();"><label for="disable_igmp">');
 	else
-		document.write('<input type="checkbox" name="disable_igmp" id="disable_igmp"><label for="disable_igmp"></label>');
+		document.write('<input type="checkbox" name="disable_igmp" id="disable_igmp"><label for="disable_igmp">');
 </script>
-       <b>$disable_igmp_proxying</b>
+       <b>$disable_igmp_proxying</b></label>
         </td>
 </tr>
 <tr id="show_bt_igmp" style="display:none;">

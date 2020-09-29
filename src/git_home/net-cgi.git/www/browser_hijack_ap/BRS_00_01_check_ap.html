@@ -5,6 +5,7 @@
 <% hijack_title() %>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="style/hijack_style.css" />
+<script language="javascript" type="text/javascript" src="script/brs_hijack.js"></script>
 <% hijack_language() %>
 <script language="javascript" type="text/javascript">
 <% start_netscan() %>
@@ -13,7 +14,7 @@ var internet_type="";
 var delay_time=1000;
 var n=0;
 var port_status = "<% cat_file("/tmp/port_status") %>";
-var wanport=top.wan_port;
+var wanport=getTop(window).wan_port;
 function loadvalue()
 {
         setTimeout("check_internet_type()",delay_time);
@@ -21,7 +22,7 @@ function loadvalue()
 
 function check_internet_type()
 {
-	if(port_status == "0" && top.wan_port == 0)
+	if(port_status == "0" && getTop(window).wan_port == 0)
 	{	
 		this.location.href = "BRS_00_01_noWan.html";
 	}

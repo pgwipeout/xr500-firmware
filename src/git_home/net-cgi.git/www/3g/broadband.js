@@ -26,7 +26,7 @@ function check_broadband()
 	cf = document.forms[0];
 	if(cf.adsl_3g[0].checked == true){
 		cf.hidden_wan_type.value = "AutoDetc";
-		if(top.dsl_enable_flag == 0)
+		if(getTop(window).dsl_enable_flag == 0)
 		  cf.action="/apply.cgi?/BAS_basic.htm timestamp=" + ts;
 		else
 		  cf.action="/apply.cgi?/BAS_basici_dsl.htm timestamp=" + ts;

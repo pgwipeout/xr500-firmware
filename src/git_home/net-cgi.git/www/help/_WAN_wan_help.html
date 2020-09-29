@@ -2,9 +2,9 @@
 </head>
 <script language="javascript" type="text/javascript">
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
-var have_igmp_flag= (top.igmp_flag == 1)?1:0;
-var have_bridge_iptv_flag=( top.bridge_iptv_flag == 1 &&((gui_region == "Russian")&& (netgear_region == "" || netgear_region.toUpperCase() == "WW") || netgear_region.toUpperCase() == "RU")) ? 1 : 0;
+var netgear_region=getTop(window).netgear_region;
+var have_igmp_flag= (getTop(window).igmp_flag == 1)?1:0;
+var have_bridge_iptv_flag=( getTop(window).bridge_iptv_flag == 1 &&((gui_region == "Russian")&& (netgear_region == "" || netgear_region.toUpperCase() == "WW") || netgear_region.toUpperCase() == "RU")) ? 1 : 0;
 
 </script>
 <script language="javascript" type="text/javascript">
@@ -12,7 +12,7 @@ if( have_igmp_flag == 1 )
 	document.write("$h_WAN_wan_full_igmp");
 else
 	document.write("$h_WAN_wan");
-if( top.is_pr_version == 1 || top.is_ru_version == 1 )
+if( getTop(window).is_pr_version == 1 || getTop(window).is_ru_version == 1 )
 	document.write("$h_WAN_wan_vpn");
 if( have_bridge_iptv_flag == 1 )
 	document.write("$h_WAN_wan_iptv");

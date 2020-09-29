@@ -20,8 +20,8 @@ var wps_now_configured="<% cfg_get("wps_status") %>";
 var wps_an_now_configured="<% cfg_get("wla_wps_status") %>";
 function loadvalue()
 {
-	top.enable_action=1;
-	top.topframe.location.href="top.html";
+	getTop(window).enable_action=1;
+	getTop(window).topframe.location.href="top.html";
 }
 </script>
 </TABLE>

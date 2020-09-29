@@ -11,7 +11,7 @@
 <% hijack_language() %>
 <script language="javascript" type="text/javascript">
 ping_result = "<% hijack_apply_result("/tmp/ping_result") %>";
-if(top.dsl_enable_flag == 1)
+if(getTop(window).dsl_enable_flag == 1)
 {
 	ping_ip_result = "<% hijack_apply_ip_result("/tmp/ping_ip_result") %>";
 	ping_gate_result = "<% hijack_apply_ip_result("/tmp/ping_gateway_result") %>";

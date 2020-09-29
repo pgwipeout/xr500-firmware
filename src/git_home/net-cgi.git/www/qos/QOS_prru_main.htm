@@ -72,7 +72,7 @@ var endis_wla_wmm="<% cfg_get("endis_wla_wmm") %>";
 var qos_endis_on="<% cfg_get("qos_endis_on") %>";
 var qos_type="<% cfg_get("qos_type")%>";
 
-var ac_router_flag = top.ac_router_flag;
+var ac_router_flag = getTop(window).ac_router_flag;
 <% qos_items_xss() %>
 <% qos_dft_items() %>
 

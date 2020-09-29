@@ -41,7 +41,7 @@ var other_servicename="<% cfg_sed("wan_mulpppoe2_servicename") %>";
 var servicename="<% cfg_sed("wan_mulpppoe2_servicename") %>";
 var wanproto_type="mulpppoe1";
 var wan_mtu_now='<% wan_mtu() %>';
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 
 var old_wan_type="<% cfg_get("wan_proto") %>";
 var old_wan_ip="<% bas_multipppoe_ip("wan_mulpppoe1_wan_assign", "wan_mulpppoe1_ip") %>";
@@ -173,7 +173,7 @@ function show_idleout(form,time)
 
 function cilck_jump()
 {
-  if(top.dsl_enable_flag == 0)
+  if(getTop(window).dsl_enable_flag == 0)
     this.location.href="BAS_ether.htm";
   else
     this.location.href="BAS_ether_dsl.htm";

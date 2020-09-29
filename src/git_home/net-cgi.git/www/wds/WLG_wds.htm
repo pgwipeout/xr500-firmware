@@ -44,9 +44,9 @@ var wan_mac="<% wan_mac() %>";
 var an_router_flag = parent.an_router_flag;
 var rep_old_lanip="<% cfg_get("old_lan_ipaddr") %>";
 
-var wds_support_wpa = top.wds_support_wpa;
+var wds_support_wpa = getTop(window).wds_support_wpa;
 var gui_region="<% cfg_get("GUI_Region") %>"
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 var pr_flag = (( gui_region == "Chinese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "PR") ? 1 : 0
 var pr_wds_support_wpa=( wds_support_wpa == 1  && pr_flag == 1) ? 1 : 0;
 
@@ -96,8 +96,8 @@ function loadvalue()
 {
 	var cf=document.forms[0];
 
-	top.enabled_wds="<% wds_enable() %>";
-	top.enabled_wps="<% wps_menu() %>";
+	getTop(window).enabled_wds="<% wds_enable() %>";
+	getTop(window).enabled_wps="<% wps_menu() %>";
 
 	/* bug23114: after set wireless, the wps button in menu maybe need change to grey, so , refresh the menu color */
 	menu_color_change('wds');
@@ -372,7 +372,7 @@ $bluebar
        <input type="checkbox" name="wds_enable_an" value="1" onclick="click_endis_wds_a();wdsWaring();" id="wds_enable_an_111"><label for="wds_enable_an_111">
        <A tabindex=-1 href="javascript:loadhelp('_wds','en_repeat')"><B>
 	<script>
-		if(top.ac_router_flag == 1 )
+		if(getTop(window).ac_router_flag == 1 )
 			document.write("$wds_enable (5GHz 802.11a/n/ac)")
 		else
 			document.write("$wds_enable (5GHz a/n)")

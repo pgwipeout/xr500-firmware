@@ -1,18 +1,19 @@
 <% start_netscan() %>
 
 <% http_header("style/form.css") %>
-<BODY bgcolor=#ffffff onLoad="redirect_to();">
+<LINK rel="stylesheet" type="text/css" href="style/formframe_wait.css">
+<BODY bgcolor=#000 onLoad="redirect_to();">
 <script>
 function redirect_to()
 {
        setTimeout("location.href='WLG_acl_add.htm'",6000);
 }
 </script>
-<div  align="center">
-<BR><BR><B>$wizard_pls_wait</B><BR><BR>
-</div>
- <div class="waiting_img_div" align="center">
-    <img src="image/wait30.gif" alt="waiting" />
- </div>
+<div id="formframe_wait_div" >
+<div>$wizard_pls_wait
+<div class="loader">
+<svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+<circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+</svg></div></div></div>
 </BODY>
 </HTML>

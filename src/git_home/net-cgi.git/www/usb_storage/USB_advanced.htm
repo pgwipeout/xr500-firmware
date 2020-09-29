@@ -218,7 +218,7 @@ function loadvalue()
 		form.hidden_is_ftp.value="1";
 	
 	}
-	if(top.enable_bridge_flag == 1)
+	if(getTop(window).enable_bridge_flag == 1)
 	{
 		//form.enableHvia.checked = false;
 		form.enable_wan_http.disabled = true;
@@ -295,7 +295,7 @@ else
 		<TD><input type="checkbox" name="enable_http" id="enable_http"><label for="enable_http"></label></TD>
 		<TD nowrap >$http_mark</TD>
 		<script>
-			if( is_remote_login() == true && top.enable_ap_flag == 0 )
+			if( is_remote_login() == true && getTop(window).enable_ap_flag == 0 )
 				document.write("<TD>http://readyshare.routerlogin.net/shares</TD>");
 			else
 				document.write('<TD><a class="linktype" href="http://readyshare.routerlogin.net/shares" target="_blank">http://readyshare.routerlogin.net/shares</a></TD>'); 
@@ -341,7 +341,7 @@ if( is_ftp == 1 )
 	document.write("<TR class=even_line>");
 	document.write("<TD><input type='checkbox' name='enable_ftp' id='enable_ftp'><label for='enable_ftp'></label></TD>");
 	document.write("<TD nowrap >$ftp_mark</TD>");
-	if( is_remote_login() == true && top.enable_ap_flag == 0 )
+	if( is_remote_login() == true && getTop(window).enable_ap_flag == 0 )
 		document.write("<TD>ftp://readyshare.routerlogin.net/shares</TD>");
 	/* to fix bug 23277 */
 	else if(list_disk_num == 0 || not_shared_number == folder_number )
@@ -520,7 +520,7 @@ for( j=0; j<list_disk_num; j++){
 </TD></TR>
 <TR><TD colspan=2><img src=/liteblue.gif width=100%% height=12></TD></TR>
 <script>
-	if(top.readycloud_flag)
+	if(getTop(window).readycloud_flag)
 		document.write("<TR><TD colspan=2>$readycloud_note</TD></TR>");
 </script>
 <TR><TD colspan=2>&nbsp;</TD></TR>

@@ -60,7 +60,7 @@ var block_no_con_sta="<% cfg_get("block_no_connect_sta") %>";
 <% list_access_no_connect_devices() %>
 var have_connect=0;
 var an_router_flag = parent.an_router_flag;
-var show_edit_button = top.show_edit_button;
+var show_edit_button = getTop(window).show_edit_button;
 function show_allow_no_connect()
 {
 	var cf=document.forms[0];

@@ -21,7 +21,7 @@ function check_ipv6_pppoe(cf)
 	if(ipv6_save_common(cf)==false)
 		return false;
 
-	if(top.ipv6_dns_manual == 1)
+	if(getTop(window).ipv6_dns_manual == 1)
 	{
 		
 		if(cf.ipv6_same_info.checked == true)

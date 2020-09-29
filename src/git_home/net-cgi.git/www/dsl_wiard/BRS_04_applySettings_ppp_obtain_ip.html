@@ -15,7 +15,7 @@ ip_content = "<% obtain_ip() %>";
 count = 1;
 var debug="<% cfg_get("wizard_debug") %>";
 var tHttp;
-var apmode_flag = top.apmode_flag;
+var apmode_flag = getTop(window).apmode_flag;
 var ap_mode = "<% cfg_get("ap_mode") %>";
 if( apmode_flag == "1" && ap_mode == "1")
 {

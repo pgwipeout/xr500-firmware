@@ -60,7 +60,7 @@ function loadvalue()
 	cf.ipv6_system.value = "<% cfg_get("ipv6_autoConfig_userClass") %>";
 	cf.domainName.value = "<% cfg_get("ipv6_autoConfig_domainName") %>";
 
-	if(top.ipv6_dns_manual == 1)
+	if(getTop(window).ipv6_dns_manual == 1)
 	{
 		load_ipv6_dns(cf);
 	}

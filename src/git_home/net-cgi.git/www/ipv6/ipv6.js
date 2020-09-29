@@ -665,10 +665,10 @@ function abbr_ipv6(ip)
 function login_type_show(cf)
 {
 	var login_type_list = cf.login_type;
-	var ipv6_6rd_flag = top.ipv6_6rd_flag;
-	var ipv6_auto_detect = (typeof(top.ipv6_auto_detect) == "undefined") ? 1 : top.ipv6_auto_detect;
-	var ipv6_dhcp_flag = (typeof(top.ipv6_dhcp_flag) == "undefined") ? 1 : top.ipv6_dhcp_flag;
-	var ipv6_pppoe_flag = (typeof(top.ipv6_pppoe_flag) == "undefined") ? 1 : top.ipv6_pppoe_flag;
+	var ipv6_6rd_flag = getTop(window).ipv6_6rd_flag;
+	var ipv6_auto_detect = (typeof(getTop(window).ipv6_auto_detect) == "undefined") ? 1 : getTop(window).ipv6_auto_detect;
+	var ipv6_dhcp_flag = (typeof(getTop(window).ipv6_dhcp_flag) == "undefined") ? 1 : getTop(window).ipv6_dhcp_flag;
+	var ipv6_pppoe_flag = (typeof(getTop(window).ipv6_pppoe_flag) == "undefined") ? 1 : getTop(window).ipv6_pppoe_flag;
 	var ipv6_items = new Array("disabled", "$pppoe2_disable", "autoDetect", "$ipv6_auto_detect", "autoConfig", "$ipv6_auto_config", "6to4", "$ipv6_6to4_tunnel", "6rd", "6rd", "bridge", "$ipv6_pass_through", "fixed", "$ipv6_fixed", "dhcp", "$router_status_dhcp", "pppoe", "$basic_intserv_pppoe");
 	var len = 0;
 	

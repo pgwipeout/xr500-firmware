@@ -5,6 +5,7 @@
 <% hijack_title() %>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="style/hijack_style.css" />
+<script language="javascript" type="text/javascript" src="/script/brs_hijack.js"></script>
 <% hijack_language() %>
 <script language="javascript" type="text/javascript">
 <% set_wan_choose() %>
@@ -13,7 +14,7 @@ var delay_time=1000;
 var n=0;
 var port_status = "<% cat_file("/tmp/port_status") %>";
 var dsl_port_status = "<% cat_file("/tmp/DSL_status") %>";
-var wanport=top.wan_port;
+var wanport=getTop(window).wan_port;
 
 var debug = "<% cfg_get("wizard_debug") %>";
 function loadvalue()
@@ -29,7 +30,7 @@ function check_internet_type()
 		{	
 			this.location.href = "BRS_log01_dsl_cable_or_none.html";
 		}
-		else if(port_status == "0" && top.wan_port == 0)
+		else if(port_status == "0" && getTop(window).wan_port == 0)
 		{	// none all
 			this.location.href = "BRS_log01_dsl_cable_or_none.html";
 		}

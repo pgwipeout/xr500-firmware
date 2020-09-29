@@ -1,7 +1,7 @@
 //goto basic home page
 function goto_home_page()
 {
-	top.location.href="index.htm";
+	getTop(window).location.href="/";
 }
 
 //add window onload event
@@ -56,7 +56,7 @@ function addClass(element,value)
 
 function showFirmVersion(flag)
 {	
-	var iframe = top.document.getElementById("header_frame");
+	var iframe = getTop(window).document.getElementById("header_frame");
 
 	if(iframe)
 	{

@@ -50,7 +50,7 @@ function loadvalue()
 	cf.rsv_mac.value=each_info[1];
 }
 
-window.onunload = function leavepage(){if(apply_flag == 0) top.back_flag=1;};
+window.onunload = function leavepage(){if(apply_flag == 0) getTop(window).back_flag=1;};
 </script>
 <input type="hidden" name="reservation_ipaddr">
 <input type="hidden" name="duplicated_reservation">

@@ -24,9 +24,9 @@ else
 <% table_header() %>
 
 <script>
-var netgear_region=top.netgear_region;
-var host_name=top.host_name;
-var wds_support_wpa = top.wds_support_wpa;
+var netgear_region=getTop(window).netgear_region;
+var host_name=getTop(window).host_name;
+var wds_support_wpa = getTop(window).wds_support_wpa;
 var gui_region="<% cfg_get("GUI_Region") %>"
 //var pr_flag = (( gui_region == "Chinese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "PR") ? 1 : 0
 var pr_wds_support_wpa=( wds_support_wpa == 1  && pr_flag == 1) ? 1 : 0;
@@ -54,8 +54,8 @@ var an_router_flag = opener.parent.an_router_flag;
 //var an_router_flag = 1;
 var str_have_an="";
 
-var dfs_channel_router_flag = top.dfs_channel_router_flag;
-var dfs_channel2_router_flag = top.dfs_channel2_router_flag;/* bug 25665: DFS channel supported in canada,Europe and Austrilia */
+var dfs_channel_router_flag = getTop(window).dfs_channel_router_flag;
+var dfs_channel2_router_flag = getTop(window).dfs_channel2_router_flag;/* bug 25665: DFS channel supported in canada,Europe and Austrilia */
 var enable_ht160 = "<% cfg_get("wla_ht160") %>";
 <% show_bridge_wlan_variable() %>
 
@@ -645,8 +645,8 @@ function loadvalue()
 		opener.opener_apply_click = 0;
 		close_window();
 	}
-	top.enabled_wds="<% wds_enable() %>";
-	top.enabled_wps="<% wps_menu() %>";
+	getTop(window).enabled_wds="<% wds_enable() %>";
+	getTop(window).enabled_wps="<% wps_menu() %>";
 	var form=document.forms[0];	
 	wl_mode="<% cfg_get("bridge_band_choose") %>";
 	

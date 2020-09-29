@@ -18,7 +18,7 @@ function loadValue()
 
 	if(ping_result == "failed")	//failed
 	{ 
-		if( top.apmode_flag == "1" && ap_mode == "1" && top.ap_mode_detection_flag == "1" )
+		if( getTop(window).apmode_flag == "1" && ap_mode == "1" && getTop(window).ap_mode_detection_flag == "1" )
 			this.location.href="BRS_05_networkIssue.html";
 		else
 			this.location.href = "BRS_02_genieHelp.html";

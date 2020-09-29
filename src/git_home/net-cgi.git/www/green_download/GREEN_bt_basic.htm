@@ -88,7 +88,7 @@ function add_BT()
 	form = document.forms[1];
 	var filestr = form.mtenFWUpload.value;
 
-	var task_num_all = top.green_download_item_num;
+	var task_num_all = getTop(window).green_download_item_num;
 	if( task_num_all >= max_tasks_all )
 	{
 		alert("$greendl_common_alert_maxtask");
@@ -105,7 +105,7 @@ function add_BT()
 		return false;
 	}
 
-	top.download_type = this_download_type;
+	getTop(window).download_type = this_download_type;
 	return true;
 }
 function add_item()
@@ -113,7 +113,7 @@ function add_item()
 	form = document.forms[0];
 	var filestr = form.folder.value;
 
-	var task_num_all = top.green_download_item_num;
+	var task_num_all = getTop(window).green_download_item_num;
 	if( task_num_all >= max_tasks_all )
 	{
 		alert("$greendl_common_alert_maxtask");
@@ -154,7 +154,7 @@ function add_item()
 
 	form.usb_path.value = str;
 	//form.submit_flag.value = "add_usb_bt_download_item";
-	top.download_type = this_download_type;
+	getTop(window).download_type = this_download_type;
 
 	return true;
 }
@@ -164,7 +164,7 @@ function add_magnet()
 	form = document.forms[0];
 
 	var magnet_url = form.magnet_url.value;
-	var task_num_all = top.green_download_item_num;
+	var task_num_all = getTop(window).green_download_item_num;
 
 	if( task_num_all >= max_tasks_all )
 	{
@@ -183,7 +183,7 @@ function add_magnet()
 		return false;
 
 	form.submit_flag.value = "add_download_item";
-	top.download_type = this_download_type;
+	getTop(window).download_type = this_download_type;
 	return true;
 }
 

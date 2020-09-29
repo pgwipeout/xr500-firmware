@@ -11,7 +11,7 @@ var wan_factory_mac="<% cfg_get("wan_factory_mac"); %>";
 var wan_remote_mac="<% cfg_get("wan_remote_mac") %>";
 var bpa_get_this_mac="<% cfg_get("wan_bpa_this_mac") %>";
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 //add a new checkox 'Enable automatic Internet connection reset at'
 var bas_auto_conn_flag="<% cfg_get("bas_auto_conn_flag") %>";
 var bas_conn_time_num="<% cfg_get("bas_conn_time_num") %>";

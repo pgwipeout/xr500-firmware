@@ -38,12 +38,12 @@ function click_button(form, flag)
 {
 	if (flag == 1)
 	{
-		if(top.topframe && !top.hidden_upgrade) //if top.topframe exists and top.hidden_upgrade does not exit
-			top.topframe.location.href="top_nochange.html";
-		else if(top.topframe && top.hidden_upgrade)     //if top.hidden_upgrade exits, top is the hidden page CheckNewFirmware.htm
-			top.topframe.location.href="CheckNewFW_top.htm";
+		if(getTop(window).topframe && !getTop(window).hidden_upgrade) //if getTop(window).topframe exists and getTop(window).hidden_upgrade does not exit
+			getTop(window).topframe.location.href="top_nochange.html";
+		else if(getTop(window).topframe && getTop(window).hidden_upgrade)     //if getTop(window).hidden_upgrade exits, top is the hidden page CheckNewFirmware.htm
+			getTop(window).topframe.location.href="CheckNewFW_top.htm";
 
-		top.enable_action=0;
+		getTop(window).enable_action=0;
 	}
 
 	form.upgrade_yes_no.value = flag;
@@ -64,7 +64,7 @@ function click_button(form, flag)
 var ts="<% cfg_get("upload_firmware") %>"
 function return_to_upgrade_page()
 {
-	if(top.hidden_upgrade)  //if top.hidden_upgrade exits, top is CheckNewFirmware.htm
+	if(getTop(window).hidden_upgrade)  //if getTop(window).hidden_upgrade exits, top is CheckNewFirmware.htm
 		this.location.href = "CheckNewFW_upgrade.htm";
 	else
 		this.location.href = "UPG_upgrade.htm";

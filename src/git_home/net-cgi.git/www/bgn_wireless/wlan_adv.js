@@ -182,7 +182,7 @@ function checkadv(form)
 			}
 			else
 			{
-				top.enable_action=0;
+				getTop(window).enable_action=0;
 				form.wds_change_ip.value="to_repeatip";
 			}
 		}
@@ -193,7 +193,7 @@ function checkadv(form)
 	{
 		if ( old_wds_endis_fun == "1" &&  old_wds_repeater_basic == "0" )
 		{
-			top.enable_action=0;
+			getTop(window).enable_action=0;
 			form.wds_change_ip.value="to_lanip";
 		}
 		else

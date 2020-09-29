@@ -73,6 +73,11 @@ User application
         http://bridge.sourceforge.net/
         GPL
         Source Code
+[ca-certificates]
+        ca-certificates_20170717.tar.xz
+        https://packages.debian.org/sid/ca-certificates
+        GPL
+        Source Code
 [confuse]
         confuse-2.6.tar.gz
         http://www.nongnu.org/confuse/
@@ -284,7 +289,7 @@ User application
         GPL
         Source Code
 [jq]
-        jq-1.3.tar.gz
+        jq-1.5.tar.gz
         openwrt
         GPL
         Source Code

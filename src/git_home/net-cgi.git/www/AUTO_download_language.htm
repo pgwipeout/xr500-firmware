@@ -21,10 +21,10 @@ var percComplete = 0;
 
 if(wan_status == 0 || ftp_status == 0)
 {
-	if(top.topframe)
-		top.topframe.location.href="top.html";
-	//if(top.contents)
-	//	top.contents.location.href="<% menu_link() %>";
+	if(getTop(window).topframe)
+		getTop(window).topframe.location.href="top.html";
+	//if(getTop(window).contents)
+	//	getTop(window).contents.location.href="<% menu_link() %>";
 	document.location.href="AUTO_download_failure.htm";
 }
 
@@ -52,25 +52,25 @@ else if (status >= 1000 && status < 2000)
 }
 else if (status == 10008)
 {
-	if(top.topframe && !top.hidden_upgrade) //if top.topframe exists and top.hidden_upgrade does not exit
-		top.topframe.location.href="top.html";
-	else if(top.topframe && top.hidden_upgrade)     //if top.hidden_upgrade exits, top is the hidden page CheckNewFirmware.htm
-		top.topframe.location.href="CheckNewFW_top.htm";
+	if(getTop(window).topframe && !getTop(window).hidden_upgrade) //if getTop(window).topframe exists and getTop(window).hidden_upgrade does not exit
+		getTop(window).topframe.location.href="top.html";
+	else if(getTop(window).topframe && getTop(window).hidden_upgrade)     //if getTop(window).hidden_upgrade exits, top is the hidden page CheckNewFirmware.htm
+		getTop(window).topframe.location.href="CheckNewFW_top.htm";
 
-	top.enable_action=1;
+	getTop(window).enable_action=1;
 	document.location.href="AUTO_MD5_failure.htm";
 }
 else if (status >= 10000) 
 {
-	if(top.topframe && !top.hidden_upgrade) //if top.topframe exists and top.hidden_upgrade does not exit 
-		top.topframe.location.href="top.html";
-	else if(top.topframe && top.hidden_upgrade)     //if top.hidden_upgrade exits, top is the hidden page CheckNewFirmware.htm
+	if(getTop(window).topframe && !getTop(window).hidden_upgrade) //if getTop(window).topframe exists and getTop(window).hidden_upgrade does not exit 
+		getTop(window).topframe.location.href="top.html";
+	else if(getTop(window).topframe && getTop(window).hidden_upgrade)     //if getTop(window).hidden_upgrade exits, top is the hidden page CheckNewFirmware.htm
 	{
 		document.forms[0].action = "/func.cgi?/AUTO_start.htm timestamp="+ts;
-		top.topframe.location.href="CheckNewFW_top.htm";
+		getTop(window).topframe.location.href="CheckNewFW_top.htm";
 	}
 	
-	top.enable_action=1;
+	getTop(window).enable_action=1;
 	document.location.href="AUTO_download_failure.htm";
 }
 

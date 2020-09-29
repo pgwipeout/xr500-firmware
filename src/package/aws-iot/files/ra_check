@@ -40,12 +40,12 @@ rae_password="qwaszxerdfcvtyghbnuijkmo"
 
 https_download_file ()
 {
-	curl -s -k $1 -o $2
+	curl -s "$1" -o "$2"
 }
 
 trace_log ()
 {
-	echo -e "$@" >&2
+	echo "$@" >&2
 }
 
 check_process_conflict ()
@@ -61,11 +61,11 @@ check_process_conflict ()
 check_and_download_policy ()
 {
 	url="${host}/${path}/${module_name}/${policy_file}"
-	for i in $(seq 1 $count)
+	for i in $(seq 1 "$count")
 	do
 		if https_download_file "$url" "$tmp_policy_file"; then
-			new_policy_ver="$(jq '.raePolicyVersion' "$tmp_policy_file")"
-			loc_policy_ver="$(jq '.raePolicyVersion' "$local_policy_file")"
+			new_policy_ver="$(jq -r '.raePolicyVersion' "$tmp_policy_file")"
+			loc_policy_ver="$(jq -r '.raePolicyVersion' "$local_policy_file")"
 		
 			if [ "$new_policy_ver" != "$loc_policy_ver" ]; then
 				trace_log "New Policy file update from $loc_policy_ver to $new_policy_ver"
@@ -83,50 +83,34 @@ check_and_download_policy ()
 	return 1
 }
 
-# @1, @2 are all like as "A.B.C.D"
+# @1, @2 are all like as "A.B.C.D", where A,B,C,D is 0~999
 # @1 - new version
 # @2 - old version
 # return 0 (True) if @1 > @2, else return 1
 cmp_version_string ()
 {
-	new="$1"
-	old="$2"
-
-	[ -z "$new" ] && return 1
-	eval set "$(echo "$new"| sed -r 's/\./ /g')"
-	if [ $# -ne 4 ]; then
-		trace_log "Invalid version string: $new!"
+	if ! echo "$1" | grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}$'; then
+		trace_log "Invalid version string (arg 1): $1!"
 		return 1
-	else
-		nv1=$1
-		nv2=$2
-		nv3=$3
-		nv4=$4
 	fi
-
-	[ -z "$old" ] && return 0
-	eval set "$(echo "$old"| sed -r 's/\./ /g')"
-	if [ $# -ne 4 ]; then
-		trace_log "Invalid version string: $old!"
+	if test -z "$2"; then
+		trace_log "No old version string passed in, assume new version found!"
 		return 0
-	else
-		ov1=$1
-		ov2=$2
-		ov3=$3
-		ov4=$4
+	elif ! echo "$2" | grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}$'; then
+		trace_log "Invalid version string (arg 2): $2!"
+		return 1
 	fi
 
-	[ "$nv1" -gt "$ov1" ] && return 0
-	[ "$nv1" -eq "$ov1" ] && [ "$nv2" -gt "$ov2" ] && return 0
-	[ "$nv1" -eq "$ov1" ] && [ "$nv2" -eq "$ov2" ] && [ "$nv3" -gt "$ov3" ] && return 0
-	[ "$nv1" -eq "$ov1" ] && [ "$nv2" -eq "$ov2" ] && [ "$nv3" -eq "$ov3" ] && [ "$nv4" -gt "$ov4" ] && return 0
-	return 1
+	new="$(printf "%04d" $(echo "$1" | sed -r 's/\./ /g'))"
+	old="$(printf "%04d" $(echo "$2" | sed -r 's/\./ /g'))"
+
+	[ "${new:-0}" -gt "${old:-0}" ] && return 0 || return 1
 }
 
 check_fileinfo_and_download_rae ()
 {
 	url="${host}/${path}/${module_name}/${info_file}"
-	for i in $(seq 1 $count)
+	for i in $(seq 1 "$count")
 	do
 		if https_download_file "$url" "$tmp_info_file"; then
 			## contents of fileinfo.txt like as:
@@ -135,7 +119,7 @@ check_fileinfo_and_download_rae ()
 			#	size=<size of file>
 			eval "$(cat $tmp_info_file)"
 
-			version="$(echo $file|sed -nr 's/RAE_.*_V(.*)/\1/p')"
+			version="$(echo "$file"|sed -nr 's/RAE_.*_V(.*)/\1/p')"
 			if [ -z "$version" ]; then
 				trace_log "Incorrect Control file: $tmp_info_file!"
 			else
@@ -161,7 +145,7 @@ check_fileinfo_and_download_rae ()
 
 	if [ "$g_have_new_rae" -ne 0 ]; then
 		url="${host}/${path}/${module_name}/${g_rae_new_file}"
-		for i in $(seq 1 $count)
+		for i in $(seq 1 "$count")
 		do
 			if https_download_file "$url" "$tmp_rae_binary"; then
 				tmp_md5="$(md5sum "$tmp_rae_binary" | cut -d' ' -f1)"

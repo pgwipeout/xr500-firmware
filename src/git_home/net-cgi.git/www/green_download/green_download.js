@@ -74,11 +74,11 @@ function chg_max_task()
 	var i;
 	var choose=document.getElementById("max_tasks");
 
-	for(i=0; i<top.green_downloading_item_num; i++)
+	for(i=0; i<getTop(window).green_downloading_item_num; i++)
 	{
 		choose.options[i].disabled=true;
 	}
-	for(i=top.green_downloading_item_num; i<8; i++)
+	for(i=getTop(window).green_downloading_item_num; i<8; i++)
 	{
 		choose.options[i].disabled=false;
 	}

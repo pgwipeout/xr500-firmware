@@ -23,11 +23,6 @@ else
 <% table_header() %>
 
 <script>
-//var gui_region="<% cfg_get("GUI_Region") %>";
-/*var netgear_region="<% get_firmware_region() %>";
-if(netgear_region == "")
-	netgear_region = "WW";*/
-//var netgear_region=top.netgear_region;
 var country="<% cfg_get("wl_country") %>";
 var wla_channel="<% cfg_get("wla_channel") %>";
 var wps_progress_status="<% wps_process_status() %>";
@@ -167,19 +162,19 @@ function loadvalue()
 {
 	var form=document.forms[0];
 
-	top.enable_ap_flag="<% cfg_get("ap_mode") %>";
+	getTop(window).enable_ap_flag="<% cfg_get("ap_mode") %>";
 	//menu_color_change('wlap');
 	
-	top.enabled_wps="<% wps_menu() %>";
-	top.enabled_wds="<% wds_enable() %>";
-		//top.enabled_wds=1;  //ma de zhongyu
+	getTop(window).enabled_wps="<% wps_menu() %>";
+	getTop(window).enabled_wds="<% wds_enable() %>";
+		//getTop(window).enabled_wds=1;  //ma de zhongyu
 		
-		if( top.location.href.indexOf("adv_index.htm") != -1 )
+		if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
 					menu_color_change('wlap');
 		else //bug23925 in basic page: if the radio is Off, the wireless button will link to wladv page.
 		{
-			top.endis_wl_radio=old_endis_wl_radio;
-			top.endis_wla_radio=old_endis_wla_radio;
+			getTop(window).endis_wl_radio=old_endis_wl_radio;
+			getTop(window).endis_wla_radio=old_endis_wla_radio;
 			basic_menu_color_change('wireless');
 		} 
 		

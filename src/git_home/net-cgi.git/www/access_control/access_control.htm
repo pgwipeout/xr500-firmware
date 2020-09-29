@@ -5,13 +5,14 @@
 <META http-equiv="Refresh" content="6; url=AccessControl_show.htm">
 <META http-equiv="content-type" content='text/html; charset=UTF-8'>
 <LINK rel="stylesheet" type="text/css" href="style/formframe_wait.css">
+<script language="javascript" type="text/javascript" src="/funcs.js"></script>
 </HEAD>
 <BODY bgcolor=#000>
 <script>
-top.back_flag = 0;
-if(top.document.getElementById('security_sub').style.display=="none")
-	top.open_or_close_sub('security');
-	top.menu_color_change('access_control');
+getTop(window).back_flag = 0;
+if(getTop(window).document.getElementById('security_sub').style.display=="none")
+	getTop(window).open_or_close_sub('security');
+	getTop(window).menu_color_change('access_control');
 </script>
 <div id="formframe_wait_div" >
 <div>$wizard_pls_wait

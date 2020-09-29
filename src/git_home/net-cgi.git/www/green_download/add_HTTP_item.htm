@@ -48,7 +48,7 @@ function add_item()
 		alert("$greendl_filetp_alert_link");
 		return false;
 	}
-	var task_num_all = top.green_download_item_num;
+	var task_num_all = getTop(window).green_download_item_num;
 	if( task_num_all >= max_tasks_all )
 	{
 		alert("$greendl_common_alert_maxtask");

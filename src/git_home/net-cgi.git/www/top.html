@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<% http_header("style/top.css", "funcs.js", "top.js") %>
+<% http_header("/funcs.js", "style/top.css", "funcs.js", "top.js") %>
 <% top_body_header("lang_check.html", "select_language") %>
 
 <script>
@@ -11,8 +11,8 @@ var lang_select = "<% cfg_get("Language_Selection") %>";
 //var type = parent.type;
 var dis_lang_crl = "<% cfg_get("Enable_GUIStringTable") %>";
 var jp_multiPPPoE = "<% cfg_get("jp_multiPPPoE") %>";
-var netgear_region=top.netgear_region;
-var wds_support_wpa=top.wds_support_wpa;
+var netgear_region=getTop(window).netgear_region;
+var wds_support_wpa=getTop(window).wds_support_wpa;
 var security_mode="<% cfg_get("wl_sectype") %>";
 var security_mode_a="<% cfg_get("wla_sectype") %>";
 var old_wds_endis_fun="<% cfg_get("wds_endis_fun") %>";
@@ -58,7 +58,7 @@ function loadvalue()
 			if(bgn_pr_wds_support_wpa == 1 || an_pr_wds_support_wpa == 1 )
 				return;
 			var form = document.forms[0];
-			top.auto_change_lang = 1;
+			getTop(window).auto_change_lang = 1;
 	                form.language.disabled=true;
         	        form.hidden_lang_avi.value=form.language.value;
                 	form.target="formframe";
@@ -76,7 +76,7 @@ window.onresize = function(){
 
 <input type=hidden name=hidden_lang_avi>
 <div id="logo"></div>
-<div id="logout" class="logout_bt" onclick='top.location.href="LGO_logout.htm";'><b>$logout_head</b></div>
+<div id="logout" class="logout_bt" onclick='getTop(window).location.href="LGO_logout.htm";'><b>$logout_head</b></div>
 <% top_hardware_version() %>
 <div id="labels">
 	<div id="basic_lab" class="label_unclick" onclick="goto_top('index.htm');">

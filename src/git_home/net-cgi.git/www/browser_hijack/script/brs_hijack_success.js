@@ -1,6 +1,6 @@
 function initPage()
 {
-	if((top.have_broadband == "1" || top.have_lte_flag == "1")&& top.multi_wan_mode == "multi" && top.multi_wan_mode_ether == "0")
+	if((getTop(window).have_broadband == "1" || getTop(window).have_lte_flag == "1")&& getTop(window).multi_wan_mode == "multi" && getTop(window).multi_wan_mode_ether == "0")
 		loadValue();
 	else
 	{
@@ -23,17 +23,17 @@ function initPage()
 
 function loadValue()
 {
-	if(top.multi_wan_mode == "multi")
+	if(getTop(window).multi_wan_mode == "multi")
 	{
 		//firstly configure ethernet, then 3g/4g
-		if(top.multi_wan_mode_ether == "0")
+		if(getTop(window).multi_wan_mode_ether == "0")
 		{
-			top.multi_wan_mode_ether="1";
+			getTop(window).multi_wan_mode_ether="1";
 			this.location.href="WIZ_failover_01.htm";
 		}
-		/*else if(top.multi_wan_mode_mobile == "0")
+		/*else if(getTop(window).multi_wan_mode_mobile == "0")
 		{
-			top.multi_wan_mode_mobile="1";
+			getTop(window).multi_wan_mode_mobile="1";
 			this.location.href="WIZ_failover_01.htm";
 		}*/
 	}
@@ -138,7 +138,7 @@ function initBtnsAction()
 	var btns_div1 = document.getElementById("btnsContainer_div1");
 	if ( btns_div1 )
 	{
-		if( top.is_ru_version == 0 )
+		if( getTop(window).is_ru_version == 0 )
 		{
 			btns_div1.style.display="none";
 		}

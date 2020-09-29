@@ -9,7 +9,7 @@ var internet_type="<% cfg_get("internet_type") %>";
 var internet_ppp_type="<% cfg_get("internet_ppp_type") %>";
 var wan_status="<% detwan_valid() %>";
 var gui_region='<% cfg_get("GUI_Region") %>';
-var have_wifi_flag = (typeof(top.have_wifi_flag) == "undefined")? 1 : top.have_wifi_flag;
+var have_wifi_flag = (typeof(getTop(window).have_wifi_flag) == "undefined")? 1 : getTop(window).have_wifi_flag;
 
 function loadvalue()
 {
@@ -68,7 +68,7 @@ function setTableHeight()
 function click_direct(str1,str2)
 {
    var sub_name= str1+"_sub";
-    if(top.document.getElementById(sub_name).style.display == "none")
+    if(getTop(window).document.getElementById(sub_name).style.display == "none")
 	parent.open_or_close_sub(str1);
 	
 	parent.click_adv_action(str2);
@@ -83,7 +83,7 @@ function click_status()
 }
 
 if(isIE()){
-	var frame_div = top.document.getElementById("formframe_div");
+	var frame_div = getTop(window).document.getElementById("formframe_div");
 	frame_div.onresize =  function(){
 		IE_RST_status();
 	}

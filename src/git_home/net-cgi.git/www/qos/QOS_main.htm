@@ -31,7 +31,7 @@ var qos_endis_bandwidth="<% cfg_get("qos_threshold") %>";
 var tcbw_unit="<% cfg_get("qos_width") %>";
 var tcbw_value="<% cfg_get("qos_uprate") %>";
 
-var ac_router_flag=top.ac_router_flag;
+var ac_router_flag=getTop(window).ac_router_flag;
 
 var max_bandwidth = parent.max_bandwidth;
 var an_router_flag = parent.an_router_flag;

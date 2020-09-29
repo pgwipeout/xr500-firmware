@@ -25,14 +25,14 @@ var ether_get_gateway="<% bas_ether_gateway() %>";
 var vpn_enable = "<% cfg_get("vpn_enable") %>";
 var gui_region="<% cfg_get("GUI_Region") %>";
 var vpn_flag="<% cfg_get("vpn_detect_ip_change_flag")%>";
-var netgear_region=(top.netgear_region == "") ? "WW" : top.netgear_region;
-var dns_third_flag=top.dns_third_flag;
+var netgear_region=(getTop(window).netgear_region == "") ? "WW" : getTop(window).netgear_region;
+var dns_third_flag=getTop(window).dns_third_flag;
 var wanproto_type="dhcp";
 var wan_mtu_now='<% wan_mtu() %>';
 if (ether_get_this_mac == "")
 	ether_get_this_mac="<% wan_mac() %>";
 var jp_multiPPPoE="<% cfg_get("jp_multiPPPoE") %>";
-var have_l2tp = (top.l2tp_flag == 1) ? 1 : 0;
+var have_l2tp = (getTop(window).l2tp_flag == 1) ? 1 : 0;
 var wan_pvc_num = "<% cfg_get("wan_pvc_num") %>";
 var true_country = "<% cfg_get("dsl_wan_country") %>";
 var true_isp = "<% cfg_get("dsl_wan_isp") %>";
@@ -40,7 +40,7 @@ var fermode = "<% cfg_get("dsl_wan_type") %>";
 var bridge_mode_select = "<% cfg_get("dsl_wan2_bridge_mode") %>";
 var lan_selecte="<% cfg_get("iptv_mask") %>";
 var lan1_selecte=lan_selecte & 1;
-var lan_ports_num = (typeof(top.lan_ports_num) == "undefined") ? 4 : top.lan_ports_num;
+var lan_ports_num = (typeof(getTop(window).lan_ports_num) == "undefined") ? 4 : getTop(window).lan_ports_num;
 var ISP_ALL = 
     new Array (
 	new Array ("Adam","Adam","Clubtelco","Clubtelco","Dodo","Dodo","Exetel","Exetel","iiNet","iiNet","Internode","Internode","Optus","Optus","People Telcom","People Telcom","Primus","Primus","Soul","Soul","Telstra","Telstra","Telstra Bigpond","Telstra Bigpond","TPG","TPG","TransACT","TransACT","Westnet","Westnet","Internode","Internode","Engin","Engin","Other","$dsl_other"),

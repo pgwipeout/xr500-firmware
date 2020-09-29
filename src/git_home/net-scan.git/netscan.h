@@ -22,6 +22,12 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#define ETHER_HEADER_LEN sizeof(struct ether_header)
+#define ETHER_ARP_LEN sizeof(struct ether_arp)
+#define ETHER_ARP_PACKET_LEN ETHER_HEADER_LEN + ETHER_ARP_LEN
+#define IP_ADDR_LEN 4
+#define BROADCAST_ADDR {0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
 #define ARP_IFNAME	"br0"
 #define ARP_FILE	"/tmp/netscan/attach_device"
 #define DHCP_LIST_FILE	"/tmp/dhcpd_hostlist"
@@ -100,9 +106,9 @@ extern void update_bios_name(uint8 *mac, char *host, struct in_addr ip);
 extern void send_bios_query(int sock, struct in_addr dst_ip);
 
 extern void reset_arp_table();
-extern void scan_arp_table(int sock, struct sockaddr *me);
+extern void scan_arp_table(void);
 extern void show_arp_table(void);
-
+extern void arp_request(const char *dst_ip_addr, const unsigned char *dst_mac_addr);
 extern char *config_get(char *name);
 
 #endif

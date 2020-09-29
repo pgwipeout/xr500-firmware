@@ -19,16 +19,16 @@ function clickRetry()
         if( hijack_process == "1" )
         {
                 if( location.href.indexOf("routerlogin.com") == -1 )
-                        setTimeout("top.location.href='http://routerlogin.com/BRS_retry.htm';", 30000);
+                        setTimeout("getTop(window).location.href='http://routerlogin.com/BRS_retry.htm';", 30000);
                 else
-                        setTimeout("top.location.href='http://routerlogin.net/BRS_retry.htm';", 30000);
+                        setTimeout("getTop(window).location.href='http://routerlogin.net/BRS_retry.htm';", 30000);
         }
         else
         {
                 if( location.href.indexOf("routerlogin.com") == -1 )
-                        setTimeout("top.location.href='http://routerlogin.com/adv_index.htm';", 30000);
+                        setTimeout("getTop(window).location.href='http://routerlogin.com/adv_index.htm';", 30000);
                 else
-                        setTimeout("top.location.href='http://routerlogin.net/adv_index.htm';", 30000);
+                        setTimeout("getTop(window).location.href='http://routerlogin.net/adv_index.htm';", 30000);
         }
 
 	return true;

@@ -2,7 +2,7 @@
 </head>
 <script language="javascript" type="text/javascript">
 var guest_router_flag=parent.guest_router_flag;
-var adv_coexistence_flag = top.adv_coexistence_flag;
+var adv_coexistence_flag = getTop(window).adv_coexistence_flag;
 </script>
 $h_wladv
 <script language="javascript" type="text/javascript">
@@ -24,10 +24,10 @@ $h_wladv
 
 		document.write("$h_wladv_beamforming");
 
-		if(top.mu_mimo_flag == 1)
+		if(getTop(window).mu_mimo_flag == 1)
 			document.write("$h_wladv_mimo");
 		
-		if(top.support_ht160_flag == 1)
+		if(getTop(window).support_ht160_flag == 1)
 			document.write("$h_wladv_ht160");
 </script>
 </body>

@@ -4,7 +4,7 @@ XR500
 
 2) List the version number of the firmware/software that correlates with the open source code archive.
 
-XR500-V2.0.0.28
+XR500-V2.1.0.4
 
 7) List the main HW platform utilized such as CPU, main chipset, RF chipset, DSP, Switch IC¡­etc.
 
@@ -52,6 +52,8 @@ bridge-mode, 1, DNI, Yes
 
 blockman, g594cecb, Atheros, Yes
 
+ca-certificates, 20170717, GPL, No
+
 curl, 7.29.0, GPL, No
 
 customer-keys, 1-netgear-xr500, Atheros, Yes
@@ -85,6 +87,8 @@ expat, 2.0.1, GPL No
 ez-ipupdate, 3.0.10, GPL, Yes
 
 fast-classifier,1, Dual BSD/GPL, Yes
+
+jq, 1.5, BSD, Yes
 
 hotplug2, 201, GPL, No
 

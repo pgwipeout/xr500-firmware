@@ -22,7 +22,7 @@ var wan2_bridge="<% cfg_get("dsl_wan2_bridge_mode") %>";
 var lan_selecte="<% cfg_get("iptv_mask") %>";
 var name ="";
 var lan1_selecte=lan_selecte & 1;
-var lan_ports_num = (typeof(top.lan_ports_num) == "undefined") ? 4 : top.lan_ports_num;
+var lan_ports_num = (typeof(getTop(window).lan_ports_num) == "undefined") ? 4 : getTop(window).lan_ports_num;
 addLoadEvent(initPage);
 function initPage()
 {

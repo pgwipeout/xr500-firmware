@@ -18,7 +18,7 @@ function formSubmit()
 {
 	var forms = document.getElementsByTagName("form");
 	var cf = forms[0];
-	if(top.dsl_enable_flag == "1")
+	if(getTop(window).dsl_enable_flag == "1")
 		this.location.href = "BRS_dsl_type_detc.html";
 	else
 		cf.submit();

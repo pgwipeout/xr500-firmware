@@ -2,6 +2,7 @@
 <LINK rel="stylesheet" type="text/css" href="style/hijack_style.css">
 <TITLE>NETGEAR Router WNDR3700 </TITLE><META http-equiv=content-type content='text/html; charset=UTF-8'>
 <META content="MSHTML 6.00.2800.1141" name=GENERATOR>
+<script language=javascript type=text/javascript src=/funcs.js></script>
 <style>
 H1 {
 	FONT-WEIGHT: bold; FONT-SIZE: 16px; COLOR: white; FONT-FAMILY: Arial, Helvetica, Geneva, Swiss, SunSans-Regular, sans-serif
@@ -87,9 +88,9 @@ function show_wait()
 if (restore_status == "2" )
 {
 	show_error();
-	top.enable_action=1;
+	getTop(window).enable_action=1;
 
-        top.topframe.location.href="top.html";	
+        getTop(window).topframe.location.href="top.html";	
 
 	setTimeout("goback()",3000);
 }

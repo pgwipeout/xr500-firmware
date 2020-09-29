@@ -37,11 +37,11 @@ function initPage()
 
 function goBack()
 {
-	if(top.dsl_enable_flag == "0")
+	if(getTop(window).dsl_enable_flag == "0")
 		this.location.href = "BRS_02_genieHelp.html";
 	else	
 	{
-		if(top.location.href.indexOf("BRS_index.htm") > -1)
+		if(getTop(window).location.href.indexOf("BRS_index.htm") > -1)
 			this.location.href = "BRS_ISP_country_help.html";
 		else
 			this.location.href = "DSL_WIZ_sel.htm";

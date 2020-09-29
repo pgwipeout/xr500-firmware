@@ -6,7 +6,7 @@
 <script>
 var lan_ip="<% cfg_get("lan_ipaddr") %>";
 var lan_subnet="<% cfg_get("lan_netmask") %>";
-var russian_pppoe_flag=top.russian_pppoe_flag;
+var russian_pppoe_flag=getTop(window).russian_pppoe_flag;
 var gui_region = "<% cfg_get("GUI_Region") %>";
 function loadvalue()
 {

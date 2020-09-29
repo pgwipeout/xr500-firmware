@@ -62,7 +62,7 @@ var old_endis_wildcards="<% cfg_get("endis_wildcards") %>";
 var ddns_oray_router_flag=parent.ddns_oray_router_flag;
 var ddns_3322_router_flag=parent.ddns_3322_router_flag;
 var gui_region="<% cfg_get("GUI_Region") %>"
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 var ddns_wildcards_flag=parent.ddns_wildcards_flag;
 var pr_flag = (( gui_region == "Chinese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "PR") ? 1 : 0
 var pr_oray_flag=( ddns_oray_router_flag == 1  && pr_flag == 1) ? 1 : 0;
@@ -195,7 +195,7 @@ function changemode()
            		 cf.sysDNSPassword.value = old_sysDNSPassword_2;
         	if( password_click ==1 )
             		cf.sysDNSPassword.type = "password";
-		if(top.is_ru_version == 1)
+		if(getTop(window).is_ru_version == 1)
 			show_status.className="common_key_gray_bt";
 		else
 			show_status.className="common_gray_bt"; //37036
@@ -207,7 +207,7 @@ function changemode()
 		cf.sysDNSHost.disabled = false;
 		username.maxLength = 64;
 		passwd.maxLength = 64;
-		if(top.is_ru_version == 1)
+		if(getTop(window).is_ru_version == 1)
 			show_status.className="common_key_bt";
 		else
 			show_status.className="common_bt";

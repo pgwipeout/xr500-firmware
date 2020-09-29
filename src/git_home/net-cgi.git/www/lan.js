@@ -343,7 +343,7 @@ function checklan(form)
 		}
 		form.change_ip_flag.value=1;
 		top_left_nolink();
-		top.enable_action=0;
+		getTop(window).enable_action=0;
 	}
 	//To fix bug 32125.Either lan ip is changed or not ,it should check whether subnet is changed
 	if(isSameIp(old_lanmask,form.lan_subnet.value)==false)
@@ -366,8 +366,8 @@ function checklan(form)
 		form.dhcp_pool_tag.value = 1;
 	if( change_count > 0)
 		alert("$change_ip_manually1");
-	alert("Your devices will get disconnected for a while to get a new IP address.");
-//	alert("$lan_disconnect_warning");
+//	alert("Your devices will get disconnected for a while to get a new IP address.");
+	alert("$lan_disconnect_warning");
 	cf.submit();//add
 	return true;
 }

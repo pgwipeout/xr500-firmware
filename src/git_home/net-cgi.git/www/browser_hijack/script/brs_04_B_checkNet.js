@@ -17,10 +17,10 @@ function loadValue()
 
 	if(ping_result == "failed")	//failed
 	{
-		if (((top.netgear_region.toUpperCase() == "WW" || top.netgear_region == "") && top.gui_region == "Russian" ) || top.netgear_region.toUpperCase() == "RU")
+		if (((getTop(window).netgear_region.toUpperCase() == "WW" || getTop(window).netgear_region == "") && getTop(window).gui_region == "Russian" ) || getTop(window).netgear_region.toUpperCase() == "RU")
 			this.location.href = "RU_welcome.htm";
 		else{
-		    if(top.dsl_enable_flag == "1"){	
+		    if(getTop(window).dsl_enable_flag == "1"){	
 			if(ping_ip_result == "failed" && ping_gate_result == "failed")
 				this.location.href = "BRS_log11_dhcp_ping_fail_ip_fail.html";
 			else if(ping_ip_result == "failed" && ping_gate_result == "success")
@@ -36,7 +36,7 @@ function loadValue()
 	}
 	else if(ping_result == "success") //success
 	{
-		if(top.dsl_enable_flag == "1")
+		if(getTop(window).dsl_enable_flag == "1")
 		{
 			if(ping_ip_result == "failed" && ping_gate_result == "failed")
 				this.location.href = "BRS_log11_dhcp_ping_success_ip_fail.html";

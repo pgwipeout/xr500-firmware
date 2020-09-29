@@ -21,9 +21,9 @@
 <% table_header() %>
 
 <script>
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 var host_name=parent.host_name;
-var wds_support_wpa = top.wds_support_wpa;
+var wds_support_wpa = getTop(window).wds_support_wpa;
 var gui_region="<% cfg_get("GUI_Region") %>"
 var pr_flag = (( gui_region == "Chinese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "PR") ? 1 : 0
 var pr_wds_support_wpa=( wds_support_wpa == 1  && pr_flag == 1) ? 1 : 0;
@@ -406,19 +406,19 @@ function setSecurity(num)
 	}
 	setSecurity_func(num);
 
-	if(top.guest_router_flag == 1 && wlg1_sectype == 2)
+	if(getTop(window).guest_router_flag == 1 && wlg1_sectype == 2)
 		opmode_disabled();
 }
 
 function loadvalue()
 {
-	top.enabled_wds="<% wds_enable() %>";
-	top.enabled_wps="<% wps_menu() %>";
+	getTop(window).enabled_wds="<% wds_enable() %>";
+	getTop(window).enabled_wps="<% wps_menu() %>";
 	/* bug23114: after set wireless, the wps button in menu maybe need change to grey, so , refresh the menu color */
-	if( top.location.href.indexOf("adv_index.htm") != -1 )
-		top.menu_color_change('wireless');
+	if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
+		getTop(window).menu_color_change('wireless');
 	else
-		top.basic_menu_color_change('wireless');
+		getTop(window).basic_menu_color_change('wireless');
 
 	var form=document.forms[0];
 	
@@ -519,7 +519,7 @@ function loadvalue()
 	else
 		document.getElementById("wep_54").style.display="none";
 
-	if(top.guest_router_flag == 1)//42382
+	if(getTop(window).guest_router_flag == 1)//42382
 	{
 		if(wlg1_sectype == 2 || wl_sectype == 2)//45001
 			opmode_disabled();

@@ -36,14 +36,14 @@ else if (status >= 1000 && status < 2000)
 }
 else if (status == 10008)
 {
-	top.topframe.location.href="top.html";
-	//top.contents.location.href="<% menu_link() %>";
+	getTop(window).topframe.location.href="top.html";
+	//getTop(window).contents.location.href="<% menu_link() %>";
 	document.location.href="AUTO_MD5_failure.htm";
 }
 else if (status >= 10000) 
 {
-	top.topframe.location.href="top.html";
-	//top.contents.location.href="<% menu_link() %>";
+	getTop(window).topframe.location.href="top.html";
+	//getTop(window).contents.location.href="<% menu_link() %>";
 	document.location.href="AUTO_download_failure.htm";
 }
 

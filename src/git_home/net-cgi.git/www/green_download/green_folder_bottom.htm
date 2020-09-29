@@ -46,14 +46,14 @@ function click_ok()
 
 	var path=str.replace(/\//g,"\\");
 
-	if(top.window.opener.greendl_open == 1)
+	if(getTop(window).window.opener.greendl_open == 1)
 	{
-		top.window.opener.document.forms[0].save_folder.value = path;
-		top.window.opener.document.forms[0].greendl_save_path.value = original_str;
-		top.window.opener.document.forms[0].greendl_disk_lable.value = str;
+		getTop(window).window.opener.document.forms[0].save_folder.value = path;
+		getTop(window).window.opener.document.forms[0].greendl_save_path.value = original_str;
+		getTop(window).window.opener.document.forms[0].greendl_disk_lable.value = str;
 	}
 	else
-		top.window.opener.document.forms[0].folder.value=path;
+		getTop(window).window.opener.document.forms[0].folder.value=path;
 	window.parent.close();
 //16168	parent.parent.folder_path=path;
 //16168	parent.location.href=parent.open_file;

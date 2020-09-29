@@ -19,9 +19,9 @@ listening_net=$6
 allow 1024-65535 192.168.0.0/24 1024-65535
 allow 1024-65535 192.168.1.0/24 1024-65535
 allow 0-65535 0.0.0.0/0 0-65535
-appsystem_location=http://updates1.netgear.com/r7800/ww/r7800.ddf
+appsystem_location=http://updates1.netgear.com/xr500/ww/xr500.ddf
 appsystem_os=Linux/3.4
-appsystem_product=r7800
+appsystem_product=xr500
 non_igd=${7:-0}
 EOF
 }

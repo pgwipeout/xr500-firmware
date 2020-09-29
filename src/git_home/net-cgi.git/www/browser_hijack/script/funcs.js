@@ -1,8 +1,33 @@
+function getTop(frameWindow)
+{
+        try
+        {
+                var parentWindow = frameWindow.parent;
+                if (frameWindow.netgear_version !== undefined)
+                {
+                        return frameWindow;
+                }
+                if (parentWindow === frameWindow)
+                {
+                        return frameWindow;
+                }
+                if (parentWindow.origin !== frameWindow.origin)
+                {
+                        return frameWindow;
+                }
+
+                return getTop(parentWindow);
+        } catch (e)
+        {
+                return top;
+        }
+}
+
 function check_DNS(dnsaddr1,dnsaddr2,wan_assign,wan_ip)
 {
-        if(dnsaddr1!="...")
+        if(dnsaddr1!="")
         {
-                if(checkipaddr(dnsaddr1)==false)
+                if(checkdnsaddr(dnsaddr1)==false)
                 {
                         alert(bh_invalid_primary_dns);
                         return false;
@@ -13,9 +38,9 @@ function check_DNS(dnsaddr1,dnsaddr2,wan_assign,wan_ip)
                         return false;
                 }
         }
-        if(dnsaddr2!="...")
+        if(dnsaddr2!="")
         {
-                if(checkipaddr(dnsaddr2)==false)
+                if(checkdnsaddr(dnsaddr2)==false)
                 {
                         alert(bh_invalid_second_dns);
                         return false;
@@ -27,7 +52,7 @@ function check_DNS(dnsaddr1,dnsaddr2,wan_assign,wan_ip)
                 }
         }
 
-        if(dnsaddr1=="..." && dnsaddr2=="...")
+        if(dnsaddr1=="" && dnsaddr2=="")
         {
                 alert(bh_dns_must_specified);
                 return false;
@@ -37,9 +62,9 @@ function check_DNS(dnsaddr1,dnsaddr2,wan_assign,wan_ip)
 
 function check_three_DNS(dnsaddr1,dnsaddr2,dnsaddr3,wan_assign,wan_ip)
 {
-        if(dnsaddr1!="...")
+        if(dnsaddr1!="")
         {
-                if(checkipaddr(dnsaddr1)==false)
+                if(checkdnsaddr(dnsaddr1)==false)
                 {
                         alert(bh_invalid_primary_dns);
                         return false;
@@ -50,9 +75,9 @@ function check_three_DNS(dnsaddr1,dnsaddr2,dnsaddr3,wan_assign,wan_ip)
                         return false;
                 }
         }
-        if(dnsaddr2!="...")
+        if(dnsaddr2!="")
         {
-                if(checkipaddr(dnsaddr2)==false)
+                if(checkdnsaddr(dnsaddr2)==false)
                 {
                         alert(bh_invalid_second_dns);
                         return false;
@@ -64,9 +89,9 @@ function check_three_DNS(dnsaddr1,dnsaddr2,dnsaddr3,wan_assign,wan_ip)
                 }
         }
 
-        if(dnsaddr3!="...")
+        if(dnsaddr3!="")
         {
-                if(checkipaddr(dnsaddr3)==false)
+                if(checkdnsaddr(dnsaddr3)==false)
                 {
                         alert(hb_invalid_third_dns);
                         return false;
@@ -78,7 +103,7 @@ function check_three_DNS(dnsaddr1,dnsaddr2,dnsaddr3,wan_assign,wan_ip)
                 }
         }
 
-        if(dnsaddr1=="..." && dnsaddr2=="..." && dnsaddr3 == "...")
+        if(dnsaddr1=="" && dnsaddr2=="" && dnsaddr3 =="")
         {
                 alert(bh_dns_must_specified);
                 return false;
@@ -254,6 +279,71 @@ function isSameSubNet(lan1Ip, lan1Mask, lan2Ip, lan2Mask)
 		return true;
 	else
 		return false;
+}
+function checkdnsaddr(dnsaddr){
+	
+	var form = document.forms[0];
+	var dnsArray = dnsaddr.split(".");
+	var dnsstr = dnsArray[0]+dnsArray[1]+dnsArray[2]+dnsArray[3];
+	var i = 0;
+
+	if((dnsArray[0]=="")||(dnsArray[0]<0)||(dnsArray[0]>255)||(dnsArray[1]=="")||(dnsArray[1]<0)||(dnsArray[1]>255)
+			||(dnsArray[2]=="")||(dnsArray[2]<0)||(dnsArray[2]>255)||(dnsArray[3]=="")||(dnsArray[3]<0)||(dnsArray[3]>255))
+	{
+		return false;
+	}
+	for(i=0;i<dnsstr.length;i++)
+	{
+		if((dnsstr.charAt(i)!='0')&&(dnsstr.charAt(i)!='1')&&(dnsstr.charAt(i)!='2')
+				&&(dnsstr.charAt(i)!='3')&&(dnsstr.charAt(i)!='4')&&(dnsstr.charAt(i)!='5')
+				&&(dnsstr.charAt(i)!='6')&&(dnsstr.charAt(i)!='7')&&(dnsstr.charAt(i)!='8')
+				&&(dnsstr.charAt(i)!='9'))
+		{
+			return false;
+		}
+	}
+	if( dnsArray[0] > 223 || dnsArray[0] == 0 )
+		return false;
+	if (dnsaddr == "0.0.0.0" || dnsaddr == "255.255.255.255")
+	{
+		return false;
+	}
+
+	var each=dnsaddr.split(".");
+	if (each[0] == "127")
+	{
+		return false;
+	}
+	if (!dnsArray || dnsArray.length != 4)
+	{
+		return false;
+	}
+	else
+	{
+		for (i = 0; i < 4; i++)
+		{
+			thisSegment = dnsArray[i];
+			if (thisSegment != "")
+			{
+				if(i==3){
+					if (!((dnsArray[3] >= 0) && (dnsArray[3] < 255)))
+					{
+						return false;
+					}	
+				}
+				else if (!(thisSegment >=0 && thisSegment <= 255))
+				{
+					return false;
+				}
+			} 
+			else
+			{
+				return false;
+			}
+		}
+
+	}
+	return true;
 }
 function checkipaddr(ipaddr)
 {

@@ -35,7 +35,7 @@ function loadvalue()
 	cf.allow_or_block.value="Blocked";
 }
 
-window.onunload = function leavepage(){if(apply_flag == 0) top.back_flag=1;};
+window.onunload = function leavepage(){if(apply_flag == 0) getTop(window).back_flag=1;};
 </script>
 <input type="hidden" name="hidden_acc_edit_type" value="block"/>
 <input type="hidden" name="hidden_edit_mac" value=""/>

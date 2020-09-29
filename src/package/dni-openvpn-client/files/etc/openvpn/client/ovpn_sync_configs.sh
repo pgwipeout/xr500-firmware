@@ -8,7 +8,7 @@ product="$(awk '{print tolower($0)}' /module_name)"
 remote_location="https://http.fw.updates1.netgear.com/sw-apps/vpn-client/${product:-xr500}"
 id_file="updated_date.txt"
 
-curl_opt="-s -k --retry 5"
+curl_opt="-s --retry 5"
 
 init_local_dirs()
 {

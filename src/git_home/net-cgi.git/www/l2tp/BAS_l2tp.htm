@@ -15,7 +15,7 @@ var l2tp_get_this_mac="<% cfg_get("wan_l2tp_this_mac") %>";
 var gui_region="<% cfg_get("GUI_Region") %>";
 var lan_ip="<% cfg_get("lan_ipaddr") %>";
 var lan_subnet="<% cfg_get("lan_netmask") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 var wanproto_type="l2tp";
 
 var old_endis_ddns="<% cfg_get("endis_ddns") %>";
@@ -23,8 +23,9 @@ var vpn_enable = "<% cfg_get("vpn_enable") %>";
 
 //bug 23653:add a new checkox 'Enable automatic Internet connection reset at'
 var bas_auto_conn_flag="<% cfg_get("bas_auto_conn_flag") %>";
-var bas_conn_time_num="<% cfg_get("bas_conn_time_num") %>";
-if ( bas_conn_time_num == "" ) // to fix bug 23294
+var bas_conn_time_num="<% cfg_sed_xss("bas_conn_time_num") %>";
+bas_conn_time_num = parseInt(bas_conn_time_num,10);
+if ( bas_conn_time_num>47||bas_conn_time_num<0||isNaN(bas_conn_time_num)) // to fix bug 23294
 	bas_conn_time_num="0";
 var auto_conn_flag=parent.auto_conn_flag;
 var autoconn_flag=(auto_conn_flag == 1 && ((gui_region == "German" &&  (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "GR")) ? 1 : 0;
@@ -58,7 +59,7 @@ function loadvalue()
  		document.getElementById("auto_conn_play").style.display="";
  	else
  		document.getElementById("auto_conn_play").style.display="none";
-	form.auto_conn_time.options[eval(bas_conn_time_num)].selected =true;
+	form.auto_conn_time.options[bas_conn_time_num].selected =true;
 	
 	if( l2tp_empty == "0" )
 	{
@@ -188,7 +189,7 @@ var old_wan_type="<% cfg_get("wan_proto") %>";
 
 function cilck_jump()
 {
-  if(top.dsl_enable_flag == 0)
+  if(getTop(window).dsl_enable_flag == 0)
     goto_formframe("BAS_ether.htm");
   else
     goto_formframe("BAS_ether_dsl.htm");
@@ -248,7 +249,7 @@ $bluebar
 	<TD nowrap>
 	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','isp')"><B>$basic_intserv_provider</B></A>
 	</TD>
-	<TD nowrap align=right>
+	<TD nowrap>
 	<select name="login_type" id="login_type" onChange="change_serv(document.forms[0])">
 		<option value="PPTP" >$basic_intserv_pptp</option>
 		<option value="L2TP" selected>$basic_intserv_l2tp</option>
@@ -265,7 +266,7 @@ $bluebar
 	<TD nowrap>
 	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','login')"><B>$basic_pppoe_login</B></A>
 	</TD>
-	<TD nowrap align=right>
+	<TD nowrap >
 	<input type="text" name="l2tp_username" id="l2tp_username" maxLength="60" size="16" onKeyPress="return getkey('ssid', event)" value="<% cfg_sed_xss("wan_l2tp_username") %>">
 	</TD>
 </TR>
@@ -273,13 +274,13 @@ $bluebar
 	<TD nowrap>
 	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','password')"><B>$basic_pppoe_passwd</B></A>
 	</TD>
-	<TD nowrap align=right>
+	<TD nowrap >
 	<input type="password" name="l2tp_passwd" id="l2tp_passwd" maxlength="60" size="16" onFocus="change_l2tp_password(this);" onKeyPress="return getkey('ssid', event)">
 	</TD>
 </TR>
 <TR> 
 	<TD><A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','conn_mode')"><B>$basic_int_connection_mode</B></A></TD> 
-	<TD align=right>
+	<TD >
 	<select name="l2tp_dod" id="l2tp_dod" onchange="show_idleout(document.forms[0],this.value)"> 
 		<option value="0">$basic_mode_always</option>
 		<option value="1">$basic_mode_dial</option>
@@ -291,7 +292,7 @@ $bluebar
 	<TD>
 	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','idletime')">$basic_pppoe_idle</A>
 	</TD>
-	<TD nowrap align=right>
+	<TD nowrap >
 	<input type="text" name="l2tp_idletime" id="l2tp_idletime" maxLength="5" size="16" value="<% idle_time("wan_l2tp_idle_time") %>" onKeyPress="return getkey('num', event)">
 	</TD>
 </TR>
@@ -355,7 +356,7 @@ $bluebar
 	<TD nowrap>
 	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','myip')"><B>$basic_pptp_myip</B></A>
 	</TD>
-	<TD nowrap align=right><!--bug 22411:when manually input IP,don't click the mouse,the subnet mask can be used -->
+	<TD nowrap ><!--bug 22411:when manually input IP,don't click the mouse,the subnet mask can be used -->
 	<input type="text" name="myip_1" id="myip1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onChange="myip_update('bas');" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);myip_update('bas');" >.
 	<input type="text" name="myip_2" id="myip2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onChange="myip_update('bas');" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);myip_update('bas');" >.
 	<input type="text" name="myip_3" id="myip3" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onChange="myip_update('bas');" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);myip_update('bas');" >.
@@ -366,7 +367,7 @@ $bluebar
 <TR id=l2tp_sub> 
 	<TD nowrap>
 	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','myip')"><B>$lan_mark_subnet</B></A>
-	</TD><TD nowrap align=right>
+	</TD><TD nowrap >
         <input type="text" name="mymask_1" id="mymask1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event)" onkeyup="keyup(event,this);">.
         <input type="text" name="mymask_2" id="mymask2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event)" onkeyup="keyup(event,this);">.
         <input type="text" name="mymask_3" id="mymask3" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event)" onkeyup="keyup(event,this);">.
@@ -377,7 +378,7 @@ $bluebar
 	<TD nowrap>
 	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','serverip')"><B>$basic_pptp_servip</B></A>
 	</TD>
-	<TD nowrap align=right><!--bug 20279-->
+	<TD nowrap ><!--bug 20279-->
 	<input type="text" size="33" name="l2tp_serv_ip" id="l2tp_serv_ip" maxlength="255" onFocus="this.select();" onblur="l2tp_servip_update();" onKeyPress="return getkey('ddns_hostname', event)" onkeyup="l2tp_servip_update();" value="<% cfg_sed_xss("wan_l2tp_server_ip") %>">
 	</TD>
 </TR>
@@ -385,7 +386,7 @@ $bluebar
 	<TD nowrap>
 	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','gateway')"><B>$basic_int_gateway</B></A>
 	</TD>
-	<TD nowrap align=right>
+	<TD nowrap >
 	<input type="text" name="mygw_1" id="mygw1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
 	<input type="text" name="mygw_2" id="mygw2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
 	<input type="text" name="mygw_3" id="mygw3" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -411,7 +412,7 @@ $bluebar
 </TR>
 <TR>
 	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_primary_dns</TD>
-	<TD nowrap align=right>
+	<TD nowrap >
 	<input type="text" name="DAddr1" id="primary_dns_address1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="DAddr2" id="primary_dns_address2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
 	<input type="text" name="DAddr3" id="primary_dns_address3" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -420,7 +421,7 @@ $bluebar
 </TR>
 <TR>
 	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_second_dns</TD>
-	<TD nowrap align=right>
+	<TD nowrap>
 	<input type="text" name="PDAddr1" id="second_dns_address1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="PDAddr2" id="second_dns_address2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
 	<input type="text" name="PDAddr3" id="second_dns_address3" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -447,7 +448,7 @@ $bluebar
 	<TD nowrap>
 	<input type="radio" name="MACAssign" id="mac_assign_define" value="2" onClick="setMAC(document.forms[0], l2tp_get_this_mac)"><label for="mac_assign_define">$basic_int_this_mac</label>
 	</TD>
-	<TD nowrap align=right>
+	<TD nowrap >
 	<input type="text" value="" name="Spoofmac" id="spoof_mac" maxlength="17" size="20" onKeyPress="return getkey('mac',event)">
 	</TD>
 </TR>

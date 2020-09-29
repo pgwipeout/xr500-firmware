@@ -44,11 +44,11 @@ function loadvalue()
 
 function clickCancel()
 {
-	if(top.location.href.indexOf("CheckNewFirmware.htm") != -1)
+	if(getTop(window).location.href.indexOf("CheckNewFirmware.htm") != -1)
 		close_top_window();
 	else
 	{
-		if(top.dsl_enable_flag == 0)
+		if(getTop(window).dsl_enable_flag == 0)
 		   location.href='BAS_basic.htm';
 		else
 		   location.href='BAS_basic_dsl.htm';

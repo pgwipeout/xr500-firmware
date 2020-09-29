@@ -11,7 +11,7 @@ function loadValue()
 {	
 	var content_frame = document.getElementById("content_frame");
 
-	if(top.hdd_multi_user ==1)
+	if(getTop(window).hdd_multi_user ==1)
 	{
 		if(first_hdd_nofind == "1")
 			content_frame.setAttribute("src", "BRS_01_checkNet_ping.html");

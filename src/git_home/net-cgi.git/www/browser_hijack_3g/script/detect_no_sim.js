@@ -58,7 +58,7 @@ function initPage()
 
 function backToUp()
 {
-	if(top.have_lte_flag=="1")
+	if(getTop(window).have_lte_flag=="1")
 		this.location.href="lte_detect_succ_hsdpa.htm";
 	else
 		this.location.href="detect_succ_hsdpa.htm";
@@ -70,7 +70,7 @@ function retry_detect_simcard()
 	var cf = forms[0];
 
 	cf.action = "/apply.cgi?/config_3g_wait_page.htm timestamp=" + ts;
-	if(top.have_lte_flag=="1")
+	if(getTop(window).have_lte_flag=="1")
 		cf.submit_flag.value = "wizard_lte_detwan";
 	else
 		cf.submit_flag.value = "wizard_3g_detwan";

@@ -28,7 +28,7 @@
 </body>
 <script>
 showFirmVersion("none");
-var apmode_flag = top.apmode_flag;
+var apmode_flag = getTop(window).apmode_flag;
 var ap_mode = "<% cfg_get("ap_mode") %>";
 var ping_result = "success";
 var wan_proto="<% cfg_get("wan_proto") %>";
@@ -45,7 +45,7 @@ function loadvalue()
 		else if(ping_result == "failed")
 			this.location.href = "BRS_06_networkIssue.html";
 	}
-	if(top.dsl_enable_flag == "1" && isp == "Fastweb")
+	if(getTop(window).dsl_enable_flag == "1" && isp == "Fastweb")
 	{
 		this.location.href = "BRS_success.html";
 		return;
@@ -105,7 +105,7 @@ function loadvalue()
 	}
 	else
 	{
-	     if(top.dsl_enable_flag == "1")
+	     if(getTop(window).dsl_enable_flag == "1")
 	      {
 				
 		if(ping_result == "success")

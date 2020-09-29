@@ -4,7 +4,7 @@ function click_endis_wds()
 	var dflag;
 	dflag=(!(cf.wds_enable.checked));
 	
-	if(top.enable_ap_flag ==1)
+	if(getTop(window).enable_ap_flag ==1)
 		setDisabled (true, cf.sysLANIPAddr1,cf.sysLANIPAddr2,cf.sysLANIPAddr3,cf.sysLANIPAddr4,cf.wds_mode[0],cf.ptp_sta,cf.ptp_mac);
 	else
 		setDisabled (dflag, cf.sysLANIPAddr1,cf.sysLANIPAddr2,cf.sysLANIPAddr3,cf.sysLANIPAddr4,cf.wds_mode[0],cf.ptp_sta,cf.ptp_mac);
@@ -22,7 +22,7 @@ function click_endis_wds_a()
 	var dflag_a;
 	dflag_a=(!(cf.wds_enable_an.checked));
 	
-	if(top.enable_ap_flag ==1)
+	if(getTop(window).enable_ap_flag ==1)
 		setDisabled (true, cf.sysLANIPAddr1_an,cf.sysLANIPAddr2_an,cf.sysLANIPAddr3_an,cf.sysLANIPAddr4_an,cf.wds_mode_an[0],cf.ptp_sta_an,cf.ptp_mac_1_an);
 	else
 		setDisabled (dflag_a, cf.sysLANIPAddr1_an,cf.sysLANIPAddr2_an,cf.sysLANIPAddr3_an,cf.sysLANIPAddr4_an,cf.wds_mode_an[0],cf.ptp_sta_an,cf.ptp_mac_1_an);
@@ -41,7 +41,7 @@ function click_repeater_basic()
 	aflag=(!(cf.wds_mode[0].checked));
 	bflag=(!(cf.wds_mode[1].checked));
 	
-	if(top.enable_ap_flag ==1)
+	if(getTop(window).enable_ap_flag ==1)
 		setDisabled (true, cf.sysLANIPAddr1,cf.sysLANIPAddr2,cf.sysLANIPAddr3,cf.sysLANIPAddr4,cf.ptp_sta,cf.ptp_mac);
 	else
 		setDisabled (aflag, cf.sysLANIPAddr1,cf.sysLANIPAddr2,cf.sysLANIPAddr3,cf.sysLANIPAddr4,cf.ptp_sta,cf.ptp_mac);
@@ -67,7 +67,7 @@ function click_repeater_basic_a()
         aflag_a=(!(cf.wds_mode_an[0].checked));
         bflag_a=(!(cf.wds_mode_an[1].checked));
 		
-	if(top.enable_ap_flag ==1)
+	if(getTop(window).enable_ap_flag ==1)
 		setDisabled (true, cf.sysLANIPAddr1_an,cf.sysLANIPAddr2_an,cf.sysLANIPAddr3_an,cf.sysLANIPAddr4_an,cf.ptp_sta_an,cf.ptp_mac_1_an);
 	else
 		setDisabled (aflag_a, cf.sysLANIPAddr1_an,cf.sysLANIPAddr2_an,cf.sysLANIPAddr3_an,cf.sysLANIPAddr4_an,cf.ptp_sta_an,cf.ptp_mac_1_an);
@@ -460,7 +460,7 @@ function check_wds (cf)
 			}
 		}
 
-		top.enable_action=0;
+		getTop(window).enable_action=0;
 
 	}
 	else
@@ -471,7 +471,7 @@ function check_wds (cf)
 		else
 			cf.change_ip_flag.value=1;
 
-		top.enable_action=0;
+		getTop(window).enable_action=0;
 
 		if(cf.wds_enable_an.checked && cf.wds_mode_an[0].checked)
 			cf.repeater_ip.value = cf.repeater_ip_a.value;

@@ -83,7 +83,7 @@ function loadvalue()
 	 /* load the LAN Setup items' value */
         ipv6_load_common(cf);
 
-	if(top.ipv6_dns_manual == 1)
+	if(getTop(window).ipv6_dns_manual == 1)
 	{
 		document.getElementById("same_info_line").style.display = "";
 		if(same_info == "1")
@@ -139,7 +139,7 @@ function loadvalue()
 $bluebar
 <tr id="same_info_line" style="display:none">
 	<td nowrap colspan=2>
-	<input type="checkbox" name="ipv6_same_info" onclick="setSameinfo();" id="ipv6_same_infopp"/><label for="ipv6_same_infopp"> &nbsp;Use the same Login information as IPv4 PPPoe</label>
+	<input type="checkbox" name="ipv6_same_info" onclick="setSameinfo();" id="ipv6_same_infopp"/><label for="ipv6_same_infopp"> &nbsp;$ipv6_use_same_with_ipv4</label>
 	</td>
 </tr>
 <TR id="login_line" style="display:none"> 

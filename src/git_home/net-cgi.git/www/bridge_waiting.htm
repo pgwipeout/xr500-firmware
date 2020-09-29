@@ -3,6 +3,8 @@
 <META http-equiv="content-type" content='text/html; charset=UTF-8'>
 <LINK rel="stylesheet" type="text/css" href="style/hijack_style.css">
 <script language="javascript" type="text/javascript" src="/advanced.js"></script>
+<script language="javascript" type="text/javascript" src="/funcs.js"></script>
+
 </HEAD>
 <BODY onload="loadvalue();" bgcolor=#ffffff>
 <script>
@@ -27,19 +29,19 @@ function timeout()
 		if(host.indexOf("www") != -1)
 		{
 			if( host.indexOf("net") != -1)
-				top.location.href="http://www.routerlogin.com/adv_index.htm";
+				getTop(window).location.href="http://www.routerlogin.com/adv_index.htm";
 			else
-				top.location.href="http://routerlogin.net/adv_index.htm";
+				getTop(window).location.href="http://routerlogin.net/adv_index.htm";
 		}
 		else
 		{
 			if(host.indexOf("net") != -1)
-				top.location.href="http://routerlogin.com/adv_index.htm";
+				getTop(window).location.href="http://routerlogin.com/adv_index.htm";
 			else
-				top.location.href="http://www.routerlogin.net/adv_index.htm";
+				getTop(window).location.href="http://www.routerlogin.net/adv_index.htm";
 		}
 	}else{
-		top.location.href="http://"+bridge_ipaddr+"/adv_index.htm";
+		getTop(window).location.href="http://"+bridge_ipaddr+"/adv_index.htm";
 	}
 }
 </script>

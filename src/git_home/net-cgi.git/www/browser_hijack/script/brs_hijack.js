@@ -1,7 +1,34 @@
+
+function getTop(frameWindow)
+{
+        try
+        {
+                var parentWindow = frameWindow.parent;
+                if (frameWindow.netgear_version !== undefined)
+                {
+                        return frameWindow;
+                }
+                if (parentWindow === frameWindow)
+                {
+                        return frameWindow;
+                }
+                if (parentWindow.origin !== frameWindow.origin)
+                {
+                        return frameWindow;
+                }
+
+                return getTop(parentWindow);
+        } catch (e)
+        {
+                return top;
+        }
+}
+
+
 //goto basic home page
 function goto_home_page()
 {
-	top.location.href="index.htm";
+	getTop(window).location.href="/";
 }
 
 //add window onload event
@@ -56,7 +83,7 @@ function addClass(element,value)
 
 function showFirmVersion(flag)
 {	
-	var iframe = top.document.getElementById("header_frame");
+	var iframe = getTop(window).document.getElementById("header_frame");
 
 	if(iframe)
 	{

@@ -3,6 +3,7 @@
 <!--META http-equiv="Refresh" content="150; url=pls_wait_run_green.htm"-->
 <META http-equiv=content-type content='text/html; charset=UTF-8'>
 <LINK rel="stylesheet" href="style/form.css">
+<script language="javascript" type="text/javascript" src="/funcs.js"></script>
 
 <!--body onLoad="updateProgress()" bgcolor=#ffffff-->
 <script type="text/javascript">
@@ -35,9 +36,9 @@ function updateProgress()
 	{
 		if( green_lang_tag == 0 && green_image_tag == 0 )
 		{
-			if ( typeof(top.topframe) != "undefined" )
-				top.topframe.location.href="top.html";
-			//top.contents.location.href="<% menu_link() %>";
+			if ( typeof(getTop(window).topframe) != "undefined" )
+				getTop(window).topframe.location.href="top.html";
+			//getTop(window).contents.location.href="<% menu_link() %>";
 			if ( is_in_cd_less || isWIZARD())
 				toInternet();
 			else

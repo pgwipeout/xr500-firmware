@@ -5,6 +5,8 @@
 <% hijack_language() %>
 <LINK rel="stylesheet" href="style/form.css">
 <LINK rel="stylesheet" type="text/css" href="style/formframe_wait.css">
+<script language="javascript" type="text/javascript" src="/funcs.js"></script>
+
 
 <script language="javascript" type="text/javascript">
 /* qutoe the script file funcs.js will increase the page loading time, and the page will show blank, so copy the 
@@ -17,7 +19,7 @@ function isCDLESS()
 
 function isWIZARD()
 {
-        var flag = top.location.href.indexOf("adv_index.htm") != -1&& top.setup_wizard_flag == 1;
+        var flag = getTop(window).location.href.indexOf("adv_index.htm") != -1&& getTop(window).setup_wizard_flag == 1;
         return flag;
 }
 function getText(str1, str2)

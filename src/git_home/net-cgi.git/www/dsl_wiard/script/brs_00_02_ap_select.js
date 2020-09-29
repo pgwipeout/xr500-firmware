@@ -45,7 +45,7 @@ function genieHelpChecking()
 	var cf = forms[0];
 	if(choices[0].checked)
 	{
-		if(top.dsl_enable_flag == "1")
+		if(getTop(window).dsl_enable_flag == "1")
             		 location.href="BRS_01_checkNet_ideth_ping.html";
 		else
 			location.href="BRS_01_checkNet_ping.html";

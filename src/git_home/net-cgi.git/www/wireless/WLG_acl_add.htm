@@ -123,7 +123,7 @@ if (stalist != "")
                     document.write("<TR class=\"even_line\">");
                else
                     document.write("<TR class=\"odd_line\">");
-			document.write('<TD nowrap align=center><input type="radio" name="MacSelect" value="'+i+'" onclick="mac_data_select('+i+')"></TD><TD nowrap align=center>&nbsp;'+sta_name_array[i]+'&nbsp;</TD><TD nowrap align=center>'+sta_mac_array[i].toUpperCase()+'</TD></TR>');
+			document.write('<TD nowrap align=center><input type="radio" name="MacSelect" value="'+i+'" onclick="mac_data_select('+i+')" id="MacSelect'+i+'"><label for="MacSelect'+i+'"></label></TD><TD nowrap align=center>&nbsp;'+sta_name_array[i]+'&nbsp;</TD><TD nowrap align=center>'+sta_mac_array[i].toUpperCase()+'</TD></TR>');
 		}
 		else
 		{
@@ -131,7 +131,7 @@ if (stalist != "")
                     document.write("<TR class=\"even_line\">");
                else
                     document.write("<TR class=\"odd_line\">");
-			document.write('<TD nowrap align=center><input type="radio" name="MacSelect" value="'+i+'" onclick="mac_data_select('+i+')"></TD><TD nowrap align=center>&nbsp;&lt;$unknown_mark&gt;&nbsp;</TD><TD nowrap align=center>'+sta_mac_array[i]+'</TD></TR>');
+			document.write('<TD nowrap align=center><input type="radio" name="MacSelect" value="'+i+'" onclick="mac_data_select('+i+')" id="MacSelect'+i+'"><label for="MacSelect'+i+'"></label></TD><TD nowrap align=center>&nbsp;&lt;$unknown_mark&gt;&nbsp;</TD><TD nowrap align=center>'+sta_mac_array[i]+'</TD></TR>');
 		}
 }
 </script>

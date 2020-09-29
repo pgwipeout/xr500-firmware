@@ -28,7 +28,7 @@ function loadValue()
 
 	if(ping_result == "failed")	//failed
 	{
-		if (((top.netgear_region.toUpperCase() == "WW" || top.netgear_region == "") && top.gui_region == "Russian" ) || top.netgear_region.toUpperCase() == "RU")
+		if (((getTop(window).netgear_region.toUpperCase() == "WW" || getTop(window).netgear_region == "") && getTop(window).gui_region == "Russian" ) || getTop(window).netgear_region.toUpperCase() == "RU")
 			this.location.href = "RU_welcome.htm";
 		else
 			this.location.href = "BRS_06_networkIssue.html";

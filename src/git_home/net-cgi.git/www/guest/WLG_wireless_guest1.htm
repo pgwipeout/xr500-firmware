@@ -27,9 +27,9 @@ else
 <TABLE width=100%% border=0 cellpadding=0 cellspacing=3>
 <TR><TD colSpan=2></TD></TR>
 <script>
-var bgn_mode1_value = top.bgn_mode1_value;
-var an_mode1_value = top.an_mode1_value;
-var have_enterprise = top.have_enterprise;
+var bgn_mode1_value = getTop(window).bgn_mode1_value;
+var an_mode1_value = getTop(window).an_mode1_value;
+var have_enterprise = getTop(window).have_enterprise;
 
 var fbwifi_enable = "<% cfg_get("fbwifi_enable") %>";
 
@@ -139,6 +139,9 @@ var wps_alert="<% cfg_get("wps_alert") %>";
 <input type="hidden" name="hidden_allow_see_and_access">
 <input type="hidden" name="radiusServerIP">
 <input type="hidden" name="s_gssid">
+<input type="hidden" name="hidden_wpae_mode">
+<input type="hidden" name="hidden_radiusServerIP">
+<input type="hidden" name="hidden_textWpaeRadiusPort">
 <input type="hidden" name="hidden_WpaeRadiusSecret">
 <input type="hidden" name="hidden_guest_network_mode_flag">
 <input type="hidden" name="wl_hidden_wlan_mode" value="">
@@ -149,6 +152,9 @@ var wps_alert="<% cfg_get("wps_alert") %>";
 <input type="hidden" name="hidden_allow_see_and_access_an">
 <input type="hidden" name="radiusServerIP_a">
 <input type="hidden" name="s_gssid_an">
+<input type="hidden" name="hidden_wpae_mode_an">
+<input type="hidden" name="hidden_radiusServerIP_a">
+<input type="hidden" name="hidden_textWpaeRadiusPort_an">
 <input type="hidden" name="hidden_WpaeRadiusSecret_a">
 <input type="hidden" name="hidden_guest_network_mode_flag_an">
 <input type="hidden" name="wl_hidden_wlan_mode_an" value="">
@@ -789,11 +795,11 @@ function setSecurity_an(num)
 }
 function loadvalue()
 {
-	top.enabled_wds="<% wds_enable() %>";
-        if( top.location.href.indexOf("adv_index.htm") != -1 )
-                top.menu_color_change('guest');
+	getTop(window).enabled_wds="<% wds_enable() %>";
+        if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
+                getTop(window).menu_color_change('guest');
         else
-                top.basic_menu_color_change('guest');
+                getTop(window).basic_menu_color_change('guest');
 
 	var form=document.forms[0];
 

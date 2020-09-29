@@ -36,7 +36,7 @@ var gui_region="<% cfg_get("GUI_Region") %>";
 if(netgear_region == "")
 	netgear_region = "WW";
 
-//var netgear_region=top.netgear_region;
+//var netgear_region=getTop(window).netgear_region;
 var country="<% cfg_get("wl_country") %>";
 var wla_channel="<% cfg_get("wla_channel") %>";
 var wps_progress_status="<% wps_process_status() %>";
@@ -86,10 +86,10 @@ var qos_router_flag = parent.qos_router_flag;
 var transmit_router_flag = parent.transmit_router_flag;
 var guest_router_flag=parent.guest_router_flag;
 var apmode_flag=parent.apmode_flag;
-var adv_coexistence_flag=top.adv_coexistence_flag;
+var adv_coexistence_flag=getTop(window).adv_coexistence_flag;
 var qtn_api_statistics_flag = parent.qtn_api_statistics_flag;
 
-var wds_support_wpa = top.wds_support_wpa;
+var wds_support_wpa = getTop(window).wds_support_wpa;
 var pr_flag = ( netgear_region.toUpperCase() == "PR") ? 1 : 0;
 var pr_wds_support_wpa=( wds_support_wpa == 1  && pr_flag == 1) ? 1 : 0;
 
@@ -168,7 +168,7 @@ function change_web_format()
 		document.getElementById("cts_rts_an").style.display="";
 		document.getElementById("pream_an").style.display="";
 		document.getElementById("blue_an").style.display="";
-		if(top.fragment_an_flag == 1)
+		if(getTop(window).fragment_an_flag == 1)
 			document.getElementById("fragment_an").style.display="";
 		else
 			document.getElementById("fragment_an").style.display="none";
@@ -212,7 +212,7 @@ function change_web_format()
 
 	}
 
-	if(top.access_control_flag == 0 )
+	if(getTop(window).access_control_flag == 0 )
 	{
 		document.getElementById("wlan_access").style.display="";
 		document.getElementById("ap_bluebar").style.display="";
@@ -222,15 +222,15 @@ function change_web_format()
 		document.getElementById("wlan_access").style.display="none";
 		document.getElementById("ap_bluebar").style.display="none";
 	}
-	if(top.airtime_fairness_flag == 1)
+	if(getTop(window).airtime_fairness_flag == 1)
 		document.getElementById("wladv_atf").style.display="";	
 	else
 		document.getElementById("wladv_atf").style.display="none";
-	if(top.support_ht160_flag == 1)
+	if(getTop(window).support_ht160_flag == 1)
 		document.getElementById("wladv_ht160").style.display="";
 	else
 		document.getElementById("wladv_ht160").style.display="none";
-	if(top.mu_mimo_flag == 1)
+	if(getTop(window).mu_mimo_flag == 1)
 		document.getElementById("wladv_mu").style.display="";
 	else
 		document.getElementById("wladv_mu").style.display="none";
@@ -393,7 +393,7 @@ function loadvalue()
 {
 	var form=document.forms[0];
 
-	top.enable_ap_flag="<% cfg_get("ap_mode") %>";	
+	getTop(window).enable_ap_flag="<% cfg_get("ap_mode") %>";	
 	//bug 29873 [Wireless]The GUI should show wireless radio as checked when user enable wireless router radio
 	//menu_color_change('wladv');
 	if(smart_connect_flag == "1") {
@@ -413,12 +413,12 @@ function loadvalue()
 	parent.enabled_wps="<% wps_menu() %>";
 	parent.enabled_wds="<% wds_enable() %>";
 	parent.menu_color_change('wladv');
-        /*if( top.location.href.indexOf("adv_index.htm") != -1 )
+        /*if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
                 menu_color_change('wladv');
         else //bug23925 in basic page: if the radio is Off, the wireless button will link to wladv page.
 	{
-		top.endis_wl_radio=old_endis_wl_radio;
-		top.endis_wla_radio=old_endis_wla_radio;
+		getTop(window).endis_wl_radio=old_endis_wl_radio;
+		getTop(window).endis_wla_radio=old_endis_wla_radio;
 		basic_menu_color_change('wireless');
 	}
 */
@@ -548,7 +548,7 @@ function loadvalue()
 		form.prevent_pin_compromise.checked = true;
 					
 	wps_protection_display();
-	if(top.enabled_wps == 0)   //33156
+	if(getTop(window).enabled_wps == 0)   //33156
 	{
 		getObj('wladv_pin').color = 'gray';	
 		getObj('wladv_enable_wps').color = 'gray';
@@ -820,7 +820,7 @@ $bluebar
 	<TD nowrap>
 	<input type="checkbox" name="wmm_enable_a" value="1" id="wmm_enable_a_chh"><label for="wmm_enable_a_chh"><b>
 	<script>
-	if(top.ac_router_flag == 1)
+	if(getTop(window).ac_router_flag == 1)
 		document.write("$qos_enable_wmm (5GHz 802.11a/n/ac)")
 	else
 		document.write("$qos_enable_wmm (5GHz a/n)")

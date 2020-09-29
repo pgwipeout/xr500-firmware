@@ -15,11 +15,11 @@ function clickYes()
 {
         var cf=document.forms[0];
 	if ( updateGreen == 1 ){
-		top.enable_action=0;
-		if(top.topframe && !top.hidden_upgrade) //if top.topframe exists and top.hidden_upgrade does not exit
-			top.topframe.location.href="top_nochange.html";
-		else if(top.topframe && top.hidden_upgrade)     //if top.hidden_upgrade exits, top is the hidden page CheckNewFirmware.htm
-			top.topframe.location.href="CheckNewFW_top.htm";
+		getTop(window).enable_action=0;
+		if(getTop(window).topframe && !getTop(window).hidden_upgrade) //if getTop(window).topframe exists and getTop(window).hidden_upgrade does not exit
+			getTop(window).topframe.location.href="top_nochange.html";
+		else if(getTop(window).topframe && getTop(window).hidden_upgrade)     //if getTop(window).hidden_upgrade exits, top is the hidden page CheckNewFirmware.htm
+			getTop(window).topframe.location.href="CheckNewFW_top.htm";
 	}
 
 	cf.submit_flag.value="download_green";
@@ -30,10 +30,10 @@ function clickYes()
 
 function clickNo()
 {
-	if(top.topframe)
-		top.topframe.location.href="top.html";
+	if(getTop(window).topframe)
+		getTop(window).topframe.location.href="top.html";
 
-	if(top.hidden_upgrade)  //if top.hidden_upgrade exits, top is CheckNewFirmware.htm
+	if(getTop(window).hidden_upgrade)  //if getTop(window).hidden_upgrade exits, top is CheckNewFirmware.htm
 		close_top_window();
 	else
 		this.location.href = "green_download_upgrade.htm";

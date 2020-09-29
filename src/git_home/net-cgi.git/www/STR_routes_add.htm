@@ -27,7 +27,7 @@ else
 var russian_pppoe_flag=parent.parent.russian_pppoe_flag;
 var wan_proto="<% cfg_get("wan_proto") %>";
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 
 if ( (wan_proto == "pptp") || (wan_proto == "l2tp" && (gui_region == "Russian" || netgear_region.toUpperCase() == "RU")) || (wan_proto == "pppoe" && russian_pppoe_flag == 1 && (gui_region == "Russian" || netgear_region.toUpperCase() == "RU")))
 {

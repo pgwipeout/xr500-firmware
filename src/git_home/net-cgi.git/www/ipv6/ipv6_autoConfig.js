@@ -26,7 +26,7 @@ function check_ipv6_dhcp(cf)
 		return false;
 	}
 
-	if(top.ipv6_dns_manual == 1)
+	if(getTop(window).ipv6_dns_manual == 1)
 	{
 		if(checkIPv6DNS(cf) == false)
 			return false;

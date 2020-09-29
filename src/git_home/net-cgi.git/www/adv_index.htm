@@ -111,6 +111,9 @@ var security_mode_a="<% cfg_get("wla_sectype") %>";
 var dis_lang_crl = "<% cfg_get("Enable_GUIStringTable") %>";
 var device_mode = "<% cfg_get("modem_mode") %>";
 var rae_cur= "<% cfg_get("rae_cur_mode") %>";
+
+var back_flag = 0;
+
 if( wds_support_wpa == 1 && gui_region == "Chinese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW"))
 {
 	if((security_mode=="3" ||  security_mode=="4" || security_mode == "5") && old_wds_endis_fun == "1")

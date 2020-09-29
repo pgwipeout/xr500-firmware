@@ -118,7 +118,7 @@ var wds_repeater_basic_a="<% cfg_get("wds_repeater_basic_a") %>";
 var qos_endis_on="<% cfg_get("qos_endis_on") %>";
 var qos_type="<% cfg_get("qos_type")%>";
 
-var ac_router_flag = top.ac_router_flag;
+var ac_router_flag = getTop(window).ac_router_flag;
 <% qos_items_xss() %>
 <% qos_dft_items() %>
 

@@ -4,7 +4,7 @@
  *	this is for one more region, select.
 */
 //for bug 34916: region list index, if region list change, this list need change too
-if(top.an_router_flag == 1){
+if(getTop(window).an_router_flag == 1){
 	var Africa=1;
 	var Asia=2;
 	var Australia=3;

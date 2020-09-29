@@ -31,11 +31,11 @@ function getip()
 		} else {
 			  if ( tHttp.readyState == 4 && tHttp.status == 0 )
 			  {
-				if(top.location.href.indexOf("BRS_index.htm") > -1){
-				  if(top.location.href.indexOf("routerlogin.net") > -1){
-					setTimeout("top.location.href='http://routerlogin.com/BRS_index.htm';", 20000);
+				if(getTop(window).location.href.indexOf("BRS_index.htm") > -1){
+				  if(getTop(window).location.href.indexOf("routerlogin.net") > -1){
+					setTimeout("getTop(window).location.href='http://routerlogin.com/BRS_index.htm';", 20000);
 				  }else{
-					setTimeout("top.location.href='http://routerlogin.net/BRS_index.htm';", 20000);
+					setTimeout("getTop(window).location.href='http://routerlogin.net/BRS_index.htm';", 20000);
 				  }
 				}else{
 					setTimeout("this.location.href='BRS_04_applySettings_ppp_second_obtain_ip.html';", 1000);

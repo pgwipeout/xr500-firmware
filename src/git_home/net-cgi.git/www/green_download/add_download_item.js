@@ -159,7 +159,7 @@ function start_download(cf)
 
 	check_result = get_ids(cf,"start");
 
-		if( cf.select_ids.value == "" && top.green_download_item_num < fileTP_max_concurrent_tasks )
+		if( cf.select_ids.value == "" && getTop(window).green_download_item_num < fileTP_max_concurrent_tasks )
 		{
 			var index_blank = cf.select_ids_queuen.value.indexOf(" ");
 
@@ -198,7 +198,7 @@ function resume_download(cf)
 
 	check_result = get_ids(cf,"resume");
 
-		if( cf.select_ids.value == "" && top.green_download_item_num < fileTP_max_concurrent_tasks )
+		if( cf.select_ids.value == "" && getTop(window).green_download_item_num < fileTP_max_concurrent_tasks )
 		{
 			var index_blank = cf.select_ids_queuen.value.indexOf(" ");
 			if( index_blank >= 0 )
@@ -271,7 +271,7 @@ function close_browser(form)
 function redirect_config_download()
 {
 	this.location.href="green_download.htm";
-	top.menu_color_change("green_basic");
+	getTop(window).menu_color_change("green_basic");
 }
 
 function enable_greendownload(form,type)
@@ -380,7 +380,7 @@ function refresh_download_table()
 		"<TD nowrap align=center><span class=\"subhead\">$block_ser_setup_pro</span></TD>" +
 		"</TR>";
 
-	for( i=0; i< top.green_download_item_num; i++)
+	for( i=0; i< getTop(window).green_download_item_num; i++)
 	{
 		var info = item[i].toString();
 		var each_info = info.split('*');
@@ -510,10 +510,10 @@ function refresh_content()
 
 
 			if ( dl_num.length > 0 )
-				top.green_download_item_num = parseInt(dl_num[0].childNodes[0].nodeValue, 10);
+				getTop(window).green_download_item_num = parseInt(dl_num[0].childNodes[0].nodeValue, 10);
 
 			if ( dling_num.length > 0 )
-				top.green_downloading_item_num = parseInt(dling_num[0].childNodes[0].nodeValue, 10);
+				getTop(window).green_downloading_item_num = parseInt(dling_num[0].childNodes[0].nodeValue, 10);
 
 			for ( i = 0; i < tasks.length; i++ )
 			{
@@ -533,7 +533,7 @@ function refresh_content()
 	xmlhttp.open("GET", "download_info.xml", true);
 	xmlhttp.send();
 
-	if( green_download_enable == "1" && autorefresh_onoff == 1 && top.green_download_item_num > 0 )
+	if( green_download_enable == "1" && autorefresh_onoff == 1 && getTop(window).green_download_item_num > 0 )
 		setTimeout("refresh_content()", delay_time);
 }
 

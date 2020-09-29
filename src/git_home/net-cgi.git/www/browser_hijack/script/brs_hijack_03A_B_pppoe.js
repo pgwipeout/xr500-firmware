@@ -25,7 +25,7 @@ function initPage()
 
 	var passwd_input = document.getElementById("pppoe_password");
 	passwd_input.onkeypress = ssidKeyCode;
-	if(top.dsl_enable_flag == 1)
+	if(getTop(window).dsl_enable_flag == 1)
 	{
 		 cf=document.forms[0];
 		 cf.pppoe_username.value="";

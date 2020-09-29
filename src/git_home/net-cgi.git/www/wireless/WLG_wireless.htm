@@ -27,13 +27,13 @@ document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel1_bt" 
 <script>
 var host_name=parent.host_name;
 var con_endis_wla_radio="<% cfg_get("endis_wla_radio") %>";
-var wds_support_wpa = top.wds_support_wpa;
+var wds_support_wpa = getTop(window).wds_support_wpa;
 var gui_region="<% cfg_get("GUI_Region") %>"
 var pr_flag = (( gui_region == "Chinese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "PR") ? 1 : 0
 var pr_wds_support_wpa=( wds_support_wpa == 1  && pr_flag == 1) ? 1 : 0;
-var have_enterprise = top.have_enterprise;
-var bgn_mode1_value = top.bgn_mode1_value;
-var an_mode1_value = top.an_mode1_value;
+var have_enterprise = getTop(window).have_enterprise;
+var bgn_mode1_value = getTop(window).bgn_mode1_value;
+var an_mode1_value = getTop(window).an_mode1_value;
 <% all_mode_strings() %>
 var msg = "<% string_warning("bgn") %>";
 var an_msg = "<% string_warning("an") %>";
@@ -76,7 +76,7 @@ var dfs_russia_router_flag = parent.dfs_russia_router_flag;
 var wl_disablecoext="<% cfg_get("wl_disablecoext") %>";
 <% show_wlan_variable() %>
 var wla_mode="<% cfg_get("wla_simple_mode") %>";
-var guest_router_flag=top.guest_router_flag;
+var guest_router_flag=getTop(window).guest_router_flag;
 var guest_network_user="<% judge_guest_user() %>";
 var enable_ht160 = "<% cfg_get("wla_ht160") %>";
 var smart_connect_flag = parent.smart_connect_flag;
@@ -120,8 +120,15 @@ var get_smart_connect = "<% cfg_get("enable_smart_connect") %>";
 <input type="hidden" name="wl_hidden_sec_type">
 <input type="hidden" name="wla_hidden_sec_type">
 
+<input type="hidden" name="hidden_wpae_mode">
+<input type="hidden" name="hidden_radiusServerIP">
+<input type="hidden" name="hidden_textWpaeRadiusPort">
 <input type="hidden" name="hidden_WpaeRadiusSecret">
+<input type="hidden" name="hidden_wpae_mode_an">
+<input type="hidden" name="hidden_radiusServerIP_a">
+<input type="hidden" name="hidden_textWpaeRadiusPort_an">
 <input type="hidden" name="hidden_WpaeRadiusSecret_a">
+
 
 <input type="hidden" name="wl_enable_ssid_broadcast">
 <input type="hidden" name="wla_enable_ssid_broadcast">
@@ -826,13 +833,13 @@ function change_web_format()
 
 function loadvalue()
 {	
-	top.enabled_wds="<% wds_enable() %>";
-	top.enabled_wps="<% wps_menu() %>";
+	getTop(window).enabled_wds="<% wds_enable() %>";
+	getTop(window).enabled_wps="<% wps_menu() %>";
 	/* bug23114: after set wireless, the wps button in menu maybe need change to grey, so , refresh the menu color */
-	if( top.location.href.indexOf("adv_index.htm") != -1 )
-		top.menu_color_change('wireless');
+	if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
+		getTop(window).menu_color_change('wireless');
 	else
-		top.basic_menu_color_change('wireless');
+		getTop(window).basic_menu_color_change('wireless');
 
 	var form=document.forms[0];
 	if(guest_network_user  == "1"){
@@ -1073,7 +1080,7 @@ function loadvalue()
 		
 
 		
-	if(top.guest_router_flag == 1)//42382
+	if(getTop(window).guest_router_flag == 1)//42382
 	{
 		if(wlg1_sectype == 2 || wl_sectype == 2)//45001
 			opmode_disabled();

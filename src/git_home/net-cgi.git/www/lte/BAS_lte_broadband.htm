@@ -30,8 +30,8 @@ var lte_vendor="<% cfg_get("lte_vendor") %>";
 
 function loadvalue()
 {
-	top.broadband_wan_type=broadband_wan_type;
-	top.enabledItemsClass();
+	getTop(window).broadband_wan_type=broadband_wan_type;
+	getTop(window).enabledItemsClass();
 
 	var cf=document.forms[0];
 

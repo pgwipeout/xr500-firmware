@@ -1,30 +1,30 @@
 <% cfg_set("after_welcome", "0") %>
 
-<% http_header("style/form.css") %>
+<% http_header("style/form.css", "/funcs.js") %>
 
 <script>
 var select_basic="<% cfg_get("internet_type") %>";
 var select_type="<% cfg_get("internet_ppp_type") %>";
 var gui_region="<% cfg_get("GUI_Region") %>";
 var jp_multiPPPoE="<% cfg_get("jp_multiPPPoE") %>";
-var netgear_region=top.netgear_region;
-//var have_l2tp=( (gui_region == "Russian" && top.l2tp_flag == 1 && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "RU") ? 1 : 0 ;
-var have_l2tp = (top.l2tp_flag == 1) ? 1 : 0;
-var support_broadband = (top.have_broadband ==1 && (top.is_ru_version==1 || top.is_pr_version==1)) ? 1 : 0;
+var netgear_region=getTop(window).netgear_region;
+//var have_l2tp=( (gui_region == "Russian" && getTop(window).l2tp_flag == 1 && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "RU") ? 1 : 0 ;
+var have_l2tp = (getTop(window).l2tp_flag == 1) ? 1 : 0;
+var support_broadband = (getTop(window).have_broadband ==1 && (getTop(window).is_ru_version==1 || getTop(window).is_pr_version==1)) ? 1 : 0;
 
 function loadvalue()
 {
-	top.broadband_mode = "<% cfg_get("dango_det_wan_type") %>";
+	getTop(window).broadband_mode = "<% cfg_get("dango_det_wan_type") %>";
 
-	if( top.location.href.indexOf("adv_index.htm") == -1 && support_broadband == 1 ){
-		top.enabledItemsClass_basic();
-		top.basic_menu_color_change('ethernet');
+	if( getTop(window).location.href.indexOf("adv_index.htm") == -1 && support_broadband == 1 ){
+		getTop(window).enabledItemsClass_basic();
+		getTop(window).basic_menu_color_change('ethernet');
 	}
 
-	if(top.to_multipppoe == 1)
+	if(getTop(window).to_multipppoe == 1)
 	{
 		this.location.href = "BAS_mulpppoe.htm";
-		top.to_multipppoe = 0;
+		getTop(window).to_multipppoe = 0;
 	}
 	else if( select_basic == 1 )
                 this.location.href="BAS_ether.htm";

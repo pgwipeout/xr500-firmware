@@ -460,9 +460,9 @@ var form_flag = "<% cfg_get("sata_partition_count") %>";
 var sata_exist="<% cfg_get("sata_diskname") %>";
 
 if( form_flag == 0)
-	top.disk_format_wait_flag = 0;
+	getTop(window).disk_format_wait_flag = 0;
 else
-	top.disk_format_wait_flag = 1;
+	getTop(window).disk_format_wait_flag = 1;
 	
        if(sata_exist == "" )
                document.write('<input class="long_common_gray_bt" type="button" name="format_inter_disk" value="$hdd_format_bt" disabled >');

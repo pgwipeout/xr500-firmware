@@ -6,7 +6,7 @@ var is_in_cd_less = isCDLESS();
 function loadvalue()
 {
        if( is_in_cd_less || isWIZARD())
-               setTimeout('top.location.href="to_internet_no_auth.htm";', 3000);
+               setTimeout('getTop(window).location.href="to_internet_no_auth.htm";', 3000);
        else
                setTimeout('location.href="UPG_upgrade.htm";', 3000);
 }

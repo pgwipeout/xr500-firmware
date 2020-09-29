@@ -79,7 +79,7 @@ function loadvalue()
 	cf.WIp3.value = relay_array[2];
 	cf.WIp4.value = relay_array[3];
 
-	if(top.ipv6_dns_manual == 1)
+	if(getTop(window).ipv6_dns_manual == 1)
 	{
 		load_ipv6_dns(cf);
 	}

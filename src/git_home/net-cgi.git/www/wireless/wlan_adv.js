@@ -99,12 +99,12 @@ function checkadv(form)
 	//form.wl_rts.value = form.rts[0].value;
 	//form.wla_rts.value = form.rts[1].value;
 
-	if(form.frag.value == "" || (form.frag_an.value == "" && top.fragment_an_flag == 1))
+	if(form.frag.value == "" || (form.frag_an.value == "" && getTop(window).fragment_an_flag == 1))
 	{
 		alert("$fragmentation_range");
 		return false;
 	}
-	if(!(form.frag.value > 255 && form.frag.value < 2347) || (!(form.frag_an.value > 255 && form.frag_an.value < 2347) && top.fragment_an_flag == 1))
+	if(!(form.frag.value > 255 && form.frag.value < 2347) || (!(form.frag_an.value > 255 && form.frag_an.value < 2347) && getTop(window).fragment_an_flag == 1))
 	{
 		alert("$fragmentation_range");
 		return false;
@@ -217,7 +217,7 @@ function checkadv(form)
 			}
 			else
 			{
-				top.enable_action=0;
+				getTop(window).enable_action=0;
 				form.wds_change_ip.value="to_repeatip";
 			}
 		}
@@ -228,7 +228,7 @@ function checkadv(form)
 	{
 		if ( old_wds_endis_fun == "1" &&  old_wds_repeater_basic == "0" )
 		{
-			top.enable_action=0;
+			getTop(window).enable_action=0;
 			form.wds_change_ip.value="to_lanip";
 		}
 		else
@@ -247,7 +247,7 @@ function checkadv(form)
 	form.wl_rts.value = form.rts.value;
 	form.wla_rts.value = form.rts_an.value;
 	form.wl_frag.value = form.frag.value;
-	if(top.fragment_an_flag == 1){
+	if(getTop(window).fragment_an_flag == 1){
 		form.frag_an.value=port_range_interception(form.frag_an.value);
 		form.wla_frag.value = form.frag_an.value;
 	}

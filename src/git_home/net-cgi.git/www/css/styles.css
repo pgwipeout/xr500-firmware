@@ -3740,10 +3740,11 @@ input[type=range]:focus::-ms-fill-upper {
             transform: scale(1.5); } }
 body {
   background-color: #120203;
-  background-image: url(../images/svg/bg.svg);
+  background-image: url('/desktop/testwallpaper.svg');
   background-attachment: fixed;
   background-size: cover;
   background-repeat: no-repeat;
+  filter:progid:DXImageTransform.Microsoft.AlphaLmageLoader(src='/desktop/testwallpaper.svg',sizingMethod='scale');
   min-height: 100%; }
 
 @font-face {

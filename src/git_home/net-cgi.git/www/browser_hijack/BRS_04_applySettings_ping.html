@@ -10,8 +10,8 @@
 var curr_country = "<% cfg_get("dsl_wan_country") %>";
 var curr_isp = "<% cfg_get("dsl_wan_isp") %>";
 var wan_type = "<% cfg_get("dsl_wan_type") %>";
-var apmode_flag = top.apmode_flag;
-var ap_mode_detection_flag = top.ap_mode_detection_flag;
+var apmode_flag = getTop(window).apmode_flag;
+var ap_mode_detection_flag = getTop(window).ap_mode_detection_flag;
 <% cfg_set("hijack_refresh_counter", "0") %>
 var ap_mode = "<% cfg_get("ap_mode") %>";
 var ping_result = "<% hijack_apply_result("/tmp/ping_result") %>"

@@ -10,8 +10,8 @@
 <% table_header() %>
 
 <script>
-top.broadband_mode = "<% cfg_get("dango_det_wan_type") %>";
-top.enabledItemsClass_basic();
+getTop(window).broadband_mode = "<% cfg_get("dango_det_wan_type") %>";
+getTop(window).enabledItemsClass_basic();
 var netgear_region="<% get_firmware_region() %>";
 <% commit() %>
 var wan_3g_status = "<% wan_3g_status() %>";
@@ -40,12 +40,12 @@ function isp_display()
 }
 
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 
 function loadvalue()
 {
-	if( top.location.href.indexOf("adv_index.htm") == -1 )
-		top.basic_menu_color_change('3g');
+	if( getTop(window).location.href.indexOf("adv_index.htm") == -1 )
+		getTop(window).basic_menu_color_change('3g');
 
 	var form=document.forms[0];
 	//var adapter_driver="<% cfg_get("adapter_driver") %>";

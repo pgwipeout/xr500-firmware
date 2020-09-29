@@ -22,7 +22,7 @@ function change_container_posision()
 
 function goto_top( page)
 {
-	top.location.href=page;
+	getTop(window).location.href=page;
 }
 
 function change_select()
@@ -63,11 +63,11 @@ function firmwareUpgrade()
 
 function do_search()
 {
-	var key = top.document.getElementsByTagName("input")[0].value.replace(/\'/g, "&apos;");
+	var key = getTop(window).document.getElementsByTagName("input")[0].value.replace(/\'/g, "&apos;");
 	var winoptions = "width=960,height=800,menubar=yes,scrollbars=yes,toolbar=yes,status=yes,location=yes,resizable=yes";
 	var url="";
 	if(key == "" || key == "$ent_srh_item") {
-		url = "http://support.netgear.com/product/"+top.host_name;
+		url = "http://support.netgear.com/product/"+getTop(window).host_name;
 	} else {
 		key = key.replace(/ /g,"%20")
 		url = "http://kb.netgear.com/app/answers/list/kw/"+key;
@@ -107,7 +107,7 @@ function load_top_value()
 	
 	var sUserAgent = navigator.userAgent;
 
-	var width = top.document.documentElement.clientWidth;
+	var width = getTop(window).document.documentElement.clientWidth;
 	var upgrade_div = document.getElementById("update_info");
 	if(upgrade_div != null)
 	{

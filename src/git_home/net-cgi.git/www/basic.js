@@ -48,11 +48,11 @@ function close_all_sub(click_name)/* fold all menus, except the menu which user 
 	var sub_name = sub_list+"_sub";
 	if( sub_name != click_name )
 	{
-		var div_name = top.document.getElementById(button_name);
+		var div_name = getTop(window).document.getElementById(button_name);
 
 		settingClass(div_name, "advanced_white_close_button");
 
-		top.document.getElementById(sub_name).style.display="none";
+		getTop(window).document.getElementById(sub_name).style.display="none";
 	}
 }
 
@@ -61,22 +61,22 @@ function open_or_close_sub(name)
 	/* to fix bug 23268, when user want to unfold one menus, fold the other menus. */
 	var button_name= name+"_bt";
 	var sub_name= name+"_sub";
-	var open_flag= top.document.getElementById(sub_name).style.display;
+	var open_flag= getTop(window).document.getElementById(sub_name).style.display;
 
 	close_all_sub(sub_name);/* fold all menus first, except the menu which user click*/
 	
-	var button_div = top.document.getElementById(button_name);
+	var button_div = getTop(window).document.getElementById(button_name);
 	if( open_flag == "none")
 	{
 		settingClass(button_div, "advanced_white_open_button");
-		top.document.getElementById(sub_name).style.display="";
+		getTop(window).document.getElementById(sub_name).style.display="";
 		subItemsClass(sub_name);
 		enabledItemsClass_basic();
 	}
 	else
 	{
 		settingClass(button_div, "advanced_white_close_button");
-		top.document.getElementById(sub_name).style.display="none";
+		getTop(window).document.getElementById(sub_name).style.display="none";
 	}
 }
 
@@ -93,21 +93,21 @@ function settingClass(obj, class_name)
 
 function basic_menu_class_default()
 {
-	var menu_div = top.document.getElementById("menu");
+	var menu_div = getTop(window).document.getElementById("menu");
 	var menu_btns = menu_div.getElementsByTagName("div");
 
 	var i;
 	for(i=0; i<menu_btns.length; i++)
 	{
-		if((top.have_broadband ==1) && (top.is_ru_version==1 || top.is_pr_version==1) && i == 2)
+		if((getTop(window).have_broadband ==1) && (getTop(window).is_ru_version==1 || getTop(window).is_pr_version==1) && i == 2)
 		{
-			menu_div = top.document.getElementById("internet_bt");
+			menu_div = getTop(window).document.getElementById("internet_bt");
 			settingClass(menu_div, "advanced_white_close_button");			
 		}
 		else{
-			if((top.enable_bridge_flag==1 ||top.enabled_wds==1 || top.enable_ap_flag== 1 || top.broadband_mode == "MyDetc" || top.enable_extender_flag == "1" || top.enable_mapt == 1 || top.device_mode == "1") && i == 2)
+			if((getTop(window).enable_bridge_flag==1 ||getTop(window).enabled_wds==1 || getTop(window).enable_ap_flag== 1 || getTop(window).broadband_mode == "MyDetc" || getTop(window).enable_extender_flag == "1" || getTop(window).enable_mapt == 1 || getTop(window).device_mode == "1") && i == 2)
 			{
-				var internet_div = top.document.getElementById("internet");
+				var internet_div = getTop(window).document.getElementById("internet");
 				internet_div.className = internet_div.className + "_grey";
 			}
 			var height = menu_btns[i].getElementsByTagName("span")[0].clientHeight;
@@ -133,47 +133,47 @@ function basic_menu_class_default()
 		}
 	}
 
-	/*if(top.enabled_wds==1 || top.enable_ap_flag== 1)
+	/*if(getTop(window).enabled_wds==1 || getTop(window).enable_ap_flag== 1)
 	{
-		var internet_div = top.document.getElementById("internet");
+		var internet_div = getTop(window).document.getElementById("internet");
 		internet_div.className = internet_div.className + "_grey";
 	}
 	*/
 
-	if((top.enable_ap_flag== 1 || top.enable_bridge_flag== 1 || top.enable_extender_flag == "1" || top.device_mode == "1") && top.have_dynamic_qos == 1 )
+	if((getTop(window).enable_ap_flag== 1 || getTop(window).enable_bridge_flag== 1 || getTop(window).enable_extender_flag == "1" || getTop(window).device_mode == "1") && getTop(window).have_dynamic_qos == 1 )
 	{
-		var intqos_div = top.document.getElementById("intqos");
+		var intqos_div = getTop(window).document.getElementById("intqos");
 		intqos_div.className = intqos_div.className + "_grey";
 	}
 
-	if(top.enable_ap_flag== 1 || top.enable_bridge_flag== 1 || top.enable_extender_flag == "1" || top.device_mode == "1" )
+	if(getTop(window).enable_ap_flag== 1 || getTop(window).enable_bridge_flag== 1 || getTop(window).enable_extender_flag == "1" || getTop(window).device_mode == "1" )
 	{
-		var parental_div = top.document.getElementById("parental");
+		var parental_div = getTop(window).document.getElementById("parental");
 		if(parental_div != null)
 			parental_div.className = parental_div.className + "_grey";
 	}
 
-	if(top.enabled_wds == 1 || top.enable_bridge_flag== 1 || top.enable_extender_flag == "1" || top.device_mode == "1" )
+	if(getTop(window).enabled_wds == 1 || getTop(window).enable_bridge_flag== 1 || getTop(window).enable_extender_flag == "1" || getTop(window).device_mode == "1" )
 	{
-		var wds_div = top.document.getElementById("guest");
+		var wds_div = getTop(window).document.getElementById("guest");
 		wds_div.className = wds_div.className + "_grey";
 	}
 	
-	if( top.enable_bridge_flag== 1 || top.device_mode == "1")
+	if( getTop(window).enable_bridge_flag== 1 || getTop(window).device_mode == "1")
 	{
-		var wds_div = top.document.getElementById("wireless");
+		var wds_div = getTop(window).document.getElementById("wireless");
 		wds_div.className = wds_div.className + "_grey";
 	}
 	
-	if( top.device_mode == "1")
+	if( getTop(window).device_mode == "1")
 	{
-		var wds_div = top.document.getElementById("readyshare");
+		var wds_div = getTop(window).document.getElementById("readyshare");
 		wds_div.className = wds_div.className + "_grey";
 	}
 	
-	/*if(top.have_broadband == 1 && top.is_ru_version == 1 && top.is_pr_version == 1)
+	/*if(getTop(window).have_broadband == 1 && getTop(window).is_ru_version == 1 && getTop(window).is_pr_version == 1)
 	{
-		menu_div = top.document.getElementById("internet_bt");
+		menu_div = getTop(window).document.getElementById("internet_bt");
 		settingClass(menu_div, "advanced_white_close_button");
 	}*/
 }
@@ -199,13 +199,13 @@ function subItemsClass(argv)
 
 	for(num=0; num<arguments.length; num++)
 	{
-		sub_menu = top.document.getElementById(arguments[num]);
+		sub_menu = getTop(window).document.getElementById(arguments[num]);
 		if(sub_menu.style.display == "none") continue;
 		items = sub_menu.getElementsByTagName("dt");
 
 		for(i=0; i<items.length; i++)
 		{
-			if( top.old_div == items[i] ) break;
+			if( getTop(window).old_div == items[i] ) break;
 			words_height = items[i].getElementsByTagName("a")[0].clientHeight;
 			if(words_height > 28 )
 				items[i].className = "long_name";
@@ -219,12 +219,12 @@ function subItemsClass(argv)
 
 function enabledItemsClass_basic()
 {
-	var cur_div = top.document.getElementById("3g");
-	var cur_div_1= top.document.getElementById("ethernet");
-	if(top.have_broadband ==1 && (top.is_pr_version == 1 || top.is_ru_version == 1))
+	var cur_div = getTop(window).document.getElementById("3g");
+	var cur_div_1= getTop(window).document.getElementById("ethernet");
+	if(getTop(window).have_broadband ==1 && (getTop(window).is_pr_version == 1 || getTop(window).is_ru_version == 1))
 	{
 		var height = cur_div.getElementsByTagName("a")[0].clientHeight;
-		if(top.broadband_mode == "AutoDetc")
+		if(getTop(window).broadband_mode == "AutoDetc")
 		{
 			if( height > 28 )
 				cur_div.className = "long_grey";
@@ -242,7 +242,7 @@ function enabledItemsClass_basic()
 		}
 		
 		var height_1 = cur_div_1.getElementsByTagName("a")[0].clientHeight;
-		if(top.enabled_wds==1 || top.enable_ap_flag== 1 || top.enable_extender_flag == "1")
+		if(getTop(window).enabled_wds==1 || getTop(window).enable_ap_flag== 1 || getTop(window).enable_extender_flag == "1")
 		{
 			if( height_1 > 28 )
 				cur_div_1.className = "long_grey";
@@ -274,19 +274,19 @@ function enabledItemsClass_basic()
 
 function clickSubMenu(clicked_item)
 {
-	if( top.old_div != "")
+	if( getTop(window).old_div != "")
 	{
-		var old_div_class = top.old_div.className;
+		var old_div_class = getTop(window).old_div.className;
 		if( old_div_class == "sub_back_purple")
-			top.old_div.className = "sub_back";
+			getTop(window).old_div.className = "sub_back";
 		else if ( old_div_class == "sub_back_purple_double")
-			top.old_div.className = "middle_name";
+			getTop(window).old_div.className = "middle_name";
 		else if ( old_div_class == "sub_back_purple_triple")
-			top.old_div.className = "long_name";
+			getTop(window).old_div.className = "long_name";
 	}
 	if( clicked_item == "0" )
 	{
-		top.old_div = "";
+		getTop(window).old_div = "";
 		return;
 	}
 	var current_class = clicked_item.className;
@@ -296,19 +296,19 @@ function clickSubMenu(clicked_item)
 		clicked_item.className = "sub_back_purple_double";
 	else if( current_class == "long_name")
 		clicked_item.className = "sub_back_purple_triple";
-	top.old_div = clicked_item;
+	getTop(window).old_div = clicked_item;
 }
 
 function basic_menu_color_change( change_id )
 {
 	basic_menu_class_default();
 
-	var clicked_item = top.document.getElementById(change_id);
+	var clicked_item = getTop(window).document.getElementById(change_id);
 	if(change_id=="broadband" || change_id=="ethernet" || change_id=="3g")
 	{
-		var parent_id = top.document.getElementById(change_id).parentNode.parentNode.id;
+		var parent_id = getTop(window).document.getElementById(change_id).parentNode.parentNode.id;
 		var btn_id = parent_id.replace('sub', 'bt');
-		var btn_div = top.document.getElementById(btn_id);
+		var btn_div = getTop(window).document.getElementById(btn_id);
 		settingClass(btn_div, "advanced_white_open_button");
 
 		clickSubMenu(clicked_item);
@@ -329,13 +329,13 @@ function click_action(id)
                         basic_menu_color_change('home');
                         goto_formframe('basic_wait.htm');
                 }
-		else if( id == "internet" && top.enabled_wds == 0 && top.enable_ap_flag != 1 && top.broadband_mode != "MyDetc" && top.enable_bridge_flag == 0 && top.enable_extender_flag != "1" && top.enable_mapt !=1 && top.device_mode != "1")
+		else if( id == "internet" && getTop(window).enabled_wds == 0 && getTop(window).enable_ap_flag != 1 && getTop(window).broadband_mode != "MyDetc" && getTop(window).enable_bridge_flag == 0 && getTop(window).enable_extender_flag != "1" && getTop(window).enable_mapt !=1 && getTop(window).device_mode != "1")
 		{
-			if(top.have_broadband==1 && (top.is_ru_version==1 || top.is_pr_version ==1))
+			if(getTop(window).have_broadband==1 && (getTop(window).is_ru_version==1 || getTop(window).is_pr_version ==1))
 			{
 				open_or_close_sub('internet');
 				basic_menu_color_change('ethernet');
-				if(top.dsl_enable_flag == 0)
+				if(getTop(window).dsl_enable_flag == 0)
 					goto_formframe('BAS_basic.htm');
 				else
 					goto_formframe('BAS_basic_dsl.htm');
@@ -343,31 +343,31 @@ function click_action(id)
 			else
 			{
 				basic_menu_color_change('internet');
-				if(top.dsl_enable_flag == 0)
+				if(getTop(window).dsl_enable_flag == 0)
 					goto_formframe('BAS_basic.htm');
 				else
 					goto_formframe('BAS_basic_dsl.htm');
 			}
 		}
-                else if( id == "broadband" && top.have_broadband ==1)
+                else if( id == "broadband" && getTop(window).have_broadband ==1)
 		{
 			basic_menu_color_change('broadband');
 			goto_formframe('BAS_broadband.htm');
 		}
-		else if( id == "ethernet" && top.have_broadband ==1 && top.enabled_wds == 0 && top.enable_ap_flag != 1)
+		else if( id == "ethernet" && getTop(window).have_broadband ==1 && getTop(window).enabled_wds == 0 && getTop(window).enable_ap_flag != 1)
 		{
 			basic_menu_color_change('ethernet');
-			if(top.dsl_enable_flag == 0)
+			if(getTop(window).dsl_enable_flag == 0)
 				goto_formframe('BAS_basic.htm');
 			else
 				goto_formframe('BAS_basic_dsl.htm');
 		}
-		else if( id == "3g" && top.have_broadband ==1 && top.broadband_mode != "AutoDetc" )
+		else if( id == "3g" && getTop(window).have_broadband ==1 && getTop(window).broadband_mode != "AutoDetc" )
 		{
 			basic_menu_color_change('3g');
 			goto_formframe('BAS_3g.htm');
 		}
-                else if( id == "wireless" && top.enable_bridge_flag == 0 && top.device_mode != "1" )
+                else if( id == "wireless" && getTop(window).enable_bridge_flag == 0 && getTop(window).device_mode != "1" )
                 {
                         basic_menu_color_change('wireless');
 			if( endis_wl_radio == '1' || endis_wla_radio == '1' )
@@ -377,7 +377,7 @@ function click_action(id)
                 }
                 else if( id == "attached" )
                 {
-			if(top.have_dynamic_qos == 1)
+			if(getTop(window).have_dynamic_qos == 1)
 			{
 				basic_menu_color_change('attached');
 				goto_formframe("QOS_device.htm");
@@ -386,26 +386,26 @@ function click_action(id)
 				goto_formframe('DEV_device.htm');
 			}
                 }
-		else if( id == "intqos" && top.have_dynamic_qos == 1 && top.enable_ap_flag != 1 && top.enable_bridge_flag == 0 && top.enable_extender_flag == "0" && top.device_mode != "1" )
+		else if( id == "intqos" && getTop(window).have_dynamic_qos == 1 && getTop(window).enable_ap_flag != 1 && getTop(window).enable_bridge_flag == 0 && getTop(window).enable_extender_flag == "0" && getTop(window).device_mode != "1" )
 		{
 			basic_menu_color_change('intqos');
-			if(top.have_advanced_qos == "1")
+			if(getTop(window).have_advanced_qos == "1")
 				goto_formframe("QOS_wait.htm");
 			else
                                 goto_formframe("QOS_dynamic.htm");
 
 		}
-		else if( id == "parental" && top.enable_ap_flag != 1 && top.enable_bridge_flag == 0 && top.enable_extender_flag == "0" && top.device_mode != "1" )
+		else if( id == "parental" && getTop(window).enable_ap_flag != 1 && getTop(window).enable_bridge_flag == 0 && getTop(window).enable_extender_flag == "0" && getTop(window).device_mode != "1" )
                 {
                         basic_menu_color_change('parental');
 			open_window('parental_ctrl.htm');
                 }
-                else if( id == "readyshare" && top.device_mode != "1" )
+                else if( id == "readyshare" && getTop(window).device_mode != "1" )
                 {
                         basic_menu_color_change('readyshare');
                         goto_formframe('USB_basic.htm');
                 }
-                else if( id == "guest" && top.enabled_wds == 0 && top.enable_bridge_flag == 0 && top.enable_extender_flag == "0" && top.device_mode != "1")
+                else if( id == "guest" && getTop(window).enabled_wds == 0 && getTop(window).enable_bridge_flag == 0 && getTop(window).enable_extender_flag == "0" && getTop(window).device_mode != "1")
                 {
                         basic_menu_color_change('guest');
                         goto_formframe('WLG_wireless_guest1.htm');
@@ -415,7 +415,7 @@ function click_action(id)
 			basic_menu_color_change('quick_qos');
 			goto_formframe('Quick_wait.htm');
 		}
-		else if( id == "green" && top.have_green_download ==1 && top.device_mode != "1" )
+		else if( id == "green" && getTop(window).have_green_download ==1 && getTop(window).device_mode != "1" )
 		{
 			if( download_type == "http" )
 				goto_formframe("GREEN_http_basic.htm");
@@ -430,9 +430,9 @@ function click_action(id)
 			basic_menu_color_change('fastlane');
 			goto_formframe('FL_fastLane.htm');
 		}
-		else if( id == "no_internet" && top.enabled_wds == 0 && top.enable_ap_flag != 1 && top.broadband_mode != "MyDetc" && top.enable_bridge_flag == 0 && top.enable_extender_flag == "0")
+		else if( id == "no_internet" && getTop(window).enabled_wds == 0 && getTop(window).enable_ap_flag != 1 && getTop(window).broadband_mode != "MyDetc" && getTop(window).enable_bridge_flag == 0 && getTop(window).enable_extender_flag == "0")
 		{
-			if(top.have_broadband==1 && (top.is_ru_version==1 || top.is_pr_version==1))
+			if(getTop(window).have_broadband==1 && (getTop(window).is_ru_version==1 || getTop(window).is_pr_version==1))
 			{
 				open_or_close_sub('internet');
 				basic_menu_color_change('ethernet');
@@ -445,9 +445,9 @@ function click_action(id)
 			else
 				document.forms[0].submit();
 		}
-		else if( id == "mobile_internet" && top.enable_bridge_flag == 0)
+		else if( id == "mobile_internet" && getTop(window).enable_bridge_flag == 0)
 		{
-			top.click_lte_sim=0;
+			getTop(window).click_lte_sim=0;
 			basic_menu_color_change('internet');
 			goto_formframe('check_mobile_internet_wait.htm');
 		}

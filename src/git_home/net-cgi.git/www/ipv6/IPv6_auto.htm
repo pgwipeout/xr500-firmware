@@ -60,16 +60,16 @@ else
  	ipv6_lan_ip = "<% ipv6_lan_ip() %>";
 
 if(connection_type == "Detecting..."){
-	top.refresh_another_time = 3;
+	getTop(window).refresh_another_time = 3;
 	setTimeout("location.href='IPv6_auto.htm';", 3000);
 }else{
-	if(top.refresh_another_time > 0 && ipv6_lan_ip == ""){
-		top.refresh_another_time--;
+	if(getTop(window).refresh_another_time > 0 && ipv6_lan_ip == ""){
+		getTop(window).refresh_another_time--;
 		connection_type = "Detecting...";
 		setTimeout("location.href='IPv6_auto.htm';", 3000);
 	}
 	else
-		top.refresh_another_time = 0;
+		getTop(window).refresh_another_time = 0;
 }
 /* to fix bug 27954 */
 var ipv6_type = "<% cfg_get("ipv6_type") %>";
@@ -97,7 +97,7 @@ function loadvalue()
 
 	ipv6_load_common(cf);		
 	
-	if(top.ipv6_dns_manual == 1)
+	if(getTop(window).ipv6_dns_manual == 1)
 	{
 		if(wan_port_status != "Link down" && (connection_type == "6to4 Tunnel" || connection_type== "Auto Config" || connection_type== "DHCP" || connection_type == "6rd Tunnel" || connection_type == "PPPoE"))
 		{
@@ -111,7 +111,7 @@ function loadvalue()
 
 function check_ipv6_auto(cf)
 {
-	if(top.ipv6_dns_manual == 1)
+	if(getTop(window).ipv6_dns_manual == 1)
 	{
 		if(wan_port_status != "Link down" &&(connection_type == "6to4 Tunnel" || connection_type== "Auto Config" || connection_type== "DHCP" || connection_type == "6rd Tunnel" || connection_type == "PPPoE"))
 		{
@@ -150,7 +150,7 @@ $bluebar
 	<TD nowrap><A tabindex=-1 href="javascript:loadhelp('_IPv6_auto','wan_type')"><B>$trigger_contype</B></A></TD>
 	<TD nowrap  id="connection_type">
 	<script>
-	if(top.dsl_enable_flag == 0)
+	if(getTop(window).dsl_enable_flag == 0)
 	{	
 		if(wan_port_status != "Link down")
 		{

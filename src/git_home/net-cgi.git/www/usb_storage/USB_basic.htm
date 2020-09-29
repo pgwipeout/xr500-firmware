@@ -158,9 +158,9 @@ var cf=document.forms[0];
 
 location.href="USB_advanced.htm";
 
-if( top.location.href.indexOf("adv_index.htm") != -1 )		//to fix bug 32119
+if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )		//to fix bug 32119
 	menu_color_change('usb_adv');
-//top.location.href="adv_index.htm";
+//getTop(window).location.href="adv_index.htm";
 }
 </script>	
 <TR><TD colspan=2>

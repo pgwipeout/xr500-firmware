@@ -52,13 +52,13 @@ function updateProgress()
 
 function menu_change() 
 {
-	top.enable_action=1;
+	getTop(window).enable_action=1;
 }
 
 function refreshError()
 {
-	top.topframe.location.href="top.html";
-	top.formframe.location.href="UPG_failure.htm";
+	getTop(window).topframe.location.href="top.html";
+	getTop(window).formframe.location.href="UPG_failure.htm";
 	menu_change();
 }
 

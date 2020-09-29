@@ -49,7 +49,7 @@ function Convert(originStr)
 		var i;
 		var speed_str;
 		var status_str;
-        for( i=1; i<= top.green_download_item_num; i++)
+        for( i=1; i<= getTop(window).green_download_item_num; i++)
         {
             var info = eval( 'item' + i );
             var each_info = info.split('*');

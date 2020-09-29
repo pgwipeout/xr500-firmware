@@ -885,14 +885,14 @@ function setSecurity_an(num)
 }
 function loadvalue()
 {
-	if(top.location.href.indexOf("hidden_gre.htm") == -1 )
+	if(getTop(window).location.href.indexOf("hidden_gre.htm") == -1 )
 	{
 
-		top.enabled_wds=<% wds_enable() %>;
-		if( top.location.href.indexOf("adv_index.htm") != -1 )
-			top.menu_color_change('guest');
+		getTop(window).enabled_wds=<% wds_enable() %>;
+		if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
+			getTop(window).menu_color_change('guest');
 		else
-			top.basic_menu_color_change('guest');
+			getTop(window).basic_menu_color_change('guest');
 	}
 	var form=document.forms[0];
 	if(enable_gre_flag == 1)

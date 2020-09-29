@@ -64,7 +64,7 @@ function loadvalue()
 	var cf = document.forms[0];
 	cf.name_tag.value="";
 	cf.icon_tag[46].selected = true;
-	if(streamboost_enable == "1" && top.enable_ap_flag != 1 && top.enable_bridge_flag == 0)
+	if(streamboost_enable == "1" && getTop(window).enable_ap_flag != 1 && getTop(window).enable_bridge_flag == 0)
 		document.getElementById("dev_priority").style.display="";
 	else
 		document.getElementById("dev_priority").style.display="none";
@@ -76,7 +76,7 @@ function loadvalue()
 	cf.icon_tag[parseInt(devtype) -1].selected = true;
 }
 
-$$(window).unload(function leavepage(){top.back_flag=1;});
+$$(window).unload(function leavepage(){getTop(window).back_flag=1;});
 function select_icon()
 {
 	var icon_img=document.getElementById("icon_img");
@@ -106,7 +106,7 @@ function check_device_edit_apply(cf)
 	var value_priority = "MEDIUM";
 	var value_type = "47";
 	var i=0;
-	if(streamboost_enable == "1" && top.enable_ap_flag != 1 && top.enable_bridge_flag == 0){
+	if(streamboost_enable == "1" && getTop(window).enable_ap_flag != 1 && getTop(window).enable_bridge_flag == 0){
 		if($$(".pri_up"))
 			value_priority = $$(".pri_up").attr("id");
 		else

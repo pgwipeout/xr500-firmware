@@ -320,6 +320,32 @@ var adsl_list = {"Australia":{
 				
 
 };
+
+function getTop(frameWindow) 
+{ 
+	try 
+	{ 
+		var parentWindow = frameWindow.parent; 
+		if (frameWindow.netgear_version !== undefined) 
+		{ 
+			return frameWindow; 
+		} 
+		if (parentWindow === frameWindow) 
+		{ 
+			return frameWindow; 
+		} 
+		if (parentWindow.origin !== frameWindow.origin) 
+		{ 
+			return frameWindow; 
+		} 
+
+		return getTop(parentWindow); 
+	} catch (e) 
+	{ 
+		return top; 
+	} 
+} 
+
 function set_checkbox_value(cb_obj, hid_obj)
 {
 	if(cb_obj.checked == true)
@@ -502,8 +528,8 @@ function createXMLHttpRequest()
 function edit_devicename(name)
 {
 	location.href="edit_device_name.htm";
-	top.menu_color_change("devname");
-	top.open_sub("setup");
+	getTop(window).menu_color_change("devname");
+	getTop(window).open_sub("setup");
 	//lert('<table cellpadding=0 cellspacing=2  border=0><tr><td colspan=3 nowrap><h3>$edit_devname</h3></td></tr><tr><td colspan=3 >$devame_note</td></tr><tr><td nowrap style="height:40px">$lan_mark_name:</td><td><div id="devn_error" style="display: none;color:red">$devname_long</div></td>	<td nowrap align=right style="width:100px"><input type="text" name="new_devname" value="'+name+'" size="20" autocomplete="off" maxlength="20" onFocus="this.select();" onKeyPress="return getkey(\'ssid\', event)" ></td> </tr><tr><td colspan=3 >$devname_warning</td></tr><tr><td  colspan=3 height="20px"></td></tr></table>',check_dev, function(){return false;}, 600, 1);
 }
 
@@ -564,19 +590,6 @@ function open_window( page )
 
 }
 
-function goto_home_page()
-{
-	if( top.location.href.indexOf("adv_index.htm") != -1 ){
-		top.location.href="adv_index.htm";	
-	}
-	else if ( top.location.href.indexOf("BRS_index.htm") > -1 ){
-		toInternet();
-	}
-	else{
-		top.location.href="index.htm";	
-	}
-}
-
 function existClassName(classname)
 {
 	if ( document.getElementsByClassName ) {
@@ -625,7 +638,7 @@ function please_wait(flag)
 function goto_formframe(page)
 {
 	please_wait(true);
-	top.formframe.location.href=page;
+	getTop(window).formframe.location.href=page;
 }
 
 function goto_page(page)
@@ -638,7 +651,7 @@ function main_top_button_div_show_scroll()
 {// for pages have top button
         if( isIE_or_Opera() && IE_version() < 9 )
         {
-                var frame_height= top.document.getElementById("formframe_div").style.height.replace(/px/,"");
+                var frame_height= getTop(window).document.getElementById("formframe_div").style.height.replace(/px/,"");
                 //51: page_title height: 20, help height:30; top button: 30 add 1 px change
                 document.getElementById("main").style.height= frame_height-81;
         }
@@ -649,7 +662,7 @@ function main_div_show_scroll()
 {// for pages have page_title, but not have top button, 
         if( isIE_or_Opera() && IE_version() < 9 )
         {
-                var frame_height= top.document.getElementById("formframe_div").style.height.replace(/px/,"");
+                var frame_height= getTop(window).document.getElementById("formframe_div").style.height.replace(/px/,"");
 		//51: page_title height: 20, help height:30;  add 1 px change
                 document.getElementById("main").style.height= frame_height-51; 
         }
@@ -659,7 +672,7 @@ function IE_RST_status()
 {
 	if( isIE_or_Opera() && IE_version() < 9 )
 	{
-		var frame_height= top.document.getElementById("formframe_div").style.height.replace(/px/,"");
+		var frame_height= getTop(window).document.getElementById("formframe_div").style.height.replace(/px/,"");
 		document.getElementById("content_icons").style.height= frame_height;
 	}
 }
@@ -691,8 +704,8 @@ function show_hidden_help_green(help_flag)
 		Not_IE_show_hidden_help(help_flag);
 	else
 	{
-		var frame_height= top.document.getElementById("formframe_div").style.height.replace(/px/,"");
-		if(!frame_height) frame_height= top.document.getElementById("formframe_div").clientHeight;
+		var frame_height= getTop(window).document.getElementById("formframe_div").style.height.replace(/px/,"");
+		if(!frame_height) frame_height= getTop(window).document.getElementById("formframe_div").clientHeight;
 		var top_height = document.getElementById("top").style.height.replace(/px/,"");
 		if( help_flag % 2 == 0 )
 		{
@@ -717,7 +730,7 @@ function show_hidden_help(help_flag)
 		Not_IE_show_hidden_help(help_flag);
 	else
 	{
-		var frame_height= top.document.getElementById("formframe_div").style.height.replace(/px/,"");
+		var frame_height= getTop(window).document.getElementById("formframe_div").style.height.replace(/px/,"");
 		if( help_flag % 2 == 0 )
 		{
 			document.getElementById("main").style.height=frame_height-170;//20+30+120
@@ -739,7 +752,7 @@ function show_hidden_help_top_button(help_flag)
 		Not_IE_show_hidden_help(help_flag);
 	else
 	{
-		var frame_height= top.document.getElementById("formframe_div").style.height.replace(/px/,"");
+		var frame_height= getTop(window).document.getElementById("formframe_div").style.height.replace(/px/,"");
 		if( help_flag % 2 == 0 )
 		{
 			document.getElementById("main").style.height=frame_height-200;//50+30+120
@@ -882,7 +895,7 @@ function check_DNS(dnsaddr1,dnsaddr2,wan_assign,wan_ip)
 {
         if(dnsaddr1!="")
         {
-                if(checkipaddr(dnsaddr1)==false)
+                if(checkdnsaddr(dnsaddr1)==false)
                 {
                         alert("$invalid_primary_dns");
                         return false;
@@ -895,7 +908,7 @@ function check_DNS(dnsaddr1,dnsaddr2,wan_assign,wan_ip)
         }
         if(dnsaddr2!="")
         {
-                if(checkipaddr(dnsaddr2)==false)
+                if(checkdnsaddr(dnsaddr2)==false)
                 {
                         alert("$invalid_second_dns");
                         return false;
@@ -919,7 +932,7 @@ function check_RU_DNS(dnsaddr1,dnsaddr2,wan_assign,wan_ip)
 {
 	if(dnsaddr1!="")
 	{
-		if(checkipaddr(dnsaddr1)==false)
+		if(checkdnsaddr(dnsaddr1)==false)
 		{
 			alert(bh_invalid_primary_dns);
 			return false;
@@ -932,7 +945,7 @@ function check_RU_DNS(dnsaddr1,dnsaddr2,wan_assign,wan_ip)
 	}
 	if(dnsaddr2!="")
 	{
-		if(checkipaddr(dnsaddr2)==false)
+		if(checkdnsaddr(dnsaddr2)==false)
 		{
 			alert(bh_invalid_second_dns);
 			return false;
@@ -1385,6 +1398,71 @@ function isSameSubNet(lan1Ip, lan1Mask, lan2Ip, lan2Mask)
 	else
 		return false;
 }
+function checkdnsaddr(dnsaddr){
+	
+	var form = document.forms[0];
+	var dnsArray = dnsaddr.split(".");
+	var dnsstr = dnsArray[0]+dnsArray[1]+dnsArray[2]+dnsArray[3];
+	var i = 0;
+
+	if((dnsArray[0]=="")||(dnsArray[0]<0)||(dnsArray[0]>255)||(dnsArray[1]=="")||(dnsArray[1]<0)||(dnsArray[1]>255)
+			||(dnsArray[2]=="")||(dnsArray[2]<0)||(dnsArray[2]>255)||(dnsArray[3]=="")||(dnsArray[3]<0)||(dnsArray[3]>255))
+	{
+		return false;
+	}
+	for(i=0;i<dnsstr.length;i++)
+	{
+		if((dnsstr.charAt(i)!='0')&&(dnsstr.charAt(i)!='1')&&(dnsstr.charAt(i)!='2')
+				&&(dnsstr.charAt(i)!='3')&&(dnsstr.charAt(i)!='4')&&(dnsstr.charAt(i)!='5')
+				&&(dnsstr.charAt(i)!='6')&&(dnsstr.charAt(i)!='7')&&(dnsstr.charAt(i)!='8')
+				&&(dnsstr.charAt(i)!='9'))
+		{
+			return false;
+		}
+	}
+	if( dnsArray[0] > 223 || dnsArray[0] == 0 )
+		return false;
+	if (dnsaddr == "0.0.0.0" || dnsaddr == "255.255.255.255")
+	{
+		return false;
+	}
+
+	var each=dnsaddr.split(".");
+	if (each[0] == "127")
+	{
+		return false;
+	}
+	if (!dnsArray || dnsArray.length != 4)
+	{
+		return false;
+	}
+	else
+	{
+		for (i = 0; i < 4; i++)
+		{
+			thisSegment = dnsArray[i];
+			if (thisSegment != "")
+			{
+				if(i==3){
+					if (!((dnsArray[3] >= 0) && (dnsArray[3] < 255)))
+					{
+						return false;
+					}	
+				}
+				else if (!(thisSegment >=0 && thisSegment <= 255))
+				{
+					return false;
+				}
+			} 
+			else
+			{
+				return false;
+			}
+		}
+
+	}
+	return true;
+}
 function checkipaddr(ipaddr)
 {
 	var form = document.forms[0];
@@ -1818,7 +1896,7 @@ function printableKeyFilter()
 function checkpsk(passphrase, passphrase_len)
 {
 	var cd_less_flag = 0;
-	if(top.location.href.search("BRS_index.htm") != -1)
+	if(getTop(window).location.href.search("BRS_index.htm") != -1)
 		cd_less_flag = 1;
 	var len = passphrase.value.length;
 	if ( len == 64 )
@@ -2552,14 +2630,14 @@ function change_serv(cf)
 		goto_formframe("BAS_bpa.htm");
 	else if( cf.login_type.value == "PPPoE" )
 	{
-	   if(top.dsl_enable_flag == 0)
+	   if(getTop(window).dsl_enable_flag == 0)
 		goto_formframe("BAS_pppoe.htm");
 	   else
 		goto_formframe("BAS_pppoe_dsl.htm");
 	}
 	else if(cf.login_type.value == "multiPPPoE" )
 	{
-		if(top.netgear_region != "JP")
+		if(getTop(window).netgear_region != "JP")
 			goto_formframe("BAS_mulpppoe.htm");
 		else
 			goto_formframe("BAS_mulpppoe_ww.htm");
@@ -2582,34 +2660,34 @@ function change_ipv6(type)
 	switch(type)
 	{
 		case "disabled":
-			top.formframe.location.href = "IPv6_disabled.htm";
+			getTop(window).formframe.location.href = "IPv6_disabled.htm";
 			break;
 		case "autoDetect":
-			top.formframe.location.href = "IPv6_auto.htm";
+			getTop(window).formframe.location.href = "IPv6_auto.htm";
 			break;
 		case "autoConfig":
-			top.formframe.location.href = "IPv6_autoConfig.htm";
+			getTop(window).formframe.location.href = "IPv6_autoConfig.htm";
 			break;
 		case "6to4":
-			top.formframe.location.href = "IPv6_tunnel.htm";
+			getTop(window).formframe.location.href = "IPv6_tunnel.htm";
 			break;
 		case "bridge":
-			top.formframe.location.href = "IPv6_passThrougth.htm";
+			getTop(window).formframe.location.href = "IPv6_passThrougth.htm";
 			break;
 		case "fixed":
-			top.formframe.location.href = "IPv6_fixed.htm";
+			getTop(window).formframe.location.href = "IPv6_fixed.htm";
 			break;
 		case "dhcp":
-			top.formframe.location.href = "IPv6_dhcp.htm";
+			getTop(window).formframe.location.href = "IPv6_dhcp.htm";
 			break;
 		case "pppoe":
-			top.formframe.location.href = "IPv6_pppoe.htm";
+			getTop(window).formframe.location.href = "IPv6_pppoe.htm";
 			break;
 		case "6rd":
-			top.formframe.location.href = "IPv6_6rd.htm";
+			getTop(window).formframe.location.href = "IPv6_6rd.htm";
                         break;
 		default:
-			top.formframe.location.href = "IPv6_disabled.htm";
+			getTop(window).formframe.location.href = "IPv6_disabled.htm";
 			break;
 	} 
 }
@@ -3136,12 +3214,12 @@ function format_IP()
 function close_top_window()
 {
 	/* for Chrome, it need to use window.open(), and then use window.close() */
-	if ( isCDLESS() && !top.hidden_upgrade )
+	if ( isCDLESS() && !getTop(window).hidden_upgrade )
                 toInternet();
         else
 	{
 		window.open('', '_self', '');
-		top.window.close();
+		getTop(window).window.close();
 	}
 }
 
@@ -3149,7 +3227,7 @@ function ru_wizard()
 {
 	if( isIE_or_Opera() && IE_version() < 9 )
 	{
-		var frame_height= top.document.getElementById("formframe_div").style.height.replace(/px/,"");
+		var frame_height= getTop(window).document.getElementById("formframe_div").style.height.replace(/px/,"");
 		document.getElementsByTagName("div")[0].style.height = frame_height;
 	}
 }
@@ -3157,9 +3235,9 @@ function ru_wizard()
 /* to fix bug */
 function scroll_show()
 {
-	if( top.location.href.indexOf("adv_index.htm") != -1 )
+	if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
 	{
-		var frame_div = top.document.getElementById("formframe_div");
+		var frame_div = getTop(window).document.getElementById("formframe_div");
 		ru_wizard();
 		if(isIE()){
 		frame_div.onresize = ru_wizard;
@@ -3168,7 +3246,7 @@ function scroll_show()
 		window.onresize = ru_wizard;
 		}
 	}
-	else if ( top.location.href.indexOf("BRS_index.htm") != -1 )
+	else if ( getTop(window).location.href.indexOf("BRS_index.htm") != -1 )
 	{
 		document.getElementsByTagName("div")[0].style.height = "500";
 	}
@@ -3248,19 +3326,19 @@ function getElementsByTagAndName(tagName, eName)
 
 function isCDLESS()
 {
-	var flag = top.location.href.indexOf("BRS_index.htm") > -1 ;
+	var flag = getTop(window).location.href.indexOf("BRS_index.htm") > -1 ;
 	return flag;
 }
 
 function isWIZARD()
 {
-	var flag = top.location.href.indexOf("adv_index.htm") != -1&& top.setup_wizard_flag == 1;
+	var flag = getTop(window).location.href.indexOf("adv_index.htm") != -1&& getTop(window).setup_wizard_flag == 1;
 	return flag;
 }
 
 function toInternet()
 {
-	top.location.href = "to_internet_no_auth.htm";
+	getTop(window).location.href = "to_internet_no_auth.htm";
 }
 
 function getText(str1, str2)
@@ -3295,8 +3373,8 @@ function select_type( type)
 function gotto_link(sub, id)
 {
 	if(sub != "None")
-		top.open_sub(sub);
-	top.click_adv_action(id);
+		getTop(window).open_sub(sub);
+	getTop(window).click_adv_action(id);
 }
 function makeStr(strSize, fillChar)
 {
@@ -3346,14 +3424,11 @@ String.prototype.replaceXSSItem = function() {
 
 function back_reload_page(page)
 {
-       console.log("back_flag=%s", top.back_flag);
-       if(top.back_flag == 1)
+       console.log("back_flag=%s", getTop(window).back_flag);
+       if(getTop(window).back_flag == 1)
        {
                location.href = page;
-               top.back_flag = 0;
+               getTop(window).back_flag = 0;
        }
 }
 
-$$(function(){
-	$$("input").attr("autocomplete","off");
-})

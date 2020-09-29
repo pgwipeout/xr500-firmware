@@ -57,7 +57,7 @@ function add_item()
 	var str_down_url = form.download_url.value;
 	var str_low_1 = str_down_url.substr(0,4);
 	var str_low_2 = str_down_url.substr(0,5);
-	var task_num_all = top.green_download_item_num;
+	var task_num_all = getTop(window).green_download_item_num;
 
 	if(str_down_url.substr(0,5).toUpperCase() == "HTTPS")
 	{
@@ -83,7 +83,7 @@ function add_item()
 
 	form.decodeurl.value=decodeURIComponent(form.download_url.value);
 
-	top.download_type = this_download_type;
+	getTop(window).download_type = this_download_type;
 	return true;
 }
 function loadvalue()

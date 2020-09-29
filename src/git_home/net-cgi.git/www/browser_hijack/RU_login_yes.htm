@@ -43,7 +43,7 @@ function check_vpn_type()
 		parent.manual_ppp_type="0";
 		location.href="RU_manual_pptp.htm";
 	}
-	else if(form.VPN_type.value == "1" && top.l2tp_flag == 1)
+	else if(form.VPN_type.value == "1" && getTop(window).l2tp_flag == 1)
 	{
 		parent.manual_ppp_type="1";
 		location.href="RU_manual_l2tp.htm";
@@ -68,7 +68,7 @@ function check_vpn_type()
 		<select class="RU_sel" name="VPN_type" size="1">
 			<option value="0"><script>document.write(basic_intserv_pptp)</script></option>
 		<script>
-			if( top.l2tp_flag == 1 )
+			if( getTop(window).l2tp_flag == 1 )
 				document.write('<option value="1">'+basic_intserv_l2tp+'</option>');
 		</script>
 			<option value="2"><script>document.write(basic_intserv_pppoe)</script></option>

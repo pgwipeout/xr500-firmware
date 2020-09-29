@@ -17,7 +17,7 @@ var lan1_selecte=lan_selecte & 1;
 addLoadEvent(initPage);
 var isp = "<% cfg_get("dsl_wan_isp") %>";
 var wan2_bridge="<% cfg_get("dsl_wan2_bridge_mode") %>";
-var lan_ports_num = (typeof(top.lan_ports_num) == "undefined") ? 4 : top.lan_ports_num;
+var lan_ports_num = (typeof(getTop(window).lan_ports_num) == "undefined") ? 4 : getTop(window).lan_ports_num;
 function initPage()
 {
 	var btns_container_div = document.getElementById("btnsContainer_div");

@@ -1,11 +1,13 @@
 <% start_netscan() %>
 
 <HTML>
-<HEAD>
+	<HEAD>
+		<script language="javascript" type="text/javascript" src="/funcs.js"></script>
+
 <script language="javascript" type="text/javascript">
-top.back_flag = 0;
+getTop(window).back_flag = 0;
 var streamboost_enable="<% cfg_get("streamboost_enable") %>";
-if(streamboost_enable == "1" && top.enable_ap_flag != 1 && top.enable_bridge_flag == 0)
+if(streamboost_enable == "1" && getTop(window).enable_ap_flag != 1 && getTop(window).enable_bridge_flag == 0)
 	document.write('<META http-equiv="Refresh" content="4; url=QOS_show_device.htm">');
 else
 	document.write('<META http-equiv="Refresh" content="4; url=QOS_list_device.htm">');

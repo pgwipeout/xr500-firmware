@@ -47,7 +47,6 @@ define Package/samba-scripts/install
 	install -m0644 ./files/group $(1)/usr/config
 	install -m0755 ./files/update_user_v_02 $(1)/usr/sbin/update_user
 	install -m0755 ./files/detectSATA $(1)/usr/sbin/detectSATA
-	$(INSTALL_BIN) ./files/smbd-watchdog $(1)/usr/sbin/smbd-watchdog
 	install -m0755 $(PKG_BUILD_DIR)/update_smb $(1)/usr/sbin/update_smb
 	-rm -f $(1)/etc/gshadow
 	ln -s /tmp/config/gshadow $(1)/etc/gshadow

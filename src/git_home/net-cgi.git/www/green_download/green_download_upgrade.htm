@@ -60,12 +60,12 @@ function loadvalue()
 		if( green_download_upgrade_stat == "1" )
 		{
 			alert("$greendl_upgrade_alert_done");
-			top.location.href="adv_index.htm";
+			getTop(window).location.href="adv_index.htm";
 		}
 		else if( green_download_upgrade_stat != "0" && green_download_upgrade_stat != "")
 		{
 			alert("$greendl_upgrade_alert_failed");
-			top.location.href="adv_index.htm";
+			getTop(window).location.href="adv_index.htm";
 		}
 	}
 }

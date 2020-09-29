@@ -50,7 +50,7 @@ function check_ipv6_6to4(cf)
 		cf.ipv6_hidden_remote.value = "0";
 	}
 	
-	if(top.ipv6_dns_manual == 1)
+	if(getTop(window).ipv6_dns_manual == 1)
 	{
 		if(checkIPv6DNS(cf) == false)
 			return false;

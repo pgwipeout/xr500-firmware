@@ -16,13 +16,13 @@ function click_next()
 {
 	if (document.forms[0].WANDetc[0].checked == true)
 	{
-		if(top.have_broadband == "1")
+		if(getTop(window).have_broadband == "1")
 			location.href = "WIZ_sel_3g_adsl.htm";
 		else
 			document.forms[0].submit();
 	}else
 	{
-		if(top.dsl_enable_flag == 0)
+		if(getTop(window).dsl_enable_flag == 0)
 		   location.href='BAS_basic.htm';
 		else
 		location.href='BAS_basic_dsl.htm';

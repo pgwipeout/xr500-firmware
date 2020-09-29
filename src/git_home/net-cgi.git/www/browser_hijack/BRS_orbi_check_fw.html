@@ -46,41 +46,17 @@ function loadvalue()
 		location.href = "BRS_upgrade_fw.html";
 }
 
-function createXMLHttpRequest()
-{
-        if(typeof XMLHttpRequest == "undefined")
-                XMLHttpRequest = function(){
-                        try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}
-                                catch(e){}
-                        try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}
-                                catch(e){}
-                        try{return new ActiveXObject("Msxml2.XMLHTTP");}
-                                catch(e){}
-                        return false;
-                }
-        return new XMLHttpRequest();
-}
-
 function check_new_firmware()
 {
 	var url = "get_autoup_status.txt?ts=" + new Date().getTime();
-	var xmlHttp = createXMLHttpRequest();
-	var status;
-	
-	xmlHttp.onreadystatechange=function()
-	{
-		status=xmlHttp.responseText;
-		
+
+	$$.get(url,
+	function(status){
 		if(status == 9999 || status >= 10000)
 			location.href = "BRS_upgrade_fw.html";
 		else
-			setTimeout(function(){
-				xmlHttp.open("GET", url, true);
-				xmlHttp.send();
-			}, 5000);
-	}
-	xmlHttp.open("GET", url, true);
-	xmlHttp.send();	
+			setTimeout(function(){check_new_firmware();}, 5000);
+	});
 }
 </script>
 </form>

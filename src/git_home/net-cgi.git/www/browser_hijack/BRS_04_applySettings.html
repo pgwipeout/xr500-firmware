@@ -13,11 +13,11 @@ function loadvalue()
 {
 	if(ap_mode =="1")
 	{
-		if(top.location.href.indexOf("BRS_") > -1){
-			if(top.location.href.indexOf("routerlogin.com") > -1){
-				setTimeout("top.location.href='http://routerlogin.net/BRS_index.htm';", 100000);
+		if(getTop(window).location.href.indexOf("BRS_") > -1){
+			if(getTop(window).location.href.indexOf("routerlogin.com") > -1){
+				setTimeout("getTop(window).location.href='http://routerlogin.net/BRS_index.htm';", 100000);
 			}else{
-				setTimeout("top.location.href='http://routerlogin.com/BRS_index.htm';", 100000);
+				setTimeout("getTop(window).location.href='http://routerlogin.com/BRS_index.htm';", 100000);
 			}
 		}else{
 				setTimeout("this.location.href='BRS_04_applySettings_ping.html';", 100000);
@@ -25,11 +25,11 @@ function loadvalue()
 	}
 	else
 	{
-		if(top.location.href.indexOf("BRS_") > -1){
-			if(top.location.href.indexOf("routerlogin.com") > -1){
-				setTimeout("top.location.href='http://routerlogin.net/BRS_index.htm';", 60000);
+		if(getTop(window).location.href.indexOf("BRS_") > -1){
+			if(getTop(window).location.href.indexOf("routerlogin.com") > -1){
+				setTimeout("getTop(window).location.href='http://routerlogin.net/BRS_index.htm';", 60000);
 			}else{
-				setTimeout("top.location.href='http://routerlogin.com/BRS_index.htm';", 60000);
+				setTimeout("getTop(window).location.href='http://routerlogin.com/BRS_index.htm';", 60000);
 			}
 		}else
 			setTimeout("this.location.href='BRS_04_applySettings_ping.html';", 60000);

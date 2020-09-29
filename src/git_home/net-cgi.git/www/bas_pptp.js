@@ -4,7 +4,7 @@ function show_hidden_help_top_button(help_flag)
 		Not_IE_show_hidden_help(help_flag);
 	else
 	{
-		var frame_height= top.document.getElementById("formframe_div").style.height.replace(/px/,"");
+		var frame_height= getTop(window).document.getElementById("formframe_div").style.height.replace(/px/,"");
 		if( help_flag % 2 == 0 )
 		{
 			document.getElementById("main").style.height=frame_height-285;//30+120+135
@@ -132,6 +132,12 @@ function is_IP_addr(serv_array)
                 }
         }
         return true;
+}
+
+function check_domain(str)
+{
+	var exp = /^(\w+\.){2}\w+$$/g;
+	return exp.test(str);
 }
 
 function check_wizard_pptp(check,page)
@@ -263,26 +269,36 @@ function check_wizard_pptp(check,page)
                 alert("$invalid_servip");
                 return false;
     	}
-    	for(i=0;i<cf.pptp_serv_ip.value.length;i++)
-    	{
-		if( isValidDdnsHost(cf.pptp_serv_ip.value.charCodeAt(i))==false )
-        	{
-            		alert("$invalid_servip");
-            		return false;
-        	}
-    	}
     	if( cf.pptp_serv_ip.value == cf.pptp_myip.value )
     	{
 		alert("$same_server_wan_ip");
 		return false;
     	}
-       if(!isValidserv_IP(cf.pptp_serv_ip.value)){
-                alert("$invalid_servip");
-                return false;
-        }	
-	var serv_array=cf.pptp_serv_ip.value.split('.');
+		var tmp = cf.pptp_serv_ip.value;
+		if(tmp.slice(0, 7) == "http://")
+			tmp = tmp.slice(7);
+		else if(tmp.slice(0, 8) == "https://")
+			tmp = tmp.slice(8);
+		var i = tmp.indexOf("/");
+		i == -1? i=tmp.length: i=i;
+		tmp = tmp.slice(0, i);
+		var isIP = /^[0-9.]+$$/g.test(tmp);
+		if(isIP)
+		{
+			if(checkipaddr(tmp) == false)
+			{
+				alert("$invalid_servip");
+				return false;
+			}
+		}
+		else if(!check_domain(tmp))
+		{
+			alert("$invalid_servip");
+			return false;
+		}
+		var serv_array=cf.pptp_serv_ip.value.split('.');
         var i;
-	var is_domain_name=0;
+		var is_domain_name=0;
         for( i=0; i<serv_array.length; i++ )
         {
                 if( serv_array[i].length > 63 )

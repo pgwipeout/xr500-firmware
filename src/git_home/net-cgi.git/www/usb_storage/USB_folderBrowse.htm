@@ -12,7 +12,6 @@
 
  var n=0;
  var selectednode=<% cfg_get("usb_selectedNode") %>;
-
 	//new tree
  	d = new dTree('d',selectednode);
 	//add node
@@ -32,6 +31,12 @@
 	//show all tree
 	document.write(d);
 
+	if(nodeNumber < 2 && parent.refresh_time<5)
+	{
+		parent.refresh_time++;
+		location.href="USB_folderBrowse.htm";
+	}
+	
 -->
 </script>
 

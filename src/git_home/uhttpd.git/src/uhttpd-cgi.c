@@ -458,6 +458,10 @@ void do_uh_cgi_request(
 					else if( ! strcasecmp(req->headers[i], "If-Match") )
 						setenv("HTTP_IF_MATCH", req->headers[i+1], 1);
 
+					else if( ! strcasecmp(req->headers[i], "X-Requested-With") )
+                                                setenv("X_REQUESTED_WITH", req->headers[i+1], 1);
+
+
 				}
 
 

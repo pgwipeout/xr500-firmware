@@ -34,7 +34,7 @@ function conf_later()
 	var do_hijack="<% cfg_get("dns_hijack") %>";
 	if(do_hijack == "0")
 	{
-		if(top.dsl_enable_flag == 0)
+		if(getTop(window).dsl_enable_flag == 0)
 		   location.href='BAS_basic.htm';
 		else
 		   location.href='BAS_basic_dsl.htm';

@@ -30,7 +30,7 @@ var passcode="<% cfg_get("itunes_app_passcode")%>";
 var tivo_flag=parent.tivo_flag;
 
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 var is_jp_version=((gui_region == "Japanese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "JP")? 1 : 0;
 var device_name="<% cfg_sed_xss("netbiosname") %>";
 function loadvalue()
@@ -196,13 +196,7 @@ function allow_control_submit(cf)
 	</TD>
 </TR>
 $bluebar
-<script>
-var master="<% cfg_get("http_loginname") %>";
-if( master == "admin" )
-	document.write('<TR><TD><input class="apply_bt" type="button" name="apply_media" id="apply_media" value="$apply_mark" onClick="check_media(document.forms[0])"></TD></TR>');
-else
-	document.write('<TR><TD><input class="apply1_bt" type="button" name="Apply_Media" value="$apply_mark" disabled></TD></TR>');
-</script>
+
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
@@ -226,6 +220,7 @@ $bluebar
 	</TD>
 </TR>-->
 $bluebar
+
 <script>
 if( master == "admin" )
 	document.write('<TR><TD nowrap><input class="apply_media" type="button" name="Apply" id="apply" value="$rescan_media_files" onClick="check_media_scan(document.forms[0])"></TD></TR>');
@@ -234,6 +229,19 @@ else
 </script>
 
 </TABLE>
+<div class="fix_button" id="fix_button">
+<TABLE width=100% border=0 cellpadding=0 cellspacing=2>
+<TD nowrap align=center>
+<script>
+var master="<% cfg_get("http_loginname") %>";
+if( master == "admin" )
+	document.write('<input class="cancel_bt" type="reset" name="Cancel" value="$cancel_mark" onClick="location.href=\'UPNP_media.htm\';">&nbsp;&nbsp;<input class="apply_bt" type="button" name="apply_media" id="apply_media" value="$apply_mark" onClick="check_media(document.forms[0])">');
+else
+	document.write('<input class="cancel1_bt" type="reset" name="Cancel" value="$cancel_mark" disabled>&nbsp;&nbsp;<input class="apply1_bt" type="button" name="Apply_Media" value="$apply_mark" disabled>');
+</script>
+</TD>
+</table>
+</div>
 
 </div>
 <% help_box("1","_UPNP_media") %>

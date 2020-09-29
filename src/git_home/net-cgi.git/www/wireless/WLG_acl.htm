@@ -36,11 +36,11 @@ var wps_alert="<% cfg_get("wps_alert") %>";
 
 function loadvalue()
 {
-	top.enabled_wps="<% wps_menu() %>";
-	if( top.location.href.indexOf("adv_index.htm") != -1 )
-		top.menu_color_change('wladv');
+	getTop(window).enabled_wps="<% wps_menu() %>";
+	if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
+		getTop(window).menu_color_change('wladv');
 	else
-		top.basic_menu_color_change('wireless');
+		getTop(window).basic_menu_color_change('wireless');
 	var form=document.forms[0];
 	if('<% cfg_get("wl_access_ctrl_on") %>' == '1')
 	{
@@ -97,7 +97,7 @@ if (array_num > 0)
                     document.write("<TR class=\"even_line\">");
                else
                     document.write("<TR class=\"odd_line\">");
-			document.write('<TD nowrap align=center><input type="radio" name="MacSelect" value="'+i+'" id="MacSelect_r"><label for="MacSelect_r"></label></TD><TD nowrap align=center> '+each_info[0].replace(/</g, "&#60;").replace(/>/g, "&#62;")+'</TD><TD nowrap align=center> '+each_info[1]+'</TD></TR>');
+			document.write('<TD nowrap align=center><input type="radio" name="MacSelect" value="'+i+'" id="MacSelect'+i+'"><label for="MacSelect'+i+'"></label></TD><TD nowrap align=center> '+each_info[0].replace(/</g, "&#60;").replace(/>/g, "&#62;")+'</TD><TD nowrap align=center> '+each_info[1]+'</TD></TR>');
 		}
 		else
 		{
@@ -105,7 +105,7 @@ if (array_num > 0)
                     document.write("<TR class=\"even_line\">");
                else
                     document.write("<TR class=\"odd_line\">");
-			document.write('<TD nowrap align=center><input type="radio" name="MacSelect" value="'+i+'" id="MacSelect_r"><label for="MacSelect_r"></label></TD><TD nowrap align=center> &lt;unknown&gt;</TD><TD nowrap align=center> '+each_info[1]+'</TD></TR>');
+			document.write('<TD nowrap align=center><input type="radio" name="MacSelect" value="'+i+'" id="MacSelect'+i+'"><label for="MacSelect'+i+'"></label></TD><TD nowrap align=center> &lt;unknown&gt;</TD><TD nowrap align=center> '+each_info[1]+'</TD></TR>');
 		}
 	}
 }		

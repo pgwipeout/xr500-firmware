@@ -61,7 +61,7 @@ var old_endis_wildcards="<% cfg_get("endis_wildcards") %>";
 var ddns_oray_router_flag=parent.ddns_oray_router_flag;
 var ddns_3322_router_flag=parent.ddns_3322_router_flag;
 var gui_region="<% cfg_get("GUI_Region") %>"
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 var ddns_wildcards_flag=parent.ddns_wildcards_flag;
 var pr_flag = (( gui_region == "Chinese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "PR") ? 1 : 0
 var pr_oray_flag=( ddns_oray_router_flag == 1  && pr_flag == 1) ? 1 : 0;

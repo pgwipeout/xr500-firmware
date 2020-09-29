@@ -5,7 +5,7 @@
 var is_in_cd_less = isCDLESS();
 function loadvalue()
 {
-	if(top.hidden_upgrade || is_in_cd_less)
+	if(getTop(window).hidden_upgrade || is_in_cd_less)
 	{
 		document.getElementById("few_seconds").style.display = "none";
 		document.getElementById("cancel_btn").style.display = "";
@@ -22,7 +22,7 @@ function goback()
 {
 	if ( is_in_cd_less || isWIZARD())
 		toInternet();
-	else if(top.hidden_upgrade)  //if top.hidden_upgrade exits, top is CheckNewFirmware.htm
+	else if(getTop(window).hidden_upgrade)  //if getTop(window).hidden_upgrade exits, top is CheckNewFirmware.htm
 		this.location.href = "CheckNewFW_upgrade.htm";
 	else
 		this.location.href = "UPG_upgrade.htm";

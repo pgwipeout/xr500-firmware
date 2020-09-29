@@ -68,7 +68,7 @@ function click_basic_green()
 {
 	var cf = document.forms[0];
 
-	if(cf.greendl_disk_lable.value != green_disk_lable && top.green_download_item_num > 0 && confirm("$greendl_basic_change_path_warning") == false)
+	if(cf.greendl_disk_lable.value != green_disk_lable && getTop(window).green_download_item_num > 0 && confirm("$greendl_basic_change_path_warning") == false)
 	{
 		this.location.href="green_download.htm";
 		return false;
@@ -168,10 +168,10 @@ function email_redirect()
 	var cf=document.forms[0];	
 	cf.submit_flag.value="download_email";
 	cf.action="/apply.cgi?/FW_email.htm timestamp=" + ts;
-	if( top.location.href.indexOf("adv_index.htm") != -1 )
+	if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
 	{
-		top.open_or_close_sub("security");
-		top.menu_color_change('email');
+		getTop(window).open_or_close_sub("security");
+		getTop(window).menu_color_change('email');
 	}
 }
 </script>

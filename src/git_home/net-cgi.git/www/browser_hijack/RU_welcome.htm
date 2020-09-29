@@ -201,8 +201,8 @@ function check_city()
 }
 function CloseWindow()
 {
-	top.window.opener=null;
-	top.window.close();
+	getTop(window).window.opener=null;
+	getTop(window).window.close();
 }
 function msg_close()
 {

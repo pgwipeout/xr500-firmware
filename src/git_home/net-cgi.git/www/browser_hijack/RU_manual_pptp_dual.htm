@@ -7,7 +7,7 @@
 var lan_ip="<% cfg_get("lan_ipaddr") %>";
 var lan_subnet="<% cfg_get("lan_netmask") %>";
 var pptp_serv_ip=parent.pptp_server_ipaddr;
-var russian_ppp_flag=top.russian_ppp_flag;
+var russian_ppp_flag=getTop(window).russian_ppp_flag;
 var gui_region = "<% cfg_get("GUI_Region") %>";
 
 function loadvalue()

@@ -16,9 +16,9 @@ function initPage()
 function pageRedirect(stat)
 {
 	if( location.href.indexOf("www.routerlogin.net") == -1 )
-		top.location.href = "http://www.routerlogin.net/BRS_03B_haveBackupFile_change_domain.htm";
+		getTop(window).location.href = "http://www.routerlogin.net/BRS_03B_haveBackupFile_change_domain.htm";
 	else
-		top.location.href = "http://www.routerlogin.com/BRS_03B_haveBackupFile_change_domain.htm";
+		getTop(window).location.href = "http://www.routerlogin.com/BRS_03B_haveBackupFile_change_domain.htm";
 }
 
 

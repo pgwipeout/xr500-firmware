@@ -4,7 +4,7 @@ function show_hidden_help_top_button(help_flag)
 		Not_IE_show_hidden_help(help_flag);
 	else
 	{
-		var frame_height= top.document.getElementById("formframe_div").style.height.replace(/px/,"");
+		var frame_height= getTop(window).document.getElementById("formframe_div").style.height.replace(/px/,"");
 		if( help_flag % 2 == 0 )
 		{
 			document.getElementById("main").style.height=frame_height-285;//30+120+135
@@ -250,7 +250,7 @@ function check_three_DNS(wan_assign)
 
         if(cf.ether_dnsaddr1.value!="")
         {
-                if(checkipaddr(cf.ether_dnsaddr1.value)==false)
+                if(checkdnsaddr(cf.ether_dnsaddr1.value)==false)
                 {
                         alert("$invalid_primary_dns");
                         return false;
@@ -264,7 +264,7 @@ function check_three_DNS(wan_assign)
         }
         if(cf.ether_dnsaddr2.value!="")
         {
-                if(checkipaddr(cf.ether_dnsaddr2.value)==false)
+                if(checkdnsaddr(cf.ether_dnsaddr2.value)==false)
                 {
                         alert("$invalid_second_dns");
                         return false;
@@ -278,7 +278,7 @@ function check_three_DNS(wan_assign)
         }
         if(cf.ether_dnsaddr3.value!="")
         {
-                if(checkipaddr(cf.ether_dnsaddr3.value)==false)
+                if(checkdnsaddr(cf.ether_dnsaddr3.value)==false)
                 {
                         alert("$invalid_third_dns");
                         return false;

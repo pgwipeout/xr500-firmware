@@ -1,6 +1,7 @@
 #!/bin/sh
 
 version=`cat /cloud_version`
+BINARY_REPO="https://http.fw.updates1.netgear.com/sw-apps/ready-genie-cloud/xr500"
 sleep_time_1=60
 sleep_time_2=300
 sleep_time_3=600
@@ -24,7 +25,7 @@ start() {
 		if [ "$readycloud_enable" = "1" ]; then
 			readycloud_user_admim="$(/bin/config get readycloud_user_admin)"
 			readycloud_user_passsword="$(/bin/config get readycloud_user_password)"
-			./opt/rcagent/scripts/register.sh $readycloud_user_admim $readycloud_user_passsword
+			/opt/rcagent/scripts/register.sh $readycloud_user_admim $readycloud_user_passsword
 		fi
 	}
 }
@@ -54,14 +55,14 @@ restore() {
 	rm -rf /tmp/clouddir
 }
 
-install_local(){
-	tar -zxvf /lib/readygeniecloud-xr500new-20170719-01.tar.gz -C /
-	echo 20170719 > /opt/version
-	sed '2s/^/source \/etc\/profile\n/' /opt/rcagent/run_server.sh > /tmp/run_server.sh
-	cp /tmp/run_server.sh /opt/rcagent/run_server.sh
-
-	start
-}
+#install_local(){
+#	tar -zxvf /lib/readygeniecloud-xr500new-20170719-01.tar.gz -C /
+#	echo 20170719 > /opt/version
+#	sed '2s/^/source \/etc\/profile\n/' /opt/rcagent/run_server.sh > /tmp/run_server.sh
+#	cp /tmp/run_server.sh /opt/rcagent/run_server.sh
+#
+#	start
+#}
 
 update() {
 #	local cloud_binary_install=$(/bin/config get cloud_binary_install)
@@ -70,30 +71,40 @@ update() {
 	[ -f $PID_file ] && return 1
 #	install_local
 	echo "$$" > $PID_file
-	echo "start to get info from ftp://updates1.netgear.com/sw-apps/ready-genie-cloud/xr500/"
+	echo "start to get info from ${BINARY_REPO}/"
 	retry_count=0
-	while [ 1 ]; do
-		curl ftp://updates1.netgear.com/sw-apps/ready-genie-cloud/xr500/ 2>/dev/null | grep readygeniecloud-xr500new2-*-.*.tar.gz > /tmp/cloud_info
-		[ -s /tmp/cloud_info ] && break
-		echo "cannot access ftp://updates1.netgear.com/sw-apps/ready-genie-cloud/xr500/ or don't find readygeniecloud tarball with version $version"
-		dynamic_sleep
-	done
-	fullversion=`tail -1 /tmp/cloud_info | awk '{print $9}'`
+# after netgear move the binary code to https server, cannot get the file list in the BINARY_REPO folder
+# as in ftp server, thus, these lines shoud be commented out
+	#while [ 1 ]; do
+	#	curl ${BINARY_REPO}/ 2>/dev/null | grep readygeniecloud-xr500new2-*-.*.tar.gz > /tmp/cloud_info
+	#	[ -s /tmp/cloud_info ] && break
+	#	echo "cannot access ${BINARY_REPO}/ or don't find readygeniecloud tarball with version $version"
+	#	dynamic_sleep
+	#done
+	fullversion=geniereadycloud-XR500-20171220-01.tar.gz
+
 	if [ -f /opt/version -a "x$(cat /opt/version)" = "x$fullversion" ]; then
-		rm -f /tmp/cloud_info
 		touch /tmp/.cloud_updated
 		rm -f $PID_file
 		echo "the readygeniecloud on update server is same as on R/W filesystem"
 		start
 		return 1
 	fi
-	size=`tail -1 /tmp/cloud_info | awk '{print $5}'`
-	echo "start to download ftp://updates1.netgear.com/sw-apps/ready-genie-cloud/xr500/$fullversion"
+
+	local size=0;
+	while [ 1 ]; do
+		size=$(curl -k --head ${BINARY_REPO}/$fullversion 2>/dev/null | sed -ne '/Content-Length/{s/.*: //;p}')
+		[ "$size" -gt 0 ] && break
+		echo "cannot access ${BINARY_REPO}/$fullversion or don't find readygeniecloud tarball with version $version"
+		dynamic_sleep
+	done
+
+	echo "start to download ${BINARY_REPO}/$fullversion"
 	retry_count=0
 	while [ 1 ]; do
-		curl ftp://updates1.netgear.com/sw-apps/ready-genie-cloud/xr500/$fullversion -o /tmp/cloud.tar.gz 2>/dev/null
-		[ "$(wc -c /tmp/cloud.tar.gz | awk '{print $1}')" = "$size" ] && break
-		echo "fail to download ftp://updates1.netgear.com/sw-apps/ready-genie-cloud/xr500/readygeniecloud-xr500-$fullversion"
+		curl -k ${BINARY_REPO}/$fullversion -o /tmp/cloud.tar.gz 2>/dev/null
+		[ "$(wc -c /tmp/cloud.tar.gz | awk '{print $1}')" -eq "$size" ] && break
+		echo "fail to download ${BINARY_REPO}/$fullversion"
 		dynamic_sleep
 	done
 	uninstall
@@ -103,7 +114,6 @@ update() {
 	touch /tmp/clouddir/opt/filelist
 	find /tmp/clouddir -type f | sed 's/\/tmp\/clouddir/\/overlay/' > /tmp/clouddir/opt/filelist
 	cp -fpR /tmp/clouddir/* /
-	rm -f /tmp/cloud_info
 	rm -f /tmp/cloud.tar.gz
 	rm -rf /tmp/clouddir
 	touch /tmp/.cloud_updated
@@ -112,7 +122,7 @@ update() {
 	cp /tmp/run_server.sh /opt/rcagent/run_server.sh
 
 	echo $fullversion | cut -d - -f 3 > /cloud_version
-	echo "install ftp://updates1.netgear.com/sw-apps/ready-genie-cloud/xr500/$fullversion to R/W filesystem successfully"
+	echo "install ${BINARY_REPO}/$fullversion to R/W filesystem successfully"
 	start
 	rm -f $PID_file
 }

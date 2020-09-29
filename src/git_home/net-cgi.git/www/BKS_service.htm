@@ -31,7 +31,7 @@ else
 var get_blockserv_ctrl='<% cfg_get("blockserv_ctrl") %>';
 var ts='<% cfg_get("block_services") %>';
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 var is_jp_version=((gui_region == "Japanese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "JP")? 1 : 0;
 function loadvalue()
 {

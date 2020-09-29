@@ -43,7 +43,7 @@ function clickRetry()
 }
 function clickskip()
 {
-	top.wan_port=1;
+	getTop(window).wan_port=1;
 	this.location.href = "BRS_00_01_check_ap.html";
 	return true;
 }

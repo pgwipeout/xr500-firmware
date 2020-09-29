@@ -27,7 +27,7 @@ function loadvalue()
 
 function goto_route()
 {
-	top.location.href = "http://www.routerlogin.net";
+	getTop(window).location.href = "http://www.routerlogin.net";
 }
 
 function go_back()

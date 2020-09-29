@@ -162,7 +162,7 @@ function setSecurity(num)
                 getObj("view").innerHTML=str_none;
         }
 
-	if(top.guest_router_flag == 1 && wlg1_sectype == 2)
+	if(getTop(window).guest_router_flag == 1 && wlg1_sectype == 2)
 		opmode_disabled();
 
 	for(var i=0; i<form.security_type.length; i++) {
@@ -255,7 +255,7 @@ function setSecurity_an(num)
 
         }
 
-	if(top.guest_router_flag == 1 && wla1_sectype == 2)
+	if(getTop(window).guest_router_flag == 1 && wla1_sectype == 2)
 		opmode_an_disabled();
 }
 
@@ -323,13 +323,13 @@ function check_dfs()
         var ch_index = channel.selectedIndex;
         var ch_name = channel.options[ch_index].text;
 	var ch_value = channel.options[ch_index].value;
-	var ht160_enabled= (top.support_ht160_flag == 1 && enable_ht160 == "1" && ((index == 10 || index == 4) && (currentMode != 1 && currentMode != 2 && currentMode != 7 && currentMode != 8)))
+	var ht160_enabled= (getTop(window).support_ht160_flag == 1 && enable_ht160 == "1" && ((index == 10 || index == 4) && (currentMode != 1 && currentMode != 2 && currentMode != 7 && currentMode != 8)))
 
 	if( ch_name.indexOf('(DFS)') == -1 && !ht160_enabled)
 	{ // not a DFS channel and  ht160 disabled, return true, continue other check.
 		return true;
 	}
-	if(top.dfs_radar_detect_flag == 1){	
+	if(getTop(window).dfs_radar_detect_flag == 1){	
 		var tmp_array;
 		if(ht160_enabled)
 		{
@@ -877,9 +877,12 @@ function check_wlan()
 			}
 		}
 		//bug 41791cf.hidden_WpaeRadiusSecret.value = cf.textWpaeRadiusSecret.value.replace(/\\/g,"\\\\\\\\").replace(/`/g,"\\\\\\`").replace(/"/g,"\\\"");
+		cf.hidden_wpae_mode.value = cf.wpae_mode.value;
+		cf.hidden_radiusServerIP.value = cf.radiusServerIP.value;
+		cf.hidden_textWpaeRadiusPort.value = port_range_interception(cf.textWpaeRadiusPort.value);
 		cf.hidden_WpaeRadiusSecret.value = cf.textWpaeRadiusSecret.value;
 		cf.wl_hidden_sec_type.value=6;
-        cf.textWpaeRadiusPort.value=port_range_interception(cf.textWpaeRadiusPort.value);		
+		
 	}	
 	else
 		cf.wl_hidden_sec_type.value=1;
@@ -1166,9 +1169,11 @@ function check_wlan()
 				}
 			}
 			//bug 41791cf.hidden_WpaeRadiusSecret_a.value = cf.textWpaeRadiusSecret_an.value.replace(/\\/g,"\\\\\\\\").replace(/`/g,"\\\\\\`").replace(/"/g,"\\\"");
-			cf.hidden_WpaeRadiusSecret_a.value = cf.textWpaeRadiusSecret_an.value;
-
-			cf.textWpaeRadiusPort_an.value=port_range_interception(cf.textWpaeRadiusPort_an.value);
+			
+			cf.hidden_wpae_mode_an.value = cf.wpae_mode_an.value;
+			cf.hidden_radiusServerIP_a.value = cf.radiusServerIP_a.value;
+			cf.hidden_textWpaeRadiusPort_an.value = port_range_interception(cf.textWpaeRadiusPort_an.value);
+			cf.hidden_WpaeRadiusSecret_a.value = cf.textWpaeRadiusSecret_an.value;		
 			cf.wla_hidden_sec_type.value=6;
 		}	
 		else
@@ -1722,6 +1727,9 @@ function check_wlan_guest(type)
 			}
 		}
 		//bug 41791cf.hidden_WpaeRadiusSecret.value = cf.textWpaeRadiusSecret.value.replace(/\\/g,"\\\\\\\\").replace(/`/g,"\\\\\\`").replace(/"/g,"\\\"");
+		cf.hidden_wpae_mode.value = cf.wpae_mode.value;
+		cf.hidden_radiusServerIP.value = cf.radiusServerIP.value;
+		cf.hidden_textWpaeRadiusPort.value = port_range_interception(cf.textWpaeRadiusPort.value);
 		cf.hidden_WpaeRadiusSecret.value = cf.textWpaeRadiusSecret.value;
 
 /*		if (!confirm("$wpae_or_wps"))
@@ -1907,8 +1915,11 @@ function check_wlan_guest(type)
 			}
 		}
 		//bug 41791cf.hidden_WpaeRadiusSecret_a.value = cf.textWpaeRadiusSecret_an.value.replace(/\\/g,"\\\\\\\\").replace(/`/g,"\\\\\\`").replace(/"/g,"\\\"");
-		cf.hidden_WpaeRadiusSecret_a.value = cf.textWpaeRadiusSecret_an.value;
 
+			cf.hidden_wpae_mode_an.value = cf.wpae_mode_an.value;
+			cf.hidden_radiusServerIP_a.value = cf.radiusServerIP_a.value;
+			cf.hidden_textWpaeRadiusPort_an.value = port_range_interception(cf.textWpaeRadiusPort_an.value);
+			cf.hidden_WpaeRadiusSecret_a.value = cf.textWpaeRadiusSecret_an.value;	
 /*		if (!confirm("$wpae_or_wps"))
 			return false;			
 */

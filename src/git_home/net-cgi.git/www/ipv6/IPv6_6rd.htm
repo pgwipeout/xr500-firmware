@@ -72,7 +72,7 @@ function loadvalue()
 		cf.relay_addr[i].value = relay_array[i];
 	}
 	
-	if(top.ipv6_dns_manual == 1)
+	if(getTop(window).ipv6_dns_manual == 1)
 	{
 		load_ipv6_dns(cf);
 	}
@@ -105,10 +105,10 @@ function loadvalue()
 </TR>
 $bluebar
 <TR>
-	<TD nowrap><B>6rd (IPv6 Rapid Deployment) Configuration</B></TD>
+	<TD nowrap><B>$ipv6_6rd_conf</B></TD>
 </TR>
 <TR>
-	<TD nowrap>6rd Prefix</TD>
+	<TD nowrap>$ipv6_6rd_prefix</TD>
 	<TD nowrap>
 	<input type="text" name="ipv6_6rd_pre"  size="3" autocomplete="off" maxlength="4" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkeya(event);" onkeyup="keyup_n(event,this,4);" >:
 	<input type="text" name="ipv6_6rd_pre"  size="3" autocomplete="off" maxlength="4" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkeya(event);" onkeyup="keyup_n(event,this,4);" >:
@@ -117,11 +117,11 @@ $bluebar
 	</td>
 </TR>
 <TR>
-	<TD nowrap>6rd Prefix Length</TD>
+	<TD nowrap>$ipv6_6rd_pre_len</TD>
 	<td nowrap><input type="text" name="ipv6_pre_len"  size="2" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup_n(event,this,3);" value='<% cfg_get("Ipv6rdPlen") %>' ></td>
 </TR>
 <TR>
-	<TD nowrap>6rd IPv4 Border Relay Address</TD>
+	<TD nowrap>$ipv6_6rd_relay</TD>
 	<td nowrap>
 	<input type="text" name="relay_addr"  size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="relay_addr"  size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
@@ -130,7 +130,7 @@ $bluebar
 	</td>
 </TR>
 <TR>
-	<TD nowrap>6rd IPv4 Address Mask Length</TD>
+	<TD nowrap>$ipv6_6rd_mask_len</TD>
 	<td nowrap><input type="text" name="ipv6_mask_len"  size="2" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup_n(event,this,3);" value='<% cfg_get("Ipv6rdv4Mask") %>'></td>
 </TR>
 $bluebar

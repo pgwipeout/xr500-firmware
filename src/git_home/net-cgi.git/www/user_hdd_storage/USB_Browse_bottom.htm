@@ -22,7 +22,7 @@ function click_ok()
 		str=""+str+"/"+info[j]+"";
 	}
 	var path=str.replace(/\//g,"\\");
-	top.window.opener.document.forms[0].folder.value=path;
+	getTop(window).window.opener.document.forms[0].folder.value=path;
 	closeBrowserwindow();/* to fix bug 24964 */
 
 //16168	parent.parent.folder_path=path;

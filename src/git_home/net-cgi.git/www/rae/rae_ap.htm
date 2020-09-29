@@ -182,8 +182,8 @@ function  check_ap()
 }
 function goto_wireless()
 {
-	top.open_or_close_sub('setup');
-	top.click_adv_action('wireless');
+	getTop(window).open_or_close_sub('setup');
+	getTop(window).click_adv_action('wireless');
 }
 function ap_show(type)
 {
@@ -219,7 +219,7 @@ function loadvalue()
 {
 var form=document.forms[0];
 
-	top.enable_ap_flag="<% cfg_get("ap_mode") %>";
+	getTop(window).enable_ap_flag="<% cfg_get("ap_mode") %>";
 	var apmode_get_ip="<% ap_mode_ip() %>";
 	if (apmode_get_ip!="")
 	{

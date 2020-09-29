@@ -64,13 +64,13 @@ function clickNext()
 	
 	if(choices[0].checked)
 	{
-		if(top.apmode_flag == "1" && ap_mode == "1" && top.ap_mode_detection_flag == "1" )
+		if(getTop(window).apmode_flag == "1" && ap_mode == "1" && getTop(window).ap_mode_detection_flag == "1" )
 		{
 			this.location.href="BRS_00_02_ap_select.html";
 		}
-		else if((top.have_broadband == "1" && (top.is_ru_version == 1 || top.is_pr_version == 1)) || top.have_lte_flag == "1" )
+		else if((getTop(window).have_broadband == "1" && (getTop(window).is_ru_version == 1 || getTop(window).is_pr_version == 1)) || getTop(window).have_lte_flag == "1" )
 		{
-			top.multi_wan_mode_ether = "0";
+			getTop(window).multi_wan_mode_ether = "0";
 			this.location.href = "WIZ_sel_3g_adsl.htm";
 		}
 		else {

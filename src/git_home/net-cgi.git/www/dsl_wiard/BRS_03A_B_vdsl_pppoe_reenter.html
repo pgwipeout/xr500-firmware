@@ -25,7 +25,7 @@ var display_iptv2 = "<% cfg_get("wan2_active") %>";
 var enable_iptv = "<% cfg_get("dsl_wan_video_enable") %>";
 var lan_selecte="<% cfg_get("iptv_mask") %>";
 var lan1_selecte=lan_selecte & 1;
-var lan_ports_num = (typeof(top.lan_ports_num) == "undefined") ? 4 : top.lan_ports_num;
+var lan_ports_num = (typeof(getTop(window).lan_ports_num) == "undefined") ? 4 : getTop(window).lan_ports_num;
 function initPage()
 {
 	var cf = document.forms[0];

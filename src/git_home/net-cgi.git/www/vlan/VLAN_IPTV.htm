@@ -49,8 +49,8 @@ var ts="<% cfg_get("apply_vlan") %>";
 
 function loadvalue()
 {
-	if( top.location.href.indexOf("adv_index.htm") != -1 )
-		top.menu_color_change('vlan');
+	if( getTop(window).location.href.indexOf("adv_index.htm") != -1 )
+		getTop(window).menu_color_change('vlan');
 
 	var cf=document.forms[0];
 	if(multi_wan_type=="3g" || (parent.enable_vlan_pppoe_support == 0 && internet_type == "0" && internet_ppp_type == "0"))
@@ -203,8 +203,8 @@ function change_vlan_type(cf)
 	</tr>
 	<tr class="odd_line">
 		<TD nowrap align=center>
-			<input type="checkbox" id="iptv_ports_0" name="iptv_ports_0"><label for="iptv_ports_0">Port1 </label>&nbsp;&nbsp;
-			<input type="checkbox" id="iptv_ports_1" name="iptv_ports_1"><label for="iptv_ports_1">Port2</label></TD>
+			<input type="checkbox" id="iptv_ports_0" name="iptv_ports_0"><label for="iptv_ports_0">$port_mark 1 </label>&nbsp;&nbsp;
+			<input type="checkbox" id="iptv_ports_1" name="iptv_ports_1"><label for="iptv_ports_1">$port_mark 2</label></TD>
 		</TD>
 		<TD nowrap align=center>
 			<input type="checkbox" id="iptv_ports_10" name="iptv_ports_10"><label for="iptv_ports_10">WiFi2.4G</label> &nbsp;&nbsp;
@@ -213,8 +213,8 @@ function change_vlan_type(cf)
 	</tr>
 	<tr class="odd_line">
 		<TD nowrap align=center>
-			<input type="checkbox" id="iptv_ports_2" name="iptv_ports_2"><label for="iptv_ports_2">Port3 </label>&nbsp;&nbsp;
-			<input type="checkbox" id="iptv_ports_3" name="iptv_ports_3"><label for="iptv_ports_3">Port4</label></TD>
+			<input type="checkbox" id="iptv_ports_2" name="iptv_ports_2"><label for="iptv_ports_2">$port_mark 3 </label>&nbsp;&nbsp;
+			<input type="checkbox" id="iptv_ports_3" name="iptv_ports_3"><label for="iptv_ports_3">$port_mark 4</label></TD>
 		</TD>
 		<TD style="display:none" nowrap align=center>
 			<input type="checkbox" id="iptv_ports_12" name="iptv_ports_12"><label for="iptv_ports_12">Guest-2.4G </label >&nbsp;&nbsp;

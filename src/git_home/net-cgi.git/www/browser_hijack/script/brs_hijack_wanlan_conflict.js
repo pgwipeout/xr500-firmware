@@ -37,15 +37,15 @@ function initPage()
 function clickContinue()
 {
 	/*if( location.href.indexOf("10.0.0.") > -1 )
-		top.location.href="http://routerlogin.net";
+		getTop(window).location.href="http://routerlogin.net";
 	else if( location.href.indexOf("172.16.0.") > -1 )
-		top.location.href="http://routerlogin.com";
+		getTop(window).location.href="http://routerlogin.com";
 	else if( location.href.indexOf("192.168.1.") > -1 )
-		top.location.href="http://www.routerlogin.net";
+		getTop(window).location.href="http://www.routerlogin.net";
 	else if( location.href.indexOf("www.routerlogin.com") == -1 )
-		top.location.href="http://www.routerlogin.com";
+		getTop(window).location.href="http://www.routerlogin.com";
 	else
-		top.location.href="http://www.routerlogin.net";
+		getTop(window).location.href="http://www.routerlogin.net";
 
 	return true;*/
 	var cf = document.forms[0];

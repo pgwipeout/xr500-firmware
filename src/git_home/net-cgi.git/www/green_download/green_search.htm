@@ -22,7 +22,7 @@ function detec_status()
 {
 	if (wan_status == 1)
 	{
-		status = top.formframe.auto_search_frame.status;
+		status = getTop(window).formframe.auto_search_frame.status;
 		if (status == 9999)
 			location.href="green_check_version.htm";
 		else if (status >= 10000)

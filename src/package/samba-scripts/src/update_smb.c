@@ -114,7 +114,6 @@ static void reload_services(void)
 		system("/usr/bin/killall smbd > /dev/null 2>&1");
 		system("/usr/bin/killall nmbd > /dev/null 2>&1");
 		system("/sbin/cmdftp stop");
-		system("/usr/bin/killall smbd-watchdog");
 		goto outer;
 	}
  
@@ -129,7 +128,6 @@ static void reload_services(void)
 		system("/usr/bin/killall -SIGHUP smbd");
 	else
 		system("/bin/nice -n 19 /usr/sbin/smbd -D");
-	system("[ -z \"$(pidof smbd-watchdog)\" ] && /usr/sbin/smbd-watchdog &");
 
 	/* NETBIOS Name */
 	system("/usr/bin/killall nmbd > /dev/null 2>&1");

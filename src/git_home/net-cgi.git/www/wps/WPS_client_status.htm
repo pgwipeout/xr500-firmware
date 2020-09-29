@@ -36,7 +36,7 @@ function makeStr(strsize)
 }
 function updateProgress()
 {
-	client_name = top.formframe.wps_status_frame.client_name;
+	client_name = getTop(window).formframe.wps_status_frame.client_name;
 	var cf = document.forms[0];
 
 	makeStr(parseInt(wps_charcount/2));
@@ -54,7 +54,7 @@ function updateProgress()
 			setTimeout("updateProgress();",1000);
 		}
 		else
-			top.formframe.location.href="WPS_success.htm";
+			getTop(window).formframe.location.href="WPS_success.htm";
 	}
 	else
 	{
@@ -94,7 +94,7 @@ if ( parent.wps_choice == 1 )
 
 <TR>
 	<TD align=center>
-	<input class="cancel_bt" type='button' name='Cancel' value='$cancel_mark' onClick='top.formframe.location.href="WPS_success.htm";'>
+	<input class="cancel_bt" type='button' name='Cancel' value='$cancel_mark' onClick='getTop(window).formframe.location.href="WPS_success.htm";'>
 	</TD>
 </TR>
 </TABLE>

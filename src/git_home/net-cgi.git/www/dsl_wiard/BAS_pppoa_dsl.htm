@@ -28,13 +28,13 @@ var vpn_enable = "<% cfg_get("vpn_enable") %>";
 
 var russian_pppoe_flag=parent.parent.russian_pppoe_flag;
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=top.netgear_region;
+var netgear_region=getTop(window).netgear_region;
 if ( bas_conn_time_num == "" ) // to fix bug 23294
 	bas_conn_time_num="0";
 var auto_conn_flag=parent.parent.auto_conn_flag;
 var autoconn_flag=(auto_conn_flag == 1 && ((gui_region == "German" &&  (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "GR")) ? 1 : 0;
 
-var pppoa_myip_flag=( top.pppoa_intranet_flag == 1 && ( (gui_region == "Russian" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "RU")) ? 1 : 0;
+var pppoa_myip_flag=( getTop(window).pppoa_intranet_flag == 1 && ( (gui_region == "Russian" && (netgear_region == "" || netgear_region.toUpperCase() == "WW")) || netgear_region.toUpperCase() == "RU")) ? 1 : 0;
 
 var is_jp_version = ((netgear_region == "" || netgear_region.toUpperCase() == "WW") && gui_region == "Japanese") || netgear_region.toUpperCase() == "JP";
 var wanproto_type="pppoa";
@@ -1207,7 +1207,7 @@ function change_serv(cf)
 	}
 	else if(cf.login_type.value == "multiPPPoE" )
 	{
-		if(top.netgear_region != "JP")
+		if(getTop(window).netgear_region != "JP")
 			location.href="BAS_mulpppoe.htm";
 		else
 			location.href="BAS_mulpppoe_ww.htm";

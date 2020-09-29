@@ -15,7 +15,7 @@ function no_login()
 }
 function do_search()
 {
-        var key = top.document.getElementsByTagName("input")[0].value;
+        var key = document.getElementsByTagName("input")[0].value;
         var winoptions = "width=960,height=800,menubar=yes,scrollbars=yes,toolbar=yes,status=yes,location=yes,resizable=yes";
         var url="";
 	if(key == "" || key == "$ent_srh_item") {
@@ -30,9 +30,9 @@ function do_search()
 
 function setFooterClass()
 {
-        var footer_div = top.document.getElementById("footer");
-	var width = top.document.getElementById("support").clientWidth + top.document.getElementById("search").clientWidth;
-        var screen_width = top.document.documentElement.clientWidth;
+        var footer_div = document.getElementById("footer");
+	var width = document.getElementById("support").clientWidth + document.getElementById("search").clientWidth;
+        var screen_width = document.documentElement.clientWidth;
 
         if( width < screen_width - 60 )
                 footer_div.className = "footer";
@@ -40,7 +40,7 @@ function setFooterClass()
                 footer_div.className = "footer_double";
 
 
-        var go_btn = top.document.getElementById("search_button");
+        var go_btn = document.getElementById("search_button");
         var content_len = go_btn.value.length;
 
         if(content_len >= 7)
@@ -78,7 +78,7 @@ function detectEnter(type, e) //bug35984
 </script>
 </HEAD>
 
-<BODY class="background" onLoad="setFooterClass();" bgcolor=#ffffff>
+<BODY class="background" onLoad="/*setFooterClass();*/" bgcolor=#ffffff>
 <div id="top">
 <div id="logo"> </div>
 <% top_hardware_version() %>

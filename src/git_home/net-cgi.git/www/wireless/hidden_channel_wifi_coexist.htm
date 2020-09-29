@@ -1,4 +1,4 @@
-<% http_header("style/form.css") %>
+<% http_header("/funcs.js", "style/form.css") %>
 <% nohelp_header("hidden_channel_wifi_coexist.htm", "wifi_channel_coexist") %>
 
 <script>
@@ -73,7 +73,7 @@ function click_apply()
 <tr>
 <tr id="an_title"><td  colspan=2>
 <script>
-	if(top.ac_router_flag == 1)
+	if(getTop(window).ac_router_flag == 1)
 		document.write("$wifi_coexist_function (5GHz 802.11a/n/ac)")
 	else
 		document.write("$wifi_coexist_function (5GHz a/n)")

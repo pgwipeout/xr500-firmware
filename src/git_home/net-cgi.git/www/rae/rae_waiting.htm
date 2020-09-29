@@ -36,22 +36,22 @@ function timeout()
 	var host= window.location.host;
 
 	if( ap_on_off == "1" &&  ap_dyn_get_ip == "0")
-		top.location.href="http://"+ap_ipaddr+"/adv_index.htm";
+		top/**/.location.href="http://"+ap_ipaddr+"/";
 	else 
 	{
 		if(host.indexOf("www") != -1)
 		{
 			if( host.indexOf("net") != -1)
-				top.location.href="http://www.routerlogin.com/adv_index.htm";
+				top/**/.location.href="http://www.routerlogin.com/";
 			else
-				top.location.href="http://routerlogin.net/adv_index.htm";
+				top/**/.location.href="http://www.routerlogin.net/";
 		}
 		else
 		{
 			if(host.indexOf("net") != -1)
-				top.location.href="http://routerlogin.com/adv_index.htm";
+				top/**/.location.href="http://routerlogin.com/";
 			else
-				top.location.href="http://www.routerlogin.net/adv_index.htm";
+				top/**/.location.href="http://routerlogin.net/";
 		}
 	}
 }

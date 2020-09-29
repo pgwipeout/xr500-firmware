@@ -19,7 +19,7 @@ function initPage()
 
 function loadValue()
 {
-   if(top.dsl_enable_flag == 0){
+   if(getTop(window).dsl_enable_flag == 0){
 	if( apmode_flag == "1" && ap_mode == "1" && ap_mode_detection_flag == "1" )
 	{
 		if(ping_result == "success")
@@ -62,7 +62,7 @@ function loadValue()
 		else if(ping_result == "failed")
 			this.location.href = "BRS_05_networkIssue.html";
 	}
-    }else if(top.dsl_enable_flag == 1)
+    }else if(getTop(window).dsl_enable_flag == 1)
     {
 	if( debug == "1")
 		return;

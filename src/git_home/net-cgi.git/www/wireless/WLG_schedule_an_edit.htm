@@ -26,7 +26,7 @@ else
 var ts="<% cfg_get("wadv_schedule_edit_an") %>";
 var p=0;
 var gui_region="<% cfg_get("GUI_Region") %>";
-var netgear_region=(top.netgear_region == "") ? "WW" : top.netgear_region;
+var netgear_region=(getTop(window).netgear_region == "") ? "WW" : getTop(window).netgear_region;
 var each_info = new Array();
 <% wireless_schedule_items_a() %>
 var edit_num = "<% cfg_get("wless_schedule_edit_num") %>";

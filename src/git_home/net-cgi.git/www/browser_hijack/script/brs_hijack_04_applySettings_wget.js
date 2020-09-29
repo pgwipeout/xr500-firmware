@@ -19,7 +19,7 @@ function initPage()
 
 function loadValue()
 {
-   if(top.dsl_enable_flag == 1)
+   if(getTop(window).dsl_enable_flag == 1)
    {
 	if(select_basic == "0" && select_type == "7")//pppoe quick
 	{

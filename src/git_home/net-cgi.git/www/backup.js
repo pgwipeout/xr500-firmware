@@ -24,7 +24,7 @@ function check_restore()
 	{	
 		cf.action="/restore.cgi?/restore_process.htm timestamp="+ts;
 		top_left_nolink();
-		top.enable_action=0;
+		getTop(window).enable_action=0;
 		cf.submit();
 	}
 	else 
@@ -37,6 +37,6 @@ function click_yesfactory()
 	cf.target="_top";
 	cf.action="/apply.cgi?/pls_wait_factory_reboot.html timestamp="+ts;
 	top_left_nolink();
-	top.enable_action=0;
+	getTop(window).enable_action=0;
 	cf.submit();
 }

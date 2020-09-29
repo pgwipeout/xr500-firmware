@@ -177,7 +177,7 @@ sortTable('tableSort1', 1, 'int');
 	<TD nowrap align=center style="width:35%"><span class="subhead">$lan_mark_name</span></TD>
         </TR>
 <script>
-if(typeof(top.have_wifi_flag) != "undefined" && top.have_wifi_flag == 0)
+if(typeof(getTop(window).have_wifi_flag) != "undefined" && getTop(window).have_wifi_flag == 0)
 {
 	document.getElementById("wireless_l1").style.display = "none";
 	document.getElementById("wireless_l2").style.display = "none";

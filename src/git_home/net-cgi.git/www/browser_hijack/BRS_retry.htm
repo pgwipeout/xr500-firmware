@@ -4,13 +4,15 @@
 <head>
 <% hijack_title() %>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script language="javascript" type="text/javascript" src="script/brs_hijack.js"></script>
+
 <script language="javascript" type="text/javascript">
 <% cfg_set("from_nowan_retry", "1") %>
 </script>
 </head>
 
 <body>
-<script language="javascript" type="text/javascript">top.location.href = "BRS_index.htm";</script>
+<script language="javascript" type="text/javascript">getTop(window).location.href = "BRS_index.htm";</script>
 </body>
 
 </html>

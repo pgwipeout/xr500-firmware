@@ -4,7 +4,7 @@
 
 var ipv6_type = "<% cfg_get("ipv6_type") %>";
 var enable_mapt = "<% cfg_get("mapt_enable") %>";
-top.enable_mapt = enable_mapt;
+getTop(window).enable_mapt = enable_mapt;
 change_ipv6(ipv6_type);	
 
 </script>

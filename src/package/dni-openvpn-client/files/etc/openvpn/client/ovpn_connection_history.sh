@@ -51,7 +51,7 @@ get_config_file()
 set_config_file()
 {
 	local city="$3"
-	[ "$city" = "Any City" ] && city="$(jq .city ${ovpn_client_stat_file})"
+	[ "$city" = "Any City" ] && city="$(jq -r .city ${ovpn_client_stat_file})"
 
 	sed -i '/^'"$1;$2;$city;"'.*$/d' ${history_db_file}
 	cat <<-EOF >${history_db_file}.new

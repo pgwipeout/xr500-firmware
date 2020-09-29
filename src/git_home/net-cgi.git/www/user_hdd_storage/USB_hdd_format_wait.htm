@@ -17,7 +17,7 @@ var form_flag = "<% cfg_get("sata_partition_count") %>";
  //var delay_time=180000;  // msecs
 function loadvalue()
 {
-	if( top.disk_format_wait_flag == 1)
+	if( getTop(window).disk_format_wait_flag == 1)
 		setTimeout( "set_disk_wait_flag();", 10000 );
 	else
 		if( form_flag != "0")
@@ -26,7 +26,7 @@ function loadvalue()
 
 function set_disk_wait_flag()
 {
-	top.disk_format_wait_flag = 0;
+	getTop(window).disk_format_wait_flag = 0;
 	location.href="USB_hdd_format_wait.htm";
 }
 

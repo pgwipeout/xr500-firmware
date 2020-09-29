@@ -11,7 +11,7 @@ function select_lable(num)
 
         select_num=num;
 	if(select_num==0){
-		if(top.have_advanced_qos == "1")
+		if(getTop(window).have_advanced_qos == "1")
 			goto_formframe("QOS_wait.htm");
 		else
 			goto_formframe("QOS_dynamic.htm");
@@ -32,7 +32,7 @@ function qos_advanced()
 		cf.hid_streamboost_enable.value = 0;
 		cf.hid_first_flag.value = "0";
 		parent.ookla_speedtest_flag = 0;
-		if(top.have_advanced_qos == "1")
+		if(getTop(window).have_advanced_qos == "1")
 			check_confirm(cf, "QOS_basic_dynamic.htm", ts);
 		else
 			check_confirm(cf, "QOS_dynamic.htm", ts);
@@ -121,7 +121,7 @@ function check_qos_apply(cf)
 	var cf=document.forms[0];
 
 	//if(cf.streamboostEnable.checked == true)
-	if(top.have_advanced_qos == 1)
+	if(getTop(window).have_advanced_qos == 1)
 		cf.hid_streamboost_enable.value=1;
 	else 
 	{
@@ -362,7 +362,7 @@ function select_device(mac,ip,name,priority, devtype, contype)
 	parent.qos_edit_devtype=devtype;
 	parent.qos_edit_contype=contype;
 
-	if(top.is_ru_version == 1)
+	if(getTop(window).is_ru_version == 1)
 		document.getElementsByName("edit")[0].className="common_bt";
 	else
 		document.getElementsByName("edit")[0].className="short_common_bt";
