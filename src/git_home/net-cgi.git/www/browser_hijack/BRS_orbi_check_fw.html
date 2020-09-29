@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+</head>
+<body onload="loadvalue()">
+<div id="container">
+	<div class="dialog-content">
+		<!--checking new formware-->
+          <div id="card-checking-for-updates" class="install-card">
+            <div class="logos">
+              <img class="netgear-logo" src="images/svg/netgear.svg">
+              <% hijack_logo_title() %>
+            </div>
+            <img class="card-image" src="images/svg/nighthawk-front.svg" onerror="this.onerror=null; this.src='images/robot.png'">
+	    <div class="content">
+		    <div class="desc-title"><script>document.write(bh_orbi_check_update)</script></div>
+
+		    <div class="loader">
+			    <div class="preloader-wrapper small active">
+				    <div class="spinner-layer">
+					    <div class="circle-clipper left">
+						    <div class="circle"></div>
+						    </div><div class="gap-patch">
+						    <div class="circle"></div>
+						    </div><div class="circle-clipper right">
+						    <div class="circle"></div>
+					    </div>
+				    </div>
+			    </div>
+		    </div>
+		    <div class="desc-text wait"><script>document.write(bh_orbi_pls_wait);</script></div>
+	    </div>
+          </div>
+	</div>
+</div>
+<script>
+var wan_status=<% detwan_valid() %>;
+function loadvalue()
+{
+	if(wan_status == 1)
+		check_new_firmware();
+	else
+		location.href = "BRS_upgrade_fw.html";
+}
+
+function createXMLHttpRequest()
+{
+        if(typeof XMLHttpRequest == "undefined")
+                XMLHttpRequest = function(){
+                        try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}
+                                catch(e){}
+                        try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}
+                                catch(e){}
+                        try{return new ActiveXObject("Msxml2.XMLHTTP");}
+                                catch(e){}
+                        return false;
+                }
+        return new XMLHttpRequest();
+}
+
+function check_new_firmware()
+{
+	var url = "get_autoup_status.txt?ts=" + new Date().getTime();
+	var xmlHttp = createXMLHttpRequest();
+	var status;
+	
+	xmlHttp.onreadystatechange=function()
+	{
+		status=xmlHttp.responseText;
+		
+		if(status == 9999 || status >= 10000)
+			location.href = "BRS_upgrade_fw.html";
+		else
+			setTimeout(function(){
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send();
+			}, 5000);
+	}
+	xmlHttp.open("GET", url, true);
+	xmlHttp.send();	
+}
+</script>
+</form>
+</body>
+</html>

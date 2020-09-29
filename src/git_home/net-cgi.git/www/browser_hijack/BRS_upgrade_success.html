@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+</head>
+<body>
+<% form_submit("apply", "to_internet_no_auth.htm", "hijack_save_time")%>
+<div id="container">
+	<div class="dialog-content">
+		<!--checking new formware-->
+          <div id="card-checking-for-updates" class="install-card">
+            <div class="logos">
+		    <img class="netgear-logo" src="images/svg/netgear.svg" onerror="this.onerror=null; this.src='images/duma-os.png'">
+		    <% hijack_logo_title() %>
+            </div>
+            <img class="card-image" src="images/svg/nighthawk-front.svg" onerror="this.onerror=null; this.src='images/robot.png'">
+		   <div class="content">
+			   <div class="desc-title"><script>document.write(bh_firmware_updating)</script></div>
+			   <div class="desc-text" id="upg_msg"><script>document.write(bh_update_success)</script></div>        
+		   </div>
+		   <div class="buttons">
+				<button id="next_btn" class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return toInternet();">
+					<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
+			  </button>
+		  </div>
+          </div>
+	</div>
+</div>
+<script>
+function toInternet()
+{
+	var cf = document.forms[0];
+	cf.target = "_top";
+	return true;
+}
+</script>
+</form>
+</body>
+</html>

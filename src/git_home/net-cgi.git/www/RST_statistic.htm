@@ -1,0 +1,426 @@
+<% http_header("style/form.css", "/funcs.js") %>
+<% nohelp_header("RST_statistic.htm", "show_statistic") %>
+
+<script>
+<% dsl_statistic() %>
+var show_statis=<% show_statistic() %> ;
+var timereset="<% cfg_sed_xss("timereset") %>";
+var clock = 0;
+if (timereset == "")
+	timereset="5";
+
+function loadvalue(){
+
+	if(top.dsl_enable_flag == 1)
+	
+		document.getElementById("dsl_status").style.display="";
+	else
+		document.getElementById("dsl_status").style.display="none";
+	
+	show_status(show_statis);
+	
+	if(timereset!="0")
+	{
+	//load slow about 2sec,so minus 2sec to make load time right
+		setTimeout("ajaxCheckStatus()", parseInt(timereset)*1000-2000);
+	}
+}
+
+function show_status(show_statis){
+	var cf = document.forms[0];
+
+//		if(timereset!="0"){
+			var uptime=show_statis.sys_uptime;
+			var new_time=change_sec_to_time(uptime);
+			document.getElementById("sys_time_1").innerHTML=new_time;
+			if(an_router_flag == 0){
+				document.getElementById("an_info").style.display= "none";
+				}
+			else
+			{
+				document.getElementById("an_info").style.display= "";
+				if (show_statis.an_status != "Link down"){
+					document.getElementById("an_status_1").innerHTML=show_statis.an_status;
+	
+				}
+				else {
+				
+					document.getElementById("an_status_1").innerHTML="$link_down";
+
+					}
+				document.getElementById("an_txpkts_1").innerHTML=show_statis.an_txpkts;
+				document.getElementById("an_rxpkts_1").innerHTML=show_statis.an_rxpkts;
+				document.getElementById("an_collisions_1").innerHTML=show_statis.an_collisions;
+				document.getElementById("an_txbs_1").innerHTML=show_statis.an_txbs;
+				document.getElementById("an_rxbs_1").innerHTML=show_statis.an_rxbs;
+				if (show_statis.an_status != "Link down")
+				{
+					var uptime=show_statis.an_systime;
+					var new_time=change_sec_to_time(uptime);
+					document.getElementById("new_time_0").innerHTML=new_time;
+				}
+				else
+					document.getElementById("new_time_0").innerHTML="00:00:00";	
+			}
+			if (show_statis.wan_status != "Link down"){
+					document.getElementById("wan_status_1").innerHTML=translate_status(show_statis.wan_status);
+				}
+				else
+					document.getElementById("wan_status_1").innerHTML="$link_down";
+				document.getElementById("wan_txpkts_1").innerHTML=show_statis.wan_txpkts;
+				document.getElementById("wan_rxpkts_1").innerHTML=show_statis.wan_rxpkts;
+				document.getElementById("wan_collisions_1").innerHTML=show_statis.wan_collisions;
+				document.getElementById("wan_txbs_1").innerHTML=show_statis.wan_txbs;
+				document.getElementById("wan_rxbs_1").innerHTML=show_statis.wan_rxbs;
+				if (show_statis.wan_status != "Link down")
+				{
+					var uptime=show_statis.wan_systime;
+					var new_time=change_sec_to_time(uptime);
+					document.getElementById("new_time_3").innerHTML=new_time;
+				}
+				else
+					document.getElementById("new_time_3").innerHTML="00:00:00";
+				//lan0	
+				if (show_statis.lan_status0 != "Link down")
+					document.getElementById("lan_status0_1").innerHTML=translate_status(show_statis.lan_status0);
+				else
+					document.getElementById("lan_status0_1").innerHTML="$link_down";
+				document.getElementById("lan_txpkts_1").innerHTML=show_statis.lan_txpkts;
+				document.getElementById("lan_rxpkts_1").innerHTML=show_statis.lan_rxpkts;
+				document.getElementById("lan_collisions_1").innerHTML=show_statis.lan_collisions;
+				document.getElementById("lan_txbs_1").innerHTML=show_statis.lan_txbs;
+				document.getElementById("lan_rxbs_1").innerHTML=show_statis.lan_rxbs;
+				if (show_statis.lan_status0 != "Link down")
+				{
+					var uptime=show_statis.lan0_systime;
+					var new_time=change_sec_to_time(uptime);
+					document.getElementById("new_time_4").innerHTML=new_time;
+				}
+				else
+					document.getElementById("new_time_4").innerHTML="00:00:00";
+				//lan1
+				if (show_statis.lan_status1 != "Link down"){
+					document.getElementById("lan_status1_1").innerHTML=translate_status(show_statis.lan_status1);
+				}
+				else
+					document.getElementById("lan_status1_1").innerHTML="$link_down";
+				if (show_statis.lan_status1 != "Link down")
+				{
+					var uptime=show_statis.lan1_systime;
+					var new_time=change_sec_to_time(uptime);
+					document.getElementById("new_time_5").innerHTML=new_time;
+				}
+				else
+					document.getElementById("new_time_5").innerHTML="00:00:00";
+				//lan2
+				if (show_statis.lan_status2 != "Link down"){
+					document.getElementById("lan_status2_1").innerHTML=translate_status(show_statis.lan_status2);
+				}
+				else
+					document.getElementById("lan_status2_1").innerHTML="$link_down";
+				if (show_statis.lan_status2 != "Link down")
+				{
+					var uptime=show_statis.lan2_systime;
+					var new_time=change_sec_to_time(uptime);
+					document.getElementById("new_time_6").innerHTML=new_time;
+				}
+				else
+					document.getElementById("new_time_6").innerHTML="00:00:00";
+				//lan3
+				if (show_statis.lan_status3 != "Link down"){
+					document.getElementById("lan_status3_1").innerHTML=translate_status(show_statis.lan_status3);
+				}
+				else
+					document.getElementById("lan_status3_1").innerHTML="$link_down";
+				if (show_statis.lan_status3 != "Link down")
+				{
+					var uptime=show_statis.lan3_systime;
+					var new_time=change_sec_to_time(uptime);
+					document.getElementById("new_time_2").innerHTML=new_time;
+				}
+				else
+					document.getElementById("new_time_2").innerHTML="00:00:00";
+				if(typeof(lan_ports_num) != "undefined" && lan_ports_num == 1)
+				{	
+					document.getElementById("lan2_info").style.display = "none";
+					document.getElementById("lan3_info").style.display = "none";
+					document.getElementById("lan4_info").style.display = "none";
+				}
+				//wlan_info
+				if(typeof(have_wifi_flag) != "undefined" && have_wifi_flag == 0)
+					document.getElementById("wlan_info").style.display = "none";
+				if (show_statis.bgn_status != "Link down"){
+					if(enable_bridge_flag == "1")
+						document.getElementById("bgn_status_1").innerHTML=link_rate+" Mbps";
+					else
+						document.getElementById("bgn_status_1").innerHTML=show_statis.bgn_status;
+				}
+				else
+					document.getElementById("bgn_status_1").innerHTML="$link_down";
+				document.getElementById("bgn_txpkts_1").innerHTML=show_statis.bgn_txpkts;
+				document.getElementById("bgn_rxpkts_1").innerHTML=show_statis.bgn_rxpkts;
+				document.getElementById("bgn_collisions_1").innerHTML=show_statis.bgn_collisions;
+				document.getElementById("bgn_txbs_1").innerHTML=show_statis.bgn_txbs;
+				document.getElementById("bgn_rxbs_1").innerHTML=show_statis.bgn_rxbs;
+				if (show_statis.bgn_status != "Link down")
+				{
+					var uptime=show_statis.bgn_systime;
+					var new_time=change_sec_to_time(uptime);
+					document.getElementById("new_time_1").innerHTML=new_time;
+				}
+				else
+					document.getElementById("new_time_1").innerHTML="00:00:00";
+
+
+		document.getElementById("set_interval").disabled = false;
+//}
+}
+function ajaxCheckStatus()
+{
+
+	var file="/statistic_data.txt";
+	var xmlHttp = createXMLHttpRequest();
+	var result;
+	xmlHttp.onreadystatechange=function()
+	{
+		var cf=document.forms[0];
+		if(xmlHttp.readyState==4 && xmlHttp.status==200)
+		{
+			result=JSON.parse(xmlHttp.responseText);
+			show_status(result);
+			
+		}
+	}
+	xmlHttp.open("GET", file, true);
+	xmlHttp.send();
+	setTimeout("ajaxCheckStatus()", parseInt(timereset)*1000);
+
+}
+
+
+
+
+
+
+<% web_flag() %>
+var enable_bridge_flag="<% cfg_get("bridge_mode") %>";
+<% bridge_link_rate() %>
+
+function translate_status(stat)
+{
+	if(stat.indexOf("Full")>0)
+		stat=stat.replace("Full", "$full");
+	else if(stat.indexOf("Half")>0)
+		stat=stat.replace("Half", "$half");
+	return stat;
+		
+}
+</script>
+<TABLE name="statistic_table" id="statistic_table" cellspacing=5 cellPadding=0 width=100% border=0>
+$bluebar
+<TR>
+	<TD nowrap><B>$statistics_sysuptime</B>&nbsp;<span id="sys_time_1">
+<script>
+var uptime=show_statis.sys_uptime;
+var new_time=change_sec_to_time(uptime);
+document.write(new_time);
+</script></span>
+	</TD>
+</TR>
+<TR>
+	<TD nowrap>
+	<TABLE border=1 cellpadding=2 cellspacing=0 width=100%>
+	<TR> 
+	<TD nowrap align=center><span class="thead">$block_ser_service_port</span></TD>
+	<TD nowrap align=center><span class="thead">$stalist_Status</span></TD>
+	<TD nowrap align=center><span class="thead">$statistics_txpkts</span></TD>
+	<TD nowrap align=center><span class="thead">$statistics_rxpkts</span></TD>
+	<TD nowrap align=center><span class="thead">$statistics_coll</span></TD>
+	<TD nowrap align=center><span class="thead">$statistics_tx</span></TD>
+	<TD nowrap align=center><span class="thead">$statistics_rx</span></TD>
+	<TD nowrap align=center><span class="thead">$statistics_up</span></TD>
+	</TR>
+	<TR> 
+	<TD nowrap align=center><span class="thead">$statistics_wan</span></TD>
+	<TD nowrap align=center><span class="ttext" id="wan_status_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="wan_txpkts_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="wan_rxpkts_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="wan_collisions_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="wan_txbs_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="wan_rxbs_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="new_time_3">
+	
+	</span></TD>
+	</TR>
+	<TR id=lan1_info>
+	<TD nowrap align=center><span class="thead" >$statistics_lan 1</span></TD>
+	<TD nowrap align=center><span class="ttext" id="lan_status0_1"></span></TD>
+	<TD nowrap align=center rowspan=4><span class="ttext" id="lan_txpkts_1"></span></TD>
+	<TD nowrap align=center rowspan=4><span class="ttext" id="lan_rxpkts_1"></span></TD>
+	<TD nowrap align=center rowspan=4><span class="ttext" id="lan_collisions_1"></span></TD>
+	<TD nowrap align=center rowspan=4><span class="ttext" id="lan_txbs_1"></span></TD>
+	<TD nowrap align=center rowspan=4><span class="ttext"id="lan_rxbs_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="new_time_4">
+
+	</span></TD>
+	</TR>
+	<TR id=lan2_info>
+	<TD nowrap align=center><span class="thead">$statistics_lan 2</span></TD>
+	<TD nowrap align=center><span class="ttext" id="lan_status1_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="new_time_5">
+
+	</span></TD>
+	</TR>
+	<TR id=lan3_info>
+	<TD nowrap align=center><span class="thead">$statistics_lan 3</span></TD>
+	<TD nowrap align=center><span class="ttext" id="lan_status2_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="new_time_6">
+		
+	</span></TD>
+	</TR>
+	<TR id=lan4_info>
+	<TD nowrap align=center><span class="thead">$statistics_lan 4</span></TD>
+	<TD nowrap align=center><span class="ttext" id="lan_status3_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="new_time_2">
+
+	</span></TD>
+	</TR>
+	<script>
+	if(typeof(lan_ports_num) != "undefined" && lan_ports_num == 1)
+	{
+		document.getElementById("lan2_info").style.display = "none";
+		document.getElementById("lan3_info").style.display = "none";
+		document.getElementById("lan4_info").style.display = "none";
+	}
+	</script>
+	<TR id=wlan_info>
+	<TD nowrap align=center><span class="thead">$statistics_wlan <script>if(an_router_flag == 1) document.write("b/g/n");</script></span></TD>
+	<TD nowrap align=center><span class="ttext" id="bgn_status_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="bgn_txpkts_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="bgn_rxpkts_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="bgn_collisions_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="bgn_txbs_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="bgn_rxbs_1"></span></TD>
+	<TD nowrap align=center><span class="ttext" id="new_time_1">
+
+	</span></TD>
+	</TR>
+	
+		<TR id=an_info>
+	
+	<TD nowrap align=center><span class="thead"><script>
+	if(ac_router_flag == 1)
+		document.write('$statistics_wlan a/n/ac');
+	else
+		document.write('$statistics_wlan a/n');
+		</script>
+	</span></td>
+	<TD nowrap align=center ><span class="ttext" id="an_status_1"></span></TD>
+    <TD nowrap align=center ><span class="ttext" id="an_txpkts_1"></span></TD>
+    <TD nowrap align=center ><span class="ttext" id="an_rxpkts_1"></span></TD>
+    <TD nowrap align=center ><span class="ttext" id="an_collisions_1"></span></TD>
+    <TD nowrap align=center ><span class="ttext" id="an_txbs_1"></span></TD>
+    <TD nowrap align=center ><span class="ttext" id="an_rxbs_1"></span></TD>
+    <TD nowrap align=center ><span class="ttext" id="new_time_0">
+			<script>
+			if (show_statis.an_status != "Link down")
+        {
+                var uptime=show_statis.an_systime;
+                var new_time=change_sec_to_time(uptime);
+                document.write(new_time);
+        }
+        else
+                document.write("00:00:00");
+			</script></span></TD>
+	
+	</TR>
+	
+	
+
+
+
+
+	
+	</TABLE>
+	</TD>
+</TR>
+<tr><td>
+<br>
+
+	<TABLE id="dsl_status" style="display:none" border=1 cellpadding=2 cellspacing=0 width=100%>
+	<tr>
+	<td nowrap align="center"><span class="thead" >$dsl_adsl_link</span></td>
+	<td nowrap align="center"><span class="thead" >$dsl_downstream</span></td>
+	<td nowrap align="center"><span class="thead" >$dsl_upstream</span></td>
+	</tr>
+	<tr>
+	<td nowrap align="center"><span class="thead">$dsl_conn_speed</span></td>
+	<td nowrap align="center"><span class="ttext" id="conn_down"><script>document.write(conn_down)</script></span></td>
+	<td nowrap align="center"><span class="ttext" id="conn_up"><script>document.write(conn_up)</script></span></td>
+	</tr>
+	<tr>
+	<td nowrap align="center"><span class="thead">$dsl_line_atten</span></td>
+	<td nowrap align="center"><span class="ttext" id="line_down"><script>document.write(line_down)</script></span></td>
+	<td nowrap align="center"><span class="ttext" id="line_up"></span></td>
+	</tr>
+	<tr>
+	<td nowrap align="center"><span class="thead" >$dsl_noise_margin</span></td>
+	<td nowrap align="center"><span class="ttext" id="noise_down"></span></td>
+	<td nowrap align="center"><span class="ttext" id="noise_up"></span></td>
+	</tr>
+	</table></td></tr></TABLE>
+
+
+
+<TABLE cellspacing=5 cellPadding=0 width=100% border=0>
+<TR>
+	<TD nowrap><B>$statistics_poll :</B>
+<script>
+if (timereset != "0")
+	document.write("<input TYPE=TEXT NAME=timeset id=\"timeset\" SIZE=5 MAXLENGTH=5 VALUE="+timereset+" onKeyPress=\"return getkey('num',event)\"> (secs)");
+else
+	document.write("<input TYPE=TEXT NAME=timeset id=\"timeset\" SIZE=5 MAXLENGTH=5 VALUE='' onKeyPress=\"return getkey('num', event)\"> (secs)");
+</script>
+	</TD>
+	<TD nowrap>
+	<script>
+	var master="<% cfg_get("http_loginname") %>";
+	if( master == "admin" )
+		document.write('<input class="common_bt" TYPE="button" NAME="Set Interval" id="set_interval" VALUE="$statistics_set" WIDTH="80" onClick="reset_time(this);">&nbsp;&nbsp;<input class="common_bt" TYPE="button" NAME="Stop" id="stop" VALUE="$statistics_stop" WIDTH="80" onClick="stop_time(this);">');
+	else
+		document.write('<input class="common1_bt" TYPE="button" NAME="Set Interval" id="set_interval" VALUE="$statistics_set" WIDTH="80" disabled>&nbsp;&nbsp;<input class="common1_bt" TYPE="button" NAME="Stop" id="stop" VALUE="$statistics_stop" WIDTH="80" disabled>');
+		
+	</script>
+	</TD>
+</TR>
+</TABLE>
+<script>
+function reset_time(th)
+{
+	cf=document.forms[0];
+	if( cf.timeset.value == "")
+	{
+		cf.timeset.value = "5";
+	}
+	var timeset=cf.timeset.value;
+	if(!(timeset > 4 && timeset < 86401))
+	{
+		alert("$rang_pool");
+		return false;
+	}
+	th.disabled = true;
+	cf.submit();
+}
+
+function stop_time(th)
+{
+	cf=document.forms[0];
+	cf.timeset.value="0";
+	th.disabled = true;
+
+	cf.submit();
+}
+</script>
+</FORM>
+</BODY>
+</HTML>

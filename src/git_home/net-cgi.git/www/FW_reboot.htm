@@ -1,0 +1,36 @@
+<% http_header("style/form.css", "/funcs.js") %>
+
+<BODY >
+
+<div class="page_title">$reboot</div>
+<div id="main" class="main">
+
+<script>
+
+</script>
+<% table_header() %>
+$bluebar
+
+
+<TR>
+	<TD nowrap>
+	<A tabindex=-1 href="javascript:loadhelp('_backup','save')"><B>$reboot_desc</B></A>
+	</TD>
+</TR>
+<TR>
+<TD nowrap colspan=2 align=center>
+<script>
+var master="<% cfg_get("http_loginname") %>";
+if(master == "admin")
+	document.write('<input class="common_key_bt" type="button" id="reboot" name="reboot" value="$reboot" onClick="location.href=\'reboot.htm\'">');
+else
+	document.write('<input class="common1_key_bt" type="button" id="reboot" name="reboot" value="$reboot" disabled>');
+</script></TD>
+</TR>
+
+</TABLE>
+
+</div>
+
+</BODY>
+</HTML>

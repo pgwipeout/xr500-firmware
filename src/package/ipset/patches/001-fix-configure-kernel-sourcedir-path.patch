@@ -1,0 +1,15 @@
+Index: ipset-6.30/configure.ac
+===================================================================
+--- ipset-6.30.orig/configure.ac	2016-10-17 12:50:14.000000000 +0100
++++ ipset-6.30/configure.ac	2017-04-23 18:35:48.718514934 +0100
+@@ -81,8 +81,8 @@
+ 
+ if test -n "$KSOURCEDIR"; then
+ 	ksourcedir="$KSOURCEDIR"
+-elif test -e "$kbuilddir/include/linux/netfilter/nfnetlink.h"; then
+-	ksourcedir="$kbuilddir"
++elif test -e "$kbuilddir/sourcecode/include/linux/netfilter/nfnetlink.h"; then
++	ksourcedir="$kbuilddir/sourcecode/"
+ else
+ 	ksourcedir="/lib/modules/$(uname -r)/source"
+ fi

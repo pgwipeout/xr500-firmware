@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+<% cat_rm_file("tmp/ping_result") %>
+</head>
+
+<body>
+<% form_submit("func", "BRS_03A_detcInetType.html", "wizard_detwan")  %>
+
+<div id="container">
+	<div class="dialog-content">
+		<!-- Problem with Router -->
+		<div id="card-problem-with-router" class="install-card clearfix" style="height:auto;">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+		     <div class="content">
+			<div class="desc-title"><script>document.write(bh_no_internet_ip);</script></div>
+			<div class="desc-text"><script>document.write(bh_genie_cannot_find_ip);</script></div>
+
+			<ol>
+				<li><p><script>document.write(bh_orbi_cannot_find_ip_msg1);</script></p>
+				<p><script>document.write(bh_orbi_cannot_find_ip_msg2);</script></p>
+				</li>
+				<li><p><script>document.write(bh_orbi_cannot_find_ip_msg3);</script></p><p><script>document.write(bh_orbi_cannot_find_ip_msg4);</script></p>
+				</li>
+			</ol>
+		  </div>
+		     <div class="buttons">		     
+			<button class="waves-effect waves-light btn button-nav" >
+				<span><script>document.write(bh_orbi_tryagain_mark);</script></span>
+			</button>			
+			<button class="waves-effect btn-flat button-nav-skip" type="button" onclick='location.href = "BRS_03A_E_IP_problem_staticIP.html";'>
+				<span><script>document.write(bh_orbi_problem_no_solve);</script></span>
+			</button>
+		     </div>
+		</div>
+	</div>
+</div>
+</form>
+</body>
+
+</html>

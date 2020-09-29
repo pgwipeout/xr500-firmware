@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<script language="javascript" type="text/javascript" src="script/funcs.js"></script>
+<% hijack_language() %>
+<script language="javascript" type="text/javascript">
+var lan_ip="<% cfg_get("lan_ipaddr") %>";
+var lan_subnet="<% cfg_get("lan_netmask") %>";
+var dns_third_flag=top.dns_third_flag;
+
+function loadvalue()
+{
+	if( dns_third_flag == 1 )
+		document.getElementById("third_dns").style.display="";
+}
+
+function checkStaticIP()
+{
+	var cf = document.forms[0];
+
+	cf.ip_address.value = cf.WPethr.value;
+	cf.subnet_mask.value = cf.WMask.value;
+	cf.gateway.value = cf.WGateway.value;
+
+	if(check_static_ip_mask_gtw()==false)
+		return false;
+	if(check_static_dns(true)==false)
+		return false;
+	if(check_ether_samesubnet()==false)
+		return false;
+
+	return true;
+}
+
+function check_static_ip_mask_gtw()
+{
+	var cf = document.forms[0];
+
+	if(checkipaddr(cf.ip_address.value)==false || is_sub_or_broad(cf.ip_address.value, cf.ip_address.value, cf.subnet_mask.value) == false)
+	{
+		alert(bh_invalid_ip);
+		return false;
+	}
+	if(checksubnet(cf.subnet_mask.value)==false)
+	{
+		alert(bh_invalid_mask);
+		return false;
+	}
+	if(checkgateway(cf.gateway.value)==false)
+	{
+		alert(bh_invalid_gateway);
+		return false;
+	}
+	if(isSameIp(cf.ip_address.value, cf.gateway.value) == true)
+	{
+		alert(bh_invalid_gateway);
+		return false;
+	}
+
+	return true;
+}
+
+function check_ether_samesubnet()
+{
+	var cf = document.forms[0];
+	if(isSameSubNet(cf.ip_address.value,cf.subnet_mask.value,lan_ip,lan_subnet) == true)
+	{
+		alert(bh_same_lan_wan_subnet);
+		return false;
+	}
+	if(isSameSubNet(cf.ip_address.value,lan_subnet,lan_ip,lan_subnet) == true)
+	{
+		alert(bh_same_lan_wan_subnet);
+		return false;
+	}
+	if(isSameSubNet(cf.ip_address.value,cf.subnet_mask.value,lan_ip,cf.subnet_mask.value) == true)
+	{
+		alert(bh_same_lan_wan_subnet);
+		return false;
+	}
+	if(isSameIp(cf.ip_address.value,lan_ip) == true)
+	{
+		alert(bh_same_lan_wan_subnet);
+		return false;
+	}
+	
+	return true;
+}
+
+function check_static_dns(wan_assign)
+{
+	var cf = document.forms[0];
+	cf.preferred_dns.value = cf.DAddr.value;
+	cf.alternate_dns.value = cf.PDAddr.value;
+	if( dns_third_flag == 1 )
+		cf.third_dns.value = cf.TDAddr.value;
+
+	if( dns_third_flag == 1 )
+	{
+		if(check_three_DNS(cf.preferred_dns.value, cf.alternate_dns.value, cf.third_dns.value, wan_assign,cf.ip_address.value)==false)
+			return false;
+	}
+	else
+	{
+	 	if(check_DNS(cf.preferred_dns.value,cf.alternate_dns.value,wan_assign,cf.ip_address.value)==false)
+			return false;
+	}
+	if(cf.preferred_dns.value == "...")
+		cf.preferred_dns.value ="";
+	if(cf.alternate_dns.value == "...")
+		cf.alternate_dns.value ="";
+	if(dns_third_flag == 1 && cf.third_dns.value == "...")
+		cf.third_dns.value = "";
+	return true;
+}
+</script>
+<% wizlog_problem_ck10("0") %>
+</head>
+
+<body onload="loadvalue();">
+<% form_submit("apply", "BRS_04_applySettings.html", "hijack_static") %>
+
+<input type="hidden" name="ip_address" value=""/>
+<input type="hidden" name="subnet_mask" value=""/>
+<input type="hidden" name="gateway" value=""/>
+<input type="hidden" name="preferred_dns" value=""/>
+<input type="hidden" name="alternate_dns" value=""/>
+<input type="hidden" name="third_dns" value=""/>
+
+<div id="container">
+	<div class="dialog-content">
+		<!-- Fixed IP Connection-->
+		<div id="card-fixed-internet-IP" class="install-card clearfix">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+		     <div class="content">
+			<div class="desc-title"><script>document.write(bh_fix_ip_setting);</script></div>
+			<div class="desc-text"><script>document.write(bh_orbi_enter_ip_setting);</script></div>
+		
+			<div class="row input-row">
+				<div class="input-field col m6">
+					<script>document.write('<input class="ip-box" name="WPethr" placeholder="IP" id="wpethr" type="text" class="validate"><label for="WPethr">'+bh_info_mark_ip+'</label>');</script>
+				</div>
+				<div class="input-field col m6">
+					<script>document.write('<input class="ip-box" placeholder="'+bh_info_mark_mask+'"  name="WMask" id="wmask" type="text"><label for="wmask">'+bh_info_mark_mask+'</label>');</script>
+				</div>
+			</div>
+
+			<div class="row input-row">
+				<div class="input-field col m6">
+					<script>document.write('<input class="ip-box" placeholder="IP" name="WGateway" id="wgateway" type="text"><label for="wgateway">'+bh_constatus_defgtw+'</label>');</script>
+				</div>
+			</div>
+
+			<div class="row input-row">
+				<div class="input-field col m6">
+					<script>
+						document.write('<input class="ip-box" placeholder="IP" name="DAddr" id="daddr"  type="text"><label for="daddr">'+bh_preferred_dns+'</label>');
+					</script>
+				</div>
+				<div class="input-field col m6">
+					<script>document.write('<input class="ip-box" placeholder="IP"  name="PDAddr" id="pdaddr" type="text"><label for="pdaddr">'+bh_alternate_dns+'</label>');</script>
+				</div>
+			</div>
+			
+			<div class="row input-row" id="third_dns">
+				<div class="input-field col m6">
+					<script>document.write('<input class="ip-box" placeholder="IP" name="TDAddr" id="tdaddr" type="text"><label for="tdaddr">'+bh_basic_int_third_dns+'</label>');</script>
+				</div>
+			</div>
+		    </div>
+		    <div class="buttons">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return checkStaticIP();">
+				<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
+			</button>
+		    </div>
+		</div>
+	</div>
+</div>	
+
+</form>
+</body>
+
+</html>

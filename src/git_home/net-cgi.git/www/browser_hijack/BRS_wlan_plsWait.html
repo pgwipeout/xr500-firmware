@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+
+<% hijack_language() %>
+</head>
+<style>
+	.word_wrap{ word-wrap:break-word; word-break:break-all;}
+	td{padding:0; width:50%}
+	.row .col.offset-a4{margin-left:auto; margin-right:auto;}
+</style>
+<body>
+<div id="container">
+	<div class="dialog-content">
+		<!-- Personalizing your router -->
+		<div id="card-orbi-personalize-router" class="install-card clearfix">
+
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+		    <div class="content">
+			<div class="desc-title"><script>document.write(bh_orbi_personalizing);</script></div>
+			<div class="desc-text">
+				<script>document.write(bh_orbi_personalizing_msg);</script>
+				<span id="wait_note" style="display:none"><br/><script>document.write(bh_orbi_personalizing_msg_1);</script></span>
+			</div>
+
+			<div class="row">
+              <div class="col " id="ssid_1">
+                <div class="icon">
+                  <i class="material-icons prefix">signal_wifi_4_bar</i>
+                </div>
+                <div class="pin-title word_wrap"><% cfg_get_ssid_html("wl_ssid") %></div>
+                <div class="pin-desc word_wrap"><% passphrase_bg_msg() %></div>
+              </div>
+              <div class="col s6 m3" id="ssid_2">
+                <div class="icon">
+                  <i class="material-icons prefix">signal_wifi_4_bar</i>
+                </div>
+                <div class="pin-title word_wrap"><% cfg_get_ssid_html("wla_ssid") %></div>
+                <div class="pin-desc word_wrap"><% passphrase_ag_msg() %></div>
+              </div>
+            </div>
+
+			<div id="wait_img" style="display:none">
+				<div class="loader">
+					<div class="preloader-wrapper small active">
+						<div class="spinner-layer">
+							<div class="circle-clipper left">
+								<div class="circle"></div>
+								</div><div class="gap-patch">
+								<div class="circle"></div>
+								</div><div class="circle-clipper right">
+								<div class="circle"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="desc-text wait" ><script>document.write(bh_orbi_pls_wait);</script></div>
+			</div>
+		     </div>
+
+		     <div id="confirm_div">
+			     <div class="content">
+				     <div class="desc-title"><script>document.write(bh_orbi_personalizing_msg_2);</script></div>
+			     </div>
+			     <div class="buttons">
+				     <button class="waves-effect waves-light btn button-nav" type="button" onclick="click_conn();"><script>document.write(bh_orbi_personalizing_conn);</script></button>
+			     </div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+var not_change="<% cfg_get("wireless_not_change") %>";
+var apply_time="<% cfg_get("wlan_apply_time") %>";
+<% from_wireless() %>
+
+var get_smart_connect="<% cfg_get("enable_smart_connect") %>";  
+if(get_smart_connect=="1"){ 
+        document.getElementById("ssid_2").style.display="none";       
+        document.getElementById("ssid_1").className+="offset-a4"; 
+}else{
+	 document.getElementById("ssid_2").style.display="";      
+	 document.getElementById("ssid_1").className+="s6 m3 offset-m3";     
+}
+var is_from_wireless = 0;//this value for temp testing.
+var c_time=0;
+var wait_time = 40;
+if(not_change == "1")
+        location.href="BRS_orbi_complete.html";
+else if(apply_time != "")
+{
+        var d = new Date();
+	var current_time = Math.floor(d.getTime()/1000);
+	wait_time = 40-(current_time - apply_time);
+	wait_time = wait_time > 40? 40: (wait_time < 1? 1: wait_time);
+}
+else
+	wait_time = 40;
+
+if(is_from_wireless != 1)
+	click_conn();
+function click_conn()
+{
+	document.getElementById("confirm_div").style.display="none";
+	document.getElementById("wait_note").style.display="";
+	document.getElementById("wait_img").style.display="";
+	print_time();
+}
+function print_time()
+{
+	c_time++;
+	if(c_time == wait_time)
+		location.href="BRS_orbi_complete.html";
+	else if(c_time >60 && !(c_time%3))
+	{
+		/*var file="get_satellite_num.txt";
+		var xmlhttp,result;
+		if ( window.XMLHttpRequest)
+			xmlhttp = new XMLHttpRequest();
+		else
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		xmlhttp.onreadystatechange = function()
+		{
+			if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 )
+			{
+				result=xmlhttp.responseText;
+				if(satellite_num!=0 && result == satellite_num)
+					location.href="BRS_orbi_complete.html";
+			}
+		}
+		xmlhttp.open("GET", file, true);
+		xmlhttp.send();*/
+		setTimeout("print_time()",1000);
+	}
+	else
+		setTimeout("print_time()",1000);
+}
+</script>
+
+</body>
+
+</html>

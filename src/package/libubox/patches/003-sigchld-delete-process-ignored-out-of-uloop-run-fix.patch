@@ -1,0 +1,49 @@
+Index: libubox-2016-11-29/uloop.c
+===================================================================
+--- libubox-2016-11-29.orig/uloop.c	2017-08-31 07:11:34.000000000 +0100
++++ libubox-2016-11-29/uloop.c	2017-10-25 14:08:50.224355048 +0100
+@@ -115,6 +115,8 @@
+ 	return 0;
+ }
+ 
++static void uloop_setup_signals(bool add);
++
+ int uloop_init(void)
+ {
+ 	if (uloop_init_pollfd() < 0)
+@@ -125,6 +127,7 @@
+ 		return -1;
+ 	}
+ 
++	uloop_setup_signals(true);
+ 	return 0;
+ }
+ 
+@@ -523,8 +526,7 @@
+ 	 * Handlers are only updated for the first call to uloop_run() (and restored
+ 	 * when this call is done).
+ 	 */
+-	if (!recursive_calls++)
+-		uloop_setup_signals(true);
++	recursive_calls++;
+ 
+ 	uloop_status = 0;
+ 	uloop_cancelled = false;
+@@ -543,14 +545,15 @@
+ 		uloop_run_events(uloop_get_next_timeout(&tv));
+ 	}
+ 
+-	if (!--recursive_calls)
+-		uloop_setup_signals(false);
++	--recursive_calls;
+ 
+ 	return uloop_status;
+ }
+ 
+ void uloop_done(void)
+ {
++	uloop_setup_signals(false);
++
+ 	if (poll_fd >= 0) {
+ 		close(poll_fd);
+ 		poll_fd = -1;

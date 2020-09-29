@@ -1,0 +1,102 @@
+Index: iptables-1.4.10/extensions/libxt_connmark.c
+===================================================================
+--- iptables-1.4.10.orig/extensions/libxt_connmark.c	2010-10-29 15:37:22.000000000 +0100
++++ iptables-1.4.10/extensions/libxt_connmark.c	2017-04-21 10:43:45.096770224 +0100
+@@ -60,7 +60,12 @@
+ 
+ 	switch (c) {
+ 	case '1': /* --mark */
++#if 0
+ 		xtables_param_act(XTF_ONLY_ONCE, "connmark", "--mark", *flags & F_MARK);
++#else
++		if( *flags & F_MARK )
++			return false;
++#endif
+ 		if (!xtables_strtoui(optarg, &end, &mark, 0, UINT32_MAX))
+ 			xtables_param_act(XTF_BAD_VALUE, "connmark", "--mark", optarg);
+ 		if (*end == '/')
+Index: iptables-1.4.10/extensions/libxt_mark.c
+===================================================================
+--- iptables-1.4.10.orig/extensions/libxt_mark.c	2010-10-29 15:37:22.000000000 +0100
++++ iptables-1.4.10/extensions/libxt_mark.c	2017-04-21 10:44:03.536770234 +0100
+@@ -39,7 +39,12 @@
+ 
+ 	switch (c) {
+ 	case '1': /* --mark */
++#if 0
+ 		xtables_param_act(XTF_ONLY_ONCE, "mark", "--mark", *flags & F_MARK);
++#else
++		if( *flags & F_MARK )
++			return false;
++#endif
+ 		if (!xtables_strtoui(optarg, &end, &mark, 0, UINT32_MAX))
+ 			xtables_param_act(XTF_BAD_VALUE, "mark", "--mark", optarg);
+ 		if (*end == '/')
+Index: iptables-1.4.10/iptables.c
+===================================================================
+--- iptables-1.4.10.orig/iptables.c	2010-10-29 15:37:22.000000000 +0100
++++ iptables-1.4.10/iptables.c	2017-04-21 10:43:26.072770226 +0100
+@@ -1317,6 +1317,7 @@
+ {
+ 	struct ipt_entry fw, *e = NULL;
+ 	int invert = 0;
++	int longindex = 0;
+ 	unsigned int nsaddrs = 0, ndaddrs = 0;
+ 	struct in_addr *saddrs = NULL, *smasks = NULL;
+ 	struct in_addr *daddrs = NULL, *dmasks = NULL;
+@@ -1360,7 +1361,8 @@
+ 
+ 	while ((c = getopt_long(argc, argv,
+ 	   "-A:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvnt:m:xc:g:",
+-					   opts, NULL)) != -1) {
++					   opts, &longindex)) != -1) {
++
+ 		switch (c) {
+ 			/*
+ 			 * Command selection
+@@ -1729,17 +1731,27 @@
+ 					       argv, invert,
+ 					       &target->tflags,
+ 					       &fw, &target->t)) {
+-				for (matchp = matches; matchp; matchp = matchp->next) {
+-					if (matchp->completed ||
+-					    matchp->match->parse == NULL)
+-						continue;
+-					if (matchp->match->parse(c - matchp->match->option_offset,
+-						     argv, invert,
+-						     &matchp->match->mflags,
+-						     &fw,
+-						     &matchp->match->m))
+-						break;
++				int i;
++				for( i = 0; opts && ( opts[i].name != 0 || opts[i].has_arg != 0 || opts[i].flag != 0 || opts[i].val != 0 ); i++ ){
++					if( !strcmp( opts[i].name, opts[longindex].name ) ){
++						for (matchp = matches; matchp; matchp = matchp->next) {
++							if (matchp->completed ||
++							    matchp->match->parse == NULL)
++								continue;
++							if (matchp->match->parse( opts[i].val - matchp->match->option_offset,	/* c - matchp->match->option_offset, */
++								     argv, invert,
++								     &matchp->match->mflags,
++								     &fw,
++								     &matchp->match->m)){
++								goto found_opt;
++							}
++						}
++
++					}
+ 				}
++
++
++ found_opt:
+ 				m = matchp ? matchp->match : NULL;
+ 
+ 				/* If you listen carefully, you can
+@@ -1823,6 +1835,7 @@
+ 			}
+ 		}
+ 		invert = FALSE;
++		longindex = 0;
+ 	}
+ 
+ 	if (strcmp(*table, "nat") == 0 &&

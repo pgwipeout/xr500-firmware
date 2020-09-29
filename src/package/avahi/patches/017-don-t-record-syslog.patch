@@ -1,0 +1,26 @@
+From c5ccaa17687642de06c8cd8cec654d0fb8153e6f Mon Sep 17 00:00:00 2001
+From: Iceway Zhang <iceway.zhang@dniserver.dnish.net>
+Date: Sun, 5 Nov 2017 08:10:12 -0500
+Subject: [PATCH 1/1] don't record syslog
+
+Signed-off-by: Iceway Zhang <iceway.zhang@dniserver.dnish.net>
+---
+ avahi-daemon/main.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/avahi-daemon/main.c b/avahi-daemon/main.c
+index 7c8fde3..a2594bd 100644
+--- a/avahi-daemon/main.c
++++ b/avahi-daemon/main.c
+@@ -1461,7 +1461,7 @@ int main(int argc, char *argv[]) {
+     int r = 255;
+     int wrote_pid_file = 0;
+ 
+-    avahi_set_log_function(log_function);
++    //avahi_set_log_function(log_function);
+ 
+     init_rand_seed();
+ 
+-- 
+1.7.4.1
+

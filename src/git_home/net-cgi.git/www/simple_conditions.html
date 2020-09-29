@@ -1,0 +1,113 @@
+<% cfg_set("hijack_language", "1") %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<% hijack_title() %>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" type="text/css" href="/css/styles.css" />
+	<% hijack_language() %>
+</head>
+<style>
+html, body{ margin: 0; border:none; background-color:#120203;background-image: url(../images/svg/bg.svg); background-attachment: fixed; background-size: cover; background-repeat: no-repeat; font-family:Arial, Helvetica, sans-serif; font-size:10pt; font-style:normal; font-weight:normal; width:100%; height:100%}
+
+.lines{padding-bottom:90px;}
+
+.lines>div+div div a{line-height:19px;}
+
+.top_link{font-size:10pt; float:right; margin: 2% 5% 2% 5%;}
+
+a {text-decoration:underline}
+</style>
+<script>
+var netgear_region = "<% get_firmware_region() %>";
+
+function loadvalue() {
+	if(netgear_region == "US" || netgear_region == "AU") {
+		document.forms[0].collect[0].checked = true;
+	}
+}
+
+function view_details(target) {
+	if(target == "collect")
+		var url = "collection_details.html";
+	else if(target == "tnc")
+		var url = "simple_tnc_details.html"
+	window.open(url, 'collect_details', 'resizable=1,scrollvars=yes,width=800,height=600,left=400,top=100').focus();
+}
+
+function check_agreement(cf) {
+	if(cf.auto_upgrade[0].checked == true)
+		cf.hid_auto_agreement.value = "1";
+	if(cf.collect[0].checked == true)
+		cf.hid_collect_agreement.value = "1";
+	cf.submit();
+}
+
+function enable_button() {
+	var cf = document.forms[0];
+	if((cf.auto_upgrade[0].checked || cf.auto_upgrade[1].checked) && (cf.collect[0].checked || cf.collect[1].checked)) {
+		cf.Apply.disabled = false;
+	}
+}
+</script>
+<body onload="loadvalue()">
+<% form_submit("apply", "welcomeok.htm", "simple_conditions") %>
+<input type="hidden" name="hid_auto_agreement" value="0">
+<input type="hidden" name="hid_collect_agreement" value="0">
+<div id="container">
+
+	<div class="dialog-content">
+		<div class="wizard_content_div">
+			<div class="install-card clearfix">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>			
+			<div class="content">		
+			
+				<div class="top_link">
+					<a href="#" onclick="view_details('tnc')"><script>document.write(tnc_tos_title)</script></a>
+				</div>
+				<div class="top_link">
+					<a href="https://www.netgear.com/about/privacy-policy/?cid=wmt_netgear_organic" target="_blank"><script>document.write(tnc_policy)</script></a>
+				</div>
+				<div style="clear:both;"></div>
+				<div class="lines">
+					<div><script>document.write(tnc_autoup_enable)</script></div>
+					<div>
+						<div><input id="aua" type="radio" name="auto_upgrade" onclick="enable_button()">
+						<label for="aua"><script>document.write(tnc_agree)</script></label>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<input id="aud" type="radio" name="auto_upgrade" onclick="enable_button()">
+						<label for="aud"><script>document.write(tnc_disagree)</script></label>
+						</div>
+					</div>
+				</div>
+				<div style="clear:both"></div>
+				<div class="lines">
+					<div><script>document.write(tnc_collect_enable)</script></div>
+					<div>
+						<div><input id="tnca" type="radio" name="collect" onclick="enable_button()">
+						<label for="tnca"><script>document.write(tnc_agree)</script></label>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<input id="tncd" type="radio" name="collect" onclick="enable_button()">
+						<label for="tncd"><script>document.write(tnc_disagree)</script></label>
+						</div>
+					</div>
+				</div>
+				<div id="allBtns_div" class="wizard_buttons_div" align="center" style="margin-top:20px;">
+				<script>
+					document.write('<input type="button" name="Apply" id="apply" class="waves-effect waves-light btn button-nav btn-icon icon-right" value="$apply_mark" onclick="check_agreement(document.forms[0])" disabled>');
+				</script>
+			    </div>
+				
+				
+			</div>	
+			</div>
+
+		</div>
+	</div>
+</div>
+</form>
+</body>
+</html>

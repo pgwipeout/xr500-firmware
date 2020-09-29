@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<% cfg_set("from_setting","1") %>
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+<script language="javascript" type="text/javascript">
+var is_04_refresh_page = 0;
+var ap_mode = "<% cfg_get("ap_mode") %>";
+
+function loadvalue()
+{
+	if(ap_mode =="1")
+	{
+		if(top.location.href.indexOf("BRS_") > -1){
+			if(top.location.href.indexOf("routerlogin.com") > -1){
+				setTimeout("top.location.href='http://routerlogin.net/BRS_index.htm';", 100000);
+			}else{
+				setTimeout("top.location.href='http://routerlogin.com/BRS_index.htm';", 100000);
+			}
+		}else{
+				setTimeout("this.location.href='BRS_04_applySettings_ping.html';", 100000);
+		}
+	}
+	else
+	{
+		if(top.location.href.indexOf("BRS_") > -1){
+			if(top.location.href.indexOf("routerlogin.com") > -1){
+				setTimeout("top.location.href='http://routerlogin.net/BRS_index.htm';", 60000);
+			}else{
+				setTimeout("top.location.href='http://routerlogin.com/BRS_index.htm';", 60000);
+			}
+		}else
+			setTimeout("this.location.href='BRS_04_applySettings_ping.html';", 60000);
+	}
+}
+</script>
+</head>
+
+<body onload="loadvalue();">
+
+<div id="container">
+	<div class="dialog-content">
+		<!-- Applying Internet Connection -->
+		<div id="card-applying-internet-connection" class="install-card clearfix">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+			<img class="card-image" src="images/svg/nighthawk-front.svg">
+		     <div class="content">
+			<div class="desc-title"><script>document.write(bh_apply_connection);</script></div>
+			<div class="desc-text"><script>document.write(bh_orbi_wait);</script></div>
+			<div class="loader">
+				<div class="preloader-wrapper small active">
+					<div class="spinner-layer">
+						<div class="circle-clipper left">
+							<div class="circle"></div>
+							</div><div class="gap-patch">
+							<div class="circle"></div>
+							</div><div class="circle-clipper right">
+							<div class="circle"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="desc-text wait"><script>document.write(bh_orbi_pls_wait);</script></div>
+		    </div>
+		</div>
+	</div>
+</div>
+</body>
+
+</html>

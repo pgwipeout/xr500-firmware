@@ -1,0 +1,759 @@
+                   =============================
+                   Release Notes for Samba 4.6.4
+                            May 24, 2017
+                   =============================
+
+
+This is a security release in order to address the following defect:
+
+o  CVE-2017-7494 (Remote code execution from a writable share)
+
+=======
+Details
+=======
+
+o  CVE-2017-7494:
+   All versions of Samba from 3.5.0 onwards are vulnerable to a remote
+   code execution vulnerability, allowing a malicious client to upload a
+   shared library to a writable share, and then cause the server to load
+   and execute it.
+
+
+Changes since 4.6.3:
+---------------------
+
+o  Volker Lendecke <vl@samba.org>
+   * BUG 12780: CVE-2017-7494: Avoid remote code execution from a writable
+     share.
+
+
+#######################################
+Reporting bugs & Development Discussion
+#######################################
+
+Please discuss this release on the samba-technical mailing list or by
+joining the #samba-technical IRC channel on irc.freenode.net.
+
+If you do report problems then please try to send high quality
+feedback. If you don't provide vital information to help us track down
+the problem then you will probably be ignored.  All bug reports should
+be filed under the "Samba 4.1 and newer" product in the project's Bugzilla
+database (https://bugzilla.samba.org/).
+
+
+======================================================================
+== Our Code, Our Bugs, Our Responsibility.
+== The Samba Team
+======================================================================
+
+
+Release notes for older releases follow:
+----------------------------------------
+
+                   =============================
+                   Release Notes for Samba 4.6.3
+                           April 25, 2017
+                   =============================
+
+
+This is the latest stable release of the Samba 4.6 release series.
+
+
+Changes since 4.6.2:
+--------------------
+
+o  Michael Adam <obnox@samba.org>
+   * BUG 12743: s3:vfs:shadow_copy2: vfs_shadow_copy2 fails to list snapshots
+     from shares with GlusterFS backend.
+
+o  Jeremy Allison <jra@samba.org>
+   * BUG 12559: Fix for Solaris C compiler.
+   * BUG 12628: s3: locking: Update oplock optimization for the leases era.
+   * BUG 12693: Make the Solaris C compiler happy.
+   * BUG 12695: s3: libgpo: Allow skipping GPO objects that don't have the
+     expected LDAP attributes.
+   * BUG 12747: Fix buffer overflow caused by wrong use of getgroups.
+
+o  Hanno Boeck <hanno@hboeck.de>
+   * BUG 12746: lib: debug: Avoid negative array access.
+   * BUG 12748: cleanupdb: Fix a memory read error.
+
+o  Ralph Boehme <slow@samba.org>
+   * BUG 7537: streams_xattr and kernel oplocks results in
+     NT_STATUS_NETWORK_BUSY.
+   * BUG 11961: winbindd: idmap_autorid allocates ids for unknown SIDs from other
+     backends.
+   * BUG 12565: vfs_fruit: Resource fork open request with
+     flags=O_CREAT|O_RDONLY.
+   * BUG 12615: manpages/vfs_fruit: Document global options.
+   * BUG 12624: lib/pthreadpool: Fix a memory leak.
+   * BUG 12727: Lookup-domain for well-known SIDs on a DC.
+   * BUG 12728: winbindd: Fix error handling in rpc_lookup_sids().
+   * BUG 12729: winbindd: Trigger possible passdb_dsdb initialisation.
+
+o  Alexander Bokovoy <ab@samba.org>
+   * BUG 12611: credentials_krb5: use gss_acquire_cred for client-side GSSAPI
+     use case.
+   * BUG 12690: lib/crypto: Implement samba.crypto Python module for RC4.
+
+o  Amitay Isaacs <amitay@gmail.com>
+   * BUG 12697: ctdb-readonly: Avoid a tight loop waiting for revoke to
+     complete.
+   * BUG 12723: ctdb_event monitor command crashes if event is not specified.
+   * BUG 12733: ctdb-docs: Fix documentation of "-n" option to 'ctdb tool'.
+
+o  Volker Lendecke <vl@samba.org>
+   * BUG 12558: smbd: Fix smb1 findfirst with DFS.
+   * BUG 12610: smbd: Do an early exit on negprot failure.
+   * BUG 12699: winbindd: Fix substitution for 'template homedir'.
+
+o  Stefan Metzmacher <metze@samba.org>
+   * BUG 12554: s4:kdc: Disable principal based autodetected referral detection.
+   * BUG 12613: idmap_autorid: Allocate new domain range if the callers knows
+     the sid is valid.
+   * BUG 12724: LINKFLAGS_PYEMBED should not contain -L/some/path.
+   * BUG 12725: PAM auth with WBFLAG_PAM_GET_PWD_POLICY returns wrong policy for
+     trusted domain.
+   * BUG 12731: rpcclient: Allow -U'OTHERDOMAIN\user' again.
+
+o  Christof Schmitt <cs@samba.org>
+   * BUG 12725: winbindd: Fix password policy for pam authentication.
+
+o  Andreas Schneider <asn@samba.org>
+   * BUG 12554: s3:gse: Correctly handle external trusts with MIT.
+   * BUG 12611: auth/credentials: Always set the realm if we set the principal
+     from the ccache.
+   * BUG 12686: replace: Include sysmacros.h.
+   * BUG 12687: s3:vfs_expand_msdfs: Do not open the remote address as a file.
+   * BUG 12704: s3:libsmb: Only print error message if kerberos use is forced.
+   * BUG 12708: winbindd: Child process crashes when kerberos-authenticating
+     a user with wrong password.
+
+o  Uri Simchoni <uri@samba.org>
+   * BUG 12715: vfs_fruit: Office document opens as read-only on macOS due to
+     CNID semantics.
+   * BUG 12737: vfs_acl_xattr: Fix failure to get ACL on Linux if memory is
+     fragmented.
+
+
+#######################################
+Reporting bugs & Development Discussion
+#######################################
+
+Please discuss this release on the samba-technical mailing list or by
+joining the #samba-technical IRC channel on irc.freenode.net.
+
+If you do report problems then please try to send high quality
+feedback. If you don't provide vital information to help us track down
+the problem then you will probably be ignored.  All bug reports should
+be filed under the "Samba 4.1 and newer" product in the project's Bugzilla
+database (https://bugzilla.samba.org/).
+
+
+======================================================================
+== Our Code, Our Bugs, Our Responsibility.
+== The Samba Team
+======================================================================
+
+
+----------------------------------------------------------------------
+
+
+                   =============================
+                   Release Notes for Samba 4.6.2
+                           March 31, 2017
+                   =============================
+
+
+This is a bug fix release to address a regression introduced by the security
+fixes for CVE-2017-2619 (Symlink race allows access outside share definition).
+Please see https://bugzilla.samba.org/show_bug.cgi?id=12721 for details.
+
+
+Changes since 4.6.1:
+--------------------
+
+o  Jeremy Allison <jra@samba.org>
+   * BUG 12721: Fix regression with "follow symlinks = no".
+
+
+#######################################
+Reporting bugs & Development Discussion
+#######################################
+
+Please discuss this release on the samba-technical mailing list or by
+joining the #samba-technical IRC channel on irc.freenode.net.
+
+If you do report problems then please try to send high quality
+feedback. If you don't provide vital information to help us track down
+the problem then you will probably be ignored.  All bug reports should
+be filed under the "Samba 4.1 and newer" product in the project's Bugzilla
+database (https://bugzilla.samba.org/).
+
+
+======================================================================
+== Our Code, Our Bugs, Our Responsibility.
+== The Samba Team
+======================================================================
+
+
+----------------------------------------------------------------------
+
+
+                   =============================
+                   Release Notes for Samba 4.6.1
+                           March 23, 2017
+                   =============================
+
+
+This is a security release in order to address the following defect:
+
+o  CVE-2017-2619 (Symlink race allows access outside share definition)
+
+=======
+Details
+=======
+
+o  CVE-2017-2619:
+   All versions of Samba prior to 4.6.1, 4.5.7, 4.4.11 are vulnerable to
+   a malicious client using a symlink race to allow access to areas of
+   the server file system not exported under the share definition.
+
+   Samba uses the realpath() system call to ensure when a client requests
+   access to a pathname that it is under the exported share path on the
+   server file system.
+
+   Clients that have write access to the exported part of the file system
+   via SMB1 unix extensions or NFS to create symlinks can race the server
+   by renaming a realpath() checked path and then creating a symlink. If
+   the client wins the race it can cause the server to access the new
+   symlink target after the exported share path check has been done. This
+   new symlink target can point to anywhere on the server file system.
+
+   This is a difficult race to win, but theoretically possible. Note that
+   the proof of concept code supplied wins the race reliably only when
+   the server is slowed down using the strace utility running on the
+   server. Exploitation of this bug has not been seen in the wild.
+
+
+Changes since 4.6.0:
+--------------------
+
+o  Jeremy Allison <jra@samba.org>
+   * BUG 12496: CVE-2017-2619: Symlink race permits opening files outside share
+     directory.
+
+o  Ralph Boehme <slow@samba.org>
+   * BUG 12496: CVE-2017-2619: Symlink race permits opening files outside share
+     directory.
+
+
+#######################################
+Reporting bugs & Development Discussion
+#######################################
+
+Please discuss this release on the samba-technical mailing list or by
+joining the #samba-technical IRC channel on irc.freenode.net.
+
+If you do report problems then please try to send high quality
+feedback. If you don't provide vital information to help us track down
+the problem then you will probably be ignored.  All bug reports should
+be filed under the "Samba 4.1 and newer" product in the project's Bugzilla
+database (https://bugzilla.samba.org/).
+
+
+======================================================================
+== Our Code, Our Bugs, Our Responsibility.
+== The Samba Team
+======================================================================
+
+
+----------------------------------------------------------------------
+
+
+		   ==============================
+                   Release Notes for Samba 4.6.0
+                           March 7, 2017
+                   ==============================
+
+
+This is the first stable release of Samba 4.6.
+Please read the release notes carefully before upgrading.
+
+
+UPGRADING
+=========
+
+ID Mapping
+----------
+We discovered that the majority of users have an invalid or incorrect
+ID mapping configuration. We implemented checks in the 'testparm' tool to
+validate the ID mapping configuration. You should run it and check if it prints
+any warnings or errors after upgrading! If it does you should fix them. See the
+'IDENTITY MAPPING CONSIDERATIONS' section in the smb.conf manpage.
+There are some ID mapping backends which are not allowed to be used for the
+default backend. Winbind will no longer start if an invalid backend is
+configured as the default backend.
+
+To avoid problems in future we advise all users to run 'testparm' after
+changing the smb.conf file!
+
+vfs_fruit option "fruit:resource" spelling correction
+-----------------------------------------------------
+
+Due to a spelling error in the vfs_fruit option parsing for the "fruit:resource"
+option, users who have set this option in their smb.conf were still using the
+default setting "fruit:resource = file" as the parser was looking for the string
+"fruit:ressource" (two "s").
+
+After upgrading to this Samba version 4.6, you MUST either remove the option
+from your smb.conf or set it to the default "fruit:resource = file", otherwise
+your macOS clients will not be able to access the resource fork data.
+
+This version Samba 4.6 accepts both the correct and incorrect spelling, but the
+next Samba version 4.7 will not accept the wrong spelling.
+
+Users who were using the wrong spelling "ressource" with two "s" can keep the
+setting, but are advised to switch to the correct spelling.
+
+vfs_fruit Netatalk metadata xattr name on *BSD
+----------------------------------------------
+
+Users on *BSD must rename the metadata xattr used by vfs_fruit when
+using the default setting "fruit:metadata = netatalk".
+
+Due to a glitch in the Samba xattr API compatibility layer for FreeBSD and a
+mistake in vfs_fruit, vfs_fruit ended up using the wrong xattr name when
+configured with "fruit:metadata = netatalk" (default). Instead of the correct
+
+  org.netatalk.Metadata
+
+it used
+
+  netatalk.Metadata
+
+Starting with Samba 4.6 vfs_fruit will use the correct "org.netatalk.Metadata"
+which means existing installations must rename this xattrs. For this purpose
+Samba now includes a new tool `mvxattr`. See below for further details.
+
+
+NEW FEATURES/CHANGES
+====================
+
+Kerberos client encryption types
+--------------------------------
+Some parts of Samba (most notably winbindd) perform Kerberos client
+operations based on a Samba-generated krb5.conf file. A new
+parameter, "kerberos encryption types" allows configuring the
+encryption types set in this file, thereby allowing the user to
+enforce strong or legacy encryption in Kerberos exchanges.
+
+The default value of "all" is compatible with previous behavior, allowing
+all encryption algorithms to be negotiated. Setting the parameter to "strong"
+only allows AES-based algorithms to be negotiated. Setting the parameter to
+"legacy" allows only RC4-HMAC-MD5 - the legacy algorithm for Active Directory.
+This can solves some corner cases of mixed environments with Server 2003R2 and
+newer DCs.
+
+Printing
+--------
+Support for uploading printer drivers from newer Windows clients (Windows 10)
+has been added until our implementation of [MS-PAR] protocol is ready.
+Several issues with uploading different printing drivers have been addressed.
+
+The OS Version for the printing server has been increased to announce
+Windows Server 2003 R2 SP2. If a driver needs a newer version then you should
+check the smb.conf manpage for details.
+
+New option for owner inheritance
+--------------------------------
+The "inherit owner" smb.conf parameter instructs smbd to set the
+owner of files to be the same as the parent directory's owner.
+Up until now, this parameter could be set to "yes" or "no".
+A new option, "unix only", enables this feature only for the UNIX owner
+of the file, not affecting the SID owner in the Windows NT ACL of the
+file. This can be used to emulate something very similar to folder quotas.
+
+Multi-process Netlogon support
+------------------------------
+
+The Netlogon server in the Samba AD DC can now run as multiple
+processes.  The Netlogon server is a part of the AD DC that handles
+NTLM authentication on behalf of domain members, including file
+servers, NTLM-authenticated web servers and 802.1x gateways.  The
+previous restriction to running as a single process has been removed,
+and it will now run in the same process model as the rest of the
+'samba' binary.
+
+As part of this change, the NETLOGON service will now run on a distinct
+TCP port, rather than being shared with all other RPC services (LSA,
+SAMR, DRSUAPI etc).
+
+New options for controlling TCP ports used for RPC services
+-----------------------------------------------------------
+
+The new 'rpc server port' option controls the default port used for
+RPC services other than Netlogon.  The Netlogon server honours instead
+the 'rpc server port:netlogon' option.  The default value for both
+these options is the first available port including or after 1024.
+
+AD LDAP and replication performance improvements
+------------------------------------------------
+
+Samba's LDB (the database holding the AD directory tree, as seen via
+LDAP) and our DRSUAPI replication code continues to improve,
+particularly in respect to the handling of large numbers of objects or
+linked attributes.
+
+ * We now respect an 'uptodateness vector' which will dramatically
+   reduce the over-replication of links from new DCs.
+
+ * We have also made the parsing of on-disk linked attributes much
+   more efficient.
+
+ * We rely on ldb 1.1.28.  This ldb version has improved memory
+   handling for ldb search results, improving poorly indexed and
+   unindexed search result processing speed by around 20%.
+
+DNS improvements
+----------------
+
+The samba-tool dns subcommand is now much more robust and can delete
+records in a number of situations where it was not possible to do so
+in the past.
+
+On the server side, DNS names are now more strictly validated.
+
+CTDB changes
+------------
+
+* "ctdb event" is a new top-level command for interacting with event scripts
+
+  "ctdb event status" replaces "ctdb scriptstatus" - the latter is
+  maintained for backward compatibility but the output format has been
+  cleaned up
+
+  "ctdb event run" replaces "ctdb eventscript"
+
+  "ctdb event script enable" replaces "ctdb enablescript"
+
+  "ctdb event script disable" replaces "ctdb disablescript"
+
+  The new command "ctdb event script list" lists event scripts.
+
+* CTDB's back-end for running event scripts has been replaced by a
+  separate, long-running daemon ctdbd_eventd.
+
+* Running ctdb interactively will log to stderr
+
+* CTDB logs now include process id for each process
+
+* CTDB tags log messages differently.  Changes include:
+
+  ctdb-recoverd: Messages from CTDB's recovery daemon
+  ctdb-recovery: Messages from CTDB database recovery
+  ctdb-eventd: Messages from CTDB's event daemon
+  ctdb-takeover: Messages from CTDB's public IP takeover subsystem
+
+* The mapping between symbolic and numeric debug levels has changed
+
+  Configurations containing numeric debug levels should be updated.
+  Symbolic debug levels are recommended.  See the DEBUG LEVEL section
+  of ctdb(7) for details.
+
+* Tunable IPAllocAlgorithm replaces LCP2PublicIPs, DeterministicIPs
+
+  See ctdb-tunables(7) for details.
+
+* CTDB's configuration tunables should be consistently set across a cluster
+
+  This has always been the cases for most tunables but this fact is
+  now documented.
+
+* CTDB ships with recovery lock helper call-outs for etcd and Ceph RADOS
+
+  To build/install these, use the "--enable-etcd-reclock" and
+  "--enable-ceph-reclock" configure options.
+
+winbind changes
+---------------
+
+winbind contains code that tries to emulate the group membership calculation
+that domain controllers do when a user logs in. This group membership calculation
+is a very complex process, in particular for domain trust relationship
+situations. Also, in many scenarios it is impossible for winbind to
+correctly do this calculation due to access restrictions in the
+domains: winbind using its machine account simply does not have the
+rights to ask for an arbitrary user's group memberships.
+
+When a user logs in to a Samba server, the domain controller correctly
+calculates the user's group memberships authoritatively and makes the
+information available to the Samba server. This is the only reliable
+way Samba can get informed about the groups a user is member of.
+
+Because of its flakiness, the fallback group membership code is unwished,
+and our code pathes try hard to only use of the group memberships
+calculated by the domain controller.
+
+However, a lot of admins rely on the fallback behavior in order to support
+access for nfs access, ssh public key authentication and passwordless sudo.
+
+That's the reason for changing this back between 4.6.0rc4 and 4.6.0
+(See BUG 12612).
+
+The winbind change to simplify the calculation of supplementary groups to make
+it more reliable and predictable has been deferred to 4.7 or later.
+
+This means that 'id <username>' without the user having logged in
+previously works similar to 4.5.
+
+winbind primary group and nss info
+----------------------------------
+
+With 4.6, it will be possible to optionally use the primary group as
+set in the "Unix Attributes" tab for the local unix token of a domain
+user.  Before 4.6, the Windows primary group was always chosen as
+primary group for the local unix token.
+
+To activate the unix primary group, set
+
+idmap config <DOMAIN> : unix_primary_group = yes
+
+Similarly, set
+
+idmap config <DOMAIN> : unix_nss_info = yes
+
+to retrieve the home directory and login shell from the "Unix
+Attributes" of the user. This supersedes the "winbind nss info"
+parameter with a per-domain configuration option.
+
+mvxattr
+-------
+
+mvxattr is a simple utility to recursively rename extended attributes of all
+files and directories in a directory tree.
+
+  Usage: mvxattr -s STRING -d STRING PATH [PATH ...]
+    -s, --from=STRING         xattr source name
+    -d, --to=STRING           xattr destination name
+    -l, --follow-symlinks     follow symlinks, the default is to ignore them
+    -p, --print               print files where the xattr got renamed
+    -v, --verbose             print files as they are checked
+    -f, --force               force overwriting of destination xattr
+
+  Help options:
+    -?, --help                Show this help message
+    --usage                   Display brief usage message
+
+idmap_hash
+----------
+
+The idmap_hash module is marked as deprecated with this release and will be
+removed in a future version. See the manpage of the module for details.
+
+
+smb.conf changes
+================
+
+  Parameter Name                Description             Default
+  --------------                -----------             -------
+  kerberos encryption types     New                     all
+  inherit owner                 New option
+  fruit:resource                Spelling correction
+  lsa over netlogon             New (deprecated)        no
+  rpc server port               New                     0
+
+
+KNOWN ISSUES
+============
+
+https://wiki.samba.org/index.php/Release_Planning_for_Samba_4.6#Release_blocking_bugs
+
+
+CHANGES SINCE 4.6.0rc4
+======================
+
+o  Jeremy Allison <jra@samba.org>
+   * BUG 12592: Fix several issues found by covscan.
+   * BUG 12608: s3: smbd: Restart reading the incoming SMB2 fd when the send
+     queue is drained.
+
+o  Ralph Boehme <slow@samba.org>
+   * BUG 12427: vfs_fruit doesn't work with fruit:metadata=stream.
+   * BUG 12526: vfs_fruit: Only veto AppleDouble files if "fruit:resource" is
+     set to "file".
+   * BUG 12604: vfs_fruit: Enabling AAPL extensions must be a global switch.
+
+o  Volker Lendecke <vl@samba.org>
+   * BUG 12612: Re-enable token groups fallback.
+
+o  Stefan Metzmacher <metze@samba.org>
+   * BUG 9048: Samba4 ldap error codes.
+   * BUG 12557: gensec:spnego: Add debug message for the failed principal.
+   * BUG 12605: s3:winbindd: Fix endless forest trust scan.
+   * BUG 12612: winbindd: Find the domain based on the sid within
+     wb_lookupusergroups_send().
+
+o  Andreas Schneider <asn@samba.org>
+   * BUG 12557: s3:librpc: Handle gss_min in gse_get_client_auth_token()
+     correctly.
+   * BUG 12582: idmap_hash: Add a deprecation message, improve the idmap_hash
+     manpage.
+   * BUG 12592: Fix several issues found by covscan.
+
+o  Martin Schwenke <martin@meltin.net>
+   * BUG 12592: ctdb-logging: CID 1396883 Dereference null return value
+     (NULL_RETURNS).
+
+
+CHANGES SINCE 4.6.0rc3
+======================
+
+o  Jeremy Allison <jra@samba.org>
+   * BUG 12545: s3: rpc_server/mdssvc: Add attribute "kMDItemContentType".
+   * BUG 12572: s3: smbd: Don't loop infinitely on bad-symlink resolution.
+
+o  Ralph Boehme <slow@samba.org>
+   * BUG 12490: vfs_fruit: Correct Netatalk metadata xattr on FreeBSD.
+   * BUG 12536: s3/smbd: Check for invalid access_mask
+     smbd_calculate_access_mask().
+   * BUG 12591: vfs_streams_xattr: use fsp, not base_fsp.
+
+o  Amitay Isaacs <amitay@gmail.com>
+   * BUG 12580: ctdb-common: Fix use-after-free error in comm_fd_handler().
+   * BUG 12595: build: Fix generation of CTDB manpages while creating tarball.
+
+o  Bryan Mason <bmason@redhat.com>
+   * BUG 12575: Modify smbspool_krb5_wrapper to just fall through to smbspool if
+     AUTH_INFO_REQUIRED is not set or is not "negotiate".
+
+o  Stefan Metzmacher <metze@samba.org>
+   * BUG 11830: s3:winbindd: Try a NETLOGON connection with noauth over NCACN_NP
+     against trusted domains.
+   * BUG 12262: 'net ads testjoin' and smb access fails after winbindd changed the
+     trust password.
+   * BUG 12585: librpc/rpc: fix regression in
+     NT_STATUS_RPC_ENUM_VALUE_OUT_OF_RANGE error mapping.
+   * BUG 12586: netlogon_creds_cli_LogonSamLogon doesn't work without
+     netr_LogonSamLogonEx.
+   * BUG 12587: winbindd child segfaults on connect to an NT4 domain.
+   * BUG 12588: s3:winbindd: Make sure cm_prepare_connection() only returns OK
+     with a valid tree connect.
+   * BUG 12598: winbindd (as member) requires kerberos against trusted ad domain,
+     while it shouldn't.
+   * BUG 12601: Backport pytalloc_GenericObject_reference() related changes to
+     4.6.
+
+o  Garming Sam <garming@catalyst.net.nz>
+   * BUG 12600: dbchecker: Stop ignoring linked cases where both objects are
+     alive.
+
+o  Andreas Schneider <asn@samba.org>
+   * BUG 12571: s3-vfs: Only walk the directory once in open_and_sort_dir().
+
+o  Martin Schwenke <martin@meltin.net>
+   * BUG 12589: CTDB statd-callout does not cause grace period when
+     CTDB_NFS_CALLOUT="".
+   * BUG 12595: ctdb-build: Fix RPM build.
+
+
+CHANGES SINCE 4.6.0rc2
+======================
+
+o  Jeremy Allison <jra@samba.org>
+   * BUG 12499: s3: vfs: dirsort doesn't handle opendir of "." correctly.
+   * BUG 12546: s3: VFS: vfs_streams_xattr.c: Make streams_xattr_open() store
+     the same path as streams_xattr_recheck().
+   * BUG 12531: Make vfs_shadow_copy2 cope with server changing directories.
+
+o  Andrew Bartlett <abartlet@samba.org>
+   * BUG 12543: samba-tool: Correct handling of default value for use_ntvfs and
+     use_xattrs.
+   * BUG 12573: Samba < 4.7 does not know about compatibleFeatures and
+     requiredFeatures.
+   * BUG 12577: 'samba-tool dbcheck' gives errors on one-way links after a
+     rename.
+
+o  Ralph Boehme <slow@samba.org>
+   * BUG 12184: s3/rpc_server: Shared rpc modules loading.
+   * BUG 12520: Ensure global "smb encrypt = off" is effective.
+   * BUG 12524: s3/rpc_server: Move rpc_modules.c to its own subsystem.
+   * BUG 12541: vfs_fruit: checks wrong AAPL config state and so always uses
+     readdirattr.
+
+o  Volker Lendecke <vl@samba.org>
+   * BUG 12551: smbd: Fix "map acl inherit" = yes.
+
+o  Stefan Metzmacher <metze@samba.org>
+   * BUG 12398: Replication with DRSUAPI_DRS_CRITICAL_ONLY and
+     DRSUAPI_DRS_GET_ANC results in WERR_DS_DRA_MISSING_PARENT S
+   * BUG 12540: s3:smbd: allow "server min protocol = SMB3_00" to go via "SMB
+     2.???" negprot.
+
+o  John Mulligan <jmulligan@nasuni.com>
+   * BUG 12542: docs: Improve description of "unix_primary_group" parameter in
+     idmap_ad manpage.
+
+o  Andreas Schneider <asn@samba.org>
+   * BUG 12552: waf: Do not install the unit test binary for krb5samba.
+
+o  Amitay Isaacs <amitay@gmail.com>
+   * BUG 12547: ctdb-build: Install CTDB tests correctly from toplevel.
+   * BUG 12549: ctdb-common: ioctl(.. FIONREAD ..) returns an int value.
+
+o  Garming Sam <garming@catalyst.net.nz>
+   * BUG 12577: 'samba-tool dbcheck' gives errors on one-way links after a
+     rename.
+
+o  Uri Simchoni <uri@samba.org>
+   * BUG 12529: waf: Backport finding of pkg-config.
+
+
+CHANGES SINCE 4.6.0rc1
+======================
+
+o  Amitay Isaacs <amitay@gmail.com>
+   * BUG 12469: CTDB lock helper getting stuck trying to lock a record.
+   * BUG 12500: ctdb-common: Fix a bug in packet reading code for generic socket
+     I/O.
+   * BUG 12510: sock_daemon_test 4 crashes with SEGV.
+   * BUG 12513: ctdb-daemon: Remove stale eventd socket.
+
+o  Björn Jacke <bj@sernet.de>
+   * BUG 12535: vfs_default: Unlock the right file in copy chunk.
+
+o  Volker Lendecke <vl@samba.org>
+   * BUG 12509: messaging: Fix dead but not cleaned-up-yet destination sockets.
+   * BUG 12538: Backport winbind fixes.
+
+o  Stefan Metzmacher <metze@samba.org>
+   * BUG 12501: s3:winbindd: talloc_steal the extra_data in
+     winbindd_list_users_recv().
+
+o  Martin Schwenke <martin@meltin.net>
+   * BUG 12511: ctdb-takeover: Handle case where there are no RELEASE_IPs to
+     send.
+   * BUG 12512: ctdb-scripts: Fix remaining uses of "ctdb gratiousarp".
+   * BUG 12516: ctdb-scripts: /etc/iproute2/rt_tables gets populated with multiple
+     'default' entries.
+
+
+#######################################
+Reporting bugs & Development Discussion
+#######################################
+
+Please discuss this release on the samba-technical mailing list or by
+joining the #samba-technical IRC channel on irc.freenode.net.
+
+If you do report problems then please try to send high quality
+feedback. If you don't provide vital information to help us track down
+the problem then you will probably be ignored.  All bug reports should
+be filed under the Samba 4.1 and newer product in the project's Bugzilla
+database (https://bugzilla.samba.org/).
+
+
+======================================================================
+== Our Code, Our Bugs, Our Responsibility.
+== The Samba Team
+======================================================================
+

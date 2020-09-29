@@ -1,0 +1,41 @@
+From 28aad97c7e2ec9a60f326b7d6b903d8a8db680b0 Mon Sep 17 00:00:00 2001
+From: Iain Fraser <iainf@netduma.com>
+Date: Wed, 22 Nov 2017 21:15:11 +0000
+Subject: [PATCH 2/2] Make sure all paths close recv_fd.
+
+---
+ libubus-io.c |   13 +++++++++++--
+ 1 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/libubus-io.c b/libubus-io.c
+index 9892fe3..134efa1 100644
+--- a/libubus-io.c
++++ b/libubus-io.c
+@@ -310,13 +310,22 @@ void __hidden ubus_handle_data(struct uloop_fd *u, unsigned int events)
+ 
+ 	while (get_next_msg(ctx, &recv_fd)) {
+ 		ubus_process_msg(ctx, &ctx->msgbuf, recv_fd);
++
++		/*
++		* Assuming there is no path that requires recv_fd left open nor
++		* is there a path that closes recv_fd then calls open later.
++		*/
++		close( recv_fd );
++		recv_fd = -1;
++
+ 		if (uloop_cancelled)
+ 			break;
++
+ 	}
+ 
+ 	/* do not leak fds when get_next_msg fails */
+-	if(!uloop_cancelled)
+-		close(recv_fd);
++	close(recv_fd);
++	recv_fd = -1;
+ 
+ 	if (u->eof)
+ 		ctx->connection_lost(ctx);
+-- 
+1.7.4.1
+

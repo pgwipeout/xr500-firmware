@@ -1,0 +1,57 @@
+<% http_header("style/form.css", "/funcs.js") %>
+<body bgcolor="#ffffff" onload="loadvalue();">
+<% hijack_language() %>
+<div id="black_over_lay" class="black_overlay">
+</div>
+<script language="javascript" type="text/javascript">
+var is_in_cd_less = isCDLESS();
+function loadvalue()
+{
+	if(top.hidden_upgrade || is_in_cd_less)
+	{
+		document.getElementById("few_seconds").style.display = "none";
+		document.getElementById("cancel_btn").style.display = "";
+	}
+	else
+	{
+		document.getElementById("few_seconds").style.display = "";
+		document.getElementById("cancel_btn").style.display = "none";
+		setTimeout("goback()", 4000);
+	}
+}
+
+function goback()
+{
+	if(top.hidden_upgrade)  //if top.hidden_upgrade exits, top is CheckNewFirmware.htm
+		this.location.href = "CheckNewFW_upgrade.htm";
+	else if(is_in_cd_less || isWIZARD() )
+		toInternet();
+	else
+		this.location.href = "UPG_upgrade.htm";
+}
+var className = getText("short_common_bt", "cancel_bt");
+var quit_mark = getText(bh_ok_mark, "$quit_mark");
+</script>
+<div class="page_title"><script>printText(bh_failure_head, "$failure_head");</script></div>
+
+<div id="main" class="main">
+<div class="help_button_sty" style="fill:white" onclick="open_help_button()" onmouseover="this.style.fill='red'" onmouseout="this.style.fill='white'">
+<svg viewbox="0 0 24 24" style="display:block;width:100%;height:100%;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></svg>
+</div>
+	<img src="/liteblue.gif" width="100%" height="12" />
+	<div align="center">
+		<br />
+		<b><script>printText(bh_upg_md5_check_error, "$upg_md5_check_error");</script></b>
+	</div>
+	<img src="/liteblue.gif" width="100%" height="12" />
+	<div id="few_seconds" align="center">
+		<script>printText(bh_few_second, "$few_second");</script>
+	</div>
+	<div id="cancel_btn" align="center">
+	<script>
+		document.write('<input type="button" class="'+className+'" name="Cancel" value="'+quit_mark+'" onclick="close_top_window();" />');
+	</script>
+	</div>
+</div>
+</body>
+</html>

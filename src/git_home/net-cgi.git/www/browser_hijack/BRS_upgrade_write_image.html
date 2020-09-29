@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+</head>
+<body>
+<% form_submit("apply", "to_internet_no_auth.htm.html", "hijack_save_time")%>
+<div id="container">
+	<div class="dialog-content">
+		<!--checking new formware-->
+          <div id="card-checking-for-updates" class="install-card">
+            <div class="logos">
+		    <img class="netgear-logo" src="images/svg/netgear.svg" onerror="this.onerror=null; this.src='images/duma-os.png'">
+		    <% hijack_logo_title() %>
+            </div>
+            <img class="card-image" src="images/svg/nighthawk-front.svg" onerror="this.onerror=null; this.src='images/robot.png'">
+		   <div class="content">
+			   <div class="desc-title"><script>document.write(bh_firmware_updating)</script></div>
+				<div class="desc-text" id="upg_msg"></div>
+				<div class="loader" id="loader_img">
+					<div class="preloader-wrapper small active">
+						<div class="spinner-layer">
+							<div class="circle-clipper left">
+								<div class="circle"></div>
+								</div><div class="gap-patch">
+								<div class="circle"></div>
+								</div><div class="circle-clipper right">
+								<div class="circle"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="desc-text" id="wait_text"><script>document.write(bh_orbi_pls_wait);</script></div>
+			</div>
+			<div class="buttons">
+				<button id="next_btn" class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return toInternet();" style="display:none;">
+					<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
+			  </button>
+			 </div>
+          </div>
+	</div>
+</div>
+<script>
+function toInternet()
+{
+	var cf = document.forms[0];
+	cf.target = "_top";
+	return true;
+}
+function display_upg_fail(msg)
+{
+		document.getElementById("upg_msg").innerHTML = msg;
+		document.getElementById("next_btn").style.display = "";
+		document.getElementById("loader_img").style.display = "none";
+		document.getElementById("wait_text").style.display = "none";
+}
+
+function createXMLHttpRequest()
+{
+        if(typeof XMLHttpRequest == "undefined")
+                XMLHttpRequest = function(){
+                        try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}
+                                catch(e){}
+                        try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}
+                                catch(e){}
+                        try{return new ActiveXObject("Msxml2.XMLHTTP");}
+                                catch(e){}
+                        return false;
+                }
+        return new XMLHttpRequest();
+}
+
+function check_write_image()
+{
+	var url = "get_upgrade_status.txt?ts=" + new Date().getTime();
+	var xmlHttp = createXMLHttpRequest();
+	
+	xmlHttp.onreadystatechange=function()
+	{
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200)
+		{
+			var result=xmlHttp.responseText;
+			var upg_status = result.split("*")[0];
+			if (upg_status >= 10000)
+			{
+				if(upg_status == 10006 || upg_status == 10000)
+					display_upg_fail(bh_download_confile_fail);
+				else
+					display_upg_fail(bh_firmware_incorrect);
+			}
+			else if (upg_status != "")
+			{
+				setTimeout("check_write_image()", 2000);
+			}
+		}
+		else if(xmlHttp.readyState == 4 && xmlHttp.status == 404)
+			setTimeout("this.location.href='BRS_upgrade_success.html'", 120000);
+	}
+	xmlHttp.open("GET", url, true);
+	xmlHttp.send();	
+}
+
+check_write_image();
+</script>
+</form>
+</body>
+</html>

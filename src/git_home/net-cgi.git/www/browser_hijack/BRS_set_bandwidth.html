@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<script language="javascript" type="text/javascript" src="script/funcs.js"></script>
+<% hijack_language() %>
+</head>
+<body onload="loadVlaue()">
+<% form_submit("apply", "BRS_security.html", "duma_set_bandwidth") %>
+<% save_timestamp("duma_set_bandwidth", "ookla_speedtest") %>
+<script>
+var ts = "<% cfg_get("ookla_speedtest") %>";
+var upload = "<% cfg_get("ookla_uplimit") %>";
+var download = "<% cfg_get("ookla_downlimit") %>";
+
+function loadVlaue()
+{
+	var cf = document.forms[0];
+	if(upload == "" || download == "")
+		{$$("#fail").show();
+	}
+
+	if(upload != "" && upload*8/1000000 > 0)
+		$$("#bw_upload").attr("value", parseFloat(upload*8/1000000).toFixed(2));
+	else
+		$$("#bw_upload").attr("value", "1000");
+	if(download != "" && download*8/1000000 > 0)
+		$$("#bw_download").attr("value", parseFloat(download*8/1000000).toFixed(2));
+	else
+		$$("#bw_download").attr("value", "1000");
+}
+
+function setBandwidth()
+{
+	var cf = document.forms[0];
+	var up = $$("#bw_upload").val().replace(/Megabits\/Sec/g, "");
+	var down = $$("#bw_download").val().replace(/Megabits\/Sec/g, "");
+	cf.hid_downSpeed.value = parseInt(down*1000000/8);
+	cf.hid_upSpeed.value = parseInt(up*1000000/8);
+	
+	return true;
+}
+function retry_speed()
+{
+	var cf = document.forms[0];
+	cf.action="/func.cgi?/BRS_check_bandwidth.html timestamp="+ts;
+	cf.submit_flag.value="ookla_speedtest";
+	
+	return true;
+}
+
+</script>
+<input type="hidden" name="hid_upSpeed">
+<input type="hidden" name="hid_downSpeed">
+<div id="container">
+	<div class="dialog-content">
+		<div id="card-qos-internet" class="install-card">
+          <div class="logos">
+		  <img class="netgear-logo" src="images/svg/netgear.svg" onerror="this.onerror=null; this.src='images/duma-os.png'">
+		<% hijack_logo_title() %>
+          </div>
+		<div class="content">
+		<div class="qos">
+			<div class="qos-panel">
+				<div class="desc-title"><script>document.write(bh_your_bandwidth)</script></div>
+				<div class="desc-text"><script>document.write(bh_edit_speed_tips)</script></div>              
+                <div class="row input-row">
+                  <div class="input-field col m6">
+                    <input placeholder="" id="bw_download" type="text" class="validate" onkeypress="return getkey('colon_num',event)" onkeyup="clearNoNum(this)" onmouseout="clearNoNum(this)" style="width:40%">
+		    <span style="font-size:13px"><script>document.write(bh_speed_unit)</script></span>
+		    <label for="bw_download"><script>document.write(bh_download)</script></label>
+                  </div>
+                  <div class="input-field col m6">
+                    <input placeholder="" id="bw_upload" type="text" class="validate" onkeypress="return getkey('colon_num',event)" onkeyup="clearNoNum(this)" onmouseout="clearNoNum(this)" style="width:40%">
+		    <span style="font-size:13px"><script>document.write(bh_speed_unit)</script></span>
+		    <label for="bw_upload"><script>document.write(bh_upload)</script></label>
+                  </div>  
+                </div>              
+              </div>
+		</div>
+		</div>
+		<div class="buttons">
+			<button class="waves-effect waves-light btn button-nav" onclick="return retry_speed()"><span><script>document.write(bh_try_again)</script></span></button> 
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" id="next_mark" onclick="return setBandwidth()"><span><script>document.write(bh_orbi_next_mark)</script></span><i class="material-icons">navigate_next</i></button> 		
+
+          </div>
+	  <span id="fail" style="display:none"><script>document.write(bh_speedtest_fail)</script></span>
+		</div>
+	</div>
+</div>
+</form>
+</body>
+
+</html>

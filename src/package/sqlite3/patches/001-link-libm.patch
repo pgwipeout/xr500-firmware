@@ -1,0 +1,15 @@
+Index: sqlite-autoconf-3180000/configure.ac
+===================================================================
+--- sqlite-autoconf-3180000.orig/configure.ac	2017-03-30 15:26:48.000000000 +0100
++++ sqlite-autoconf-3180000/configure.ac	2017-05-01 19:31:36.774926519 +0100
+@@ -164,6 +164,10 @@
+ 
+ AC_CHECK_FUNCS(posix_fallocate)
+ 
++
++# Verify __isnan is in math lib
++AC_CHECK_LIB([m],[__isnan])
++
+ #-----------------------------------------------------------------------
+ # UPDATE: Maybe it's better if users just set CFLAGS before invoking
+ # configure. This option doesn't really add much...

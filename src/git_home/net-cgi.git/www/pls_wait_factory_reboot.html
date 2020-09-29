@@ -1,0 +1,62 @@
+
+<HTML>
+<HEAD>
+<TITLE></TITLE>
+<LINK rel="stylesheet" href="style/form.css">
+<LINK rel="stylesheet" type="text/css" href="style/formframe_wait.css">
+<META http-equiv=content-type content='text/html; charset=<% lang_charset() %>'>
+
+<script type="text/javascript">
+var pchar = "|||"; // progress char
+var maxchars = 40; 
+var delay_time = 2460; // msecs
+var charcount = 0; 
+var percent = parseFloat(100/maxchars);
+
+function makeStr(strsize)
+{
+	var currentPer = strsize * percent ;
+	document.getElementById("bar").style.width = currentPer + "%";
+}
+
+function updateProgress()
+{
+	var cf = document.forms[0];
+	if (charcount < maxchars)
+	{
+		charcount ++;
+		makeStr(charcount);
+		setTimeout("updateProgress()",delay_time);
+	}
+	else
+	{ 
+		top/*don't remove*/.location.href="http://www.routerlogin.net";
+	}
+}
+</script>
+</HEAD>
+<BODY bgcolor="black" onLoad="updateProgress()">
+<div id="formframe_wait_div" >
+<div>$update_head
+<div class="loader">
+<svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+<circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+</svg></div></div></div>
+<div style="display:none">
+<FORM>
+<TABLE border="0" cellpadding="0" cellspacing="3" width="100%">
+<TR>
+	<TD align="left"><H1>$update_head</H1></TD>
+	<TD nowrap>
+	<!--<input size="56" type="text" name="progress" class="rebootbar" value="">-->
+	<div class="rebootbar1" id="progress"><div id="bar" class="bar"></div></div>
+	</TD>
+</TR>
+<TR>
+	<TD colspan="2"><img src="/liteblue.gif" width=100% height="12"></TD>
+</TR>
+</table>
+</form>
+</div>
+</BODY>
+</HTML>

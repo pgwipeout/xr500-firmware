@@ -1,0 +1,30 @@
+<% http_header("style/form.css", "/funcs.js") %>
+<body onLoad="loadvalue()">
+<% hijack_language() %>
+<script>
+var is_in_cd_less = isCDLESS();
+function loadvalue()
+{
+       if( is_in_cd_less || isWIZARD())
+               setTimeout('top.location.href="to_internet_no_auth.htm";', 3000);
+       else
+               setTimeout('location.href="UPG_upgrade.htm";', 3000);
+}
+</script>
+<div id="black_over_lay" class="black_overlay">
+</div>
+<div class="page_title"><script>printText(bh_failure_head, "$failure_head");</script></div>
+<div id="main" class="main">
+<div class="help_button_sty" style="fill:white" onclick="open_help_button()" onmouseover="this.style.fill='red'" onmouseout="this.style.fill='white'">
+<svg viewbox="0 0 24 24" style="display:block;width:100%;height:100%;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></svg>
+</div>
+<% table_header() %>
+$bluebar
+
+<TR><TD nowrap><B><script>printText(bh_wait_cancel, "$wait_cancel");</script></B></TD></TR>
+$bluebar
+<TR><TD nowrap><script>printText(bh_few_second, "$few_second");</script></TD></TR> 
+</TABLE>
+</div>
+</BODY>
+</HTML>

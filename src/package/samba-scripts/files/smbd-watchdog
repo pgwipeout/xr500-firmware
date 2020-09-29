@@ -1,0 +1,18 @@
+#!/bin/sh
+
+### This file is just a workaround solution for OOM issue on XR500
+
+while true
+do
+	shmem=$(awk '/Shmem:/ {print $2}' /proc/meminfo)
+
+	# large than 40MB, restart samba
+	if [ ${shmem:-0} -gt 40960 ] && [ -n "$(pidof smbd)" ]; then
+		echo "Share memory is: $shmem, will restart smbd"
+		killall smbd
+		sleep 1
+		update_smb &
+	fi
+
+	sleep 3600 # 1 hour
+done

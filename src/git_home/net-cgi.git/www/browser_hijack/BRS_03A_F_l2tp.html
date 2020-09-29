@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<script language="javascript" type="text/javascript" src="script/funcs.js"></script>
+<% hijack_language() %>
+<% deleteFiles("/tmp/ping_result_error", "/tmp/ping_ip_result_error", "/tmp/ping_gateway_result_error")%>
+<% deleteFiles("/tmp/ping_result", "/tmp/wget_file_result") %>
+</head>
+
+<body>
+<% form_submit("apply", "BRS_04_applySettings.html", "hijack_l2tp") %>
+
+<input type="hidden" name="WANAssign" value="0" />
+
+<script>
+function checkL2TP()
+{
+	var forms = document.getElementsByTagName("form");
+	var cf = forms[0];
+
+	var l2tp_username = document.getElementById("inputName");
+	var l2tp_passwd = document.getElementById("inputPasswd");
+	var l2tp_idletime = document.getElementById("inputIdle");
+
+	if(l2tp_username.value=="")
+	{
+		alert(bh_login_name_null);
+		return false;
+	}
+
+	var i;
+	for(i=0; i<l2tp_passwd.value.length; i++)
+	{
+		if(isValidChar(l2tp_passwd.value.charCodeAt(i))==false)
+		{
+			alert(bh_password_error);
+			return false;
+		}
+	}
+	if(l2tp_idletime.value.length <= 0)
+	{
+		alert(bh_idle_time_null);
+		return false;
+	}
+	else if(!_isNumeric(l2tp_idletime.value))
+	{
+		alert(bh_invalid_idle_time);
+		return false;
+	}
+
+	if(!checkIPaddr())
+		return false;
+
+	return true;
+}
+
+function checkIPaddr()
+{
+	var forms = document.getElementsByTagName("form");
+        var cf = forms[0];
+
+	var l2tp_myip = document.getElementById("inputIPaddr");
+        var l2tp_gateway = document.getElementById("inputGateway");
+
+	if(l2tp_myip.value != "")
+	{
+		cf.WANAssign.value = 1;
+		if(checkipaddr(l2tp_myip.value)==false)
+		{
+			alert(bh_invalid_myip);
+			return false;
+		}
+		if(l2tp_gateway.value != "" && checkgateway(l2tp_gateway.value) == false)
+		{
+			alert(bh_invalid_gateway);
+			return false;
+		}
+		if(l2tp_gateway.value != "")
+		{
+			if(isSameIp(l2tp_myip.value,l2tp_gateway.value) == true)
+			{
+				alert(bh_invalid_gateway);
+				return false;
+			}
+		}
+	}
+	else
+		cf.WANAssign.value=0;
+	
+	return true;
+}
+
+</script>
+
+
+<div id="container">
+	<div class="dialog-content">
+		<!-- Incorrect ISP-->
+		<div id="card-PPTP-internet" class="install-card clearfix">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+		 <div class="content">
+			<div class="desc-title"><script>document.write(bh_l2tp_connection);</script></div>
+			<div class="desc-text"><script>document.write(bh_orbi_enter_info_below);</script></div>
+			
+		  <div class="row input-row">
+			<div class="input-field col m6">
+				<script>document.write('<input type="text" id="inputName" placeholder="'+bh_pppoe_login_name+'" maxlength="60" name="login_name" ><label for="inputName">'+bh_pppoe_login_name+'</label>');</script>
+			</div>
+
+			<div class="input-field col m6">
+				<script>document.write('<input type="password" placeholder="'+bh_ddns_passwd+'" id="inputPasswd" maxlength="16" name="passwd"><label for="inputPasswd">'+bh_ddns_passwd+'</label>');</script>
+			</div>
+		   </div>
+		   <div class="row input-row">
+			<div class="input-field col m6">		
+				<script>document.write('<input type="number" placeholder="'+bh_in_minutes+'" class="ip-box" id="inputIdle" name="idle_timeout" min="0"><label for="inputIdle">'+bh_basic_pppoe_idle+'</label>');</script>
+			</div>
+			
+			<div class="input-field col m6">			
+				<script>document.write('<input type="text" placeholder="IP" id="inputIPaddr" maxlength="15" name="ip_address"><label for="inputIPaddr">'+bh_info_mark_ip+'</label>');</script>
+			</div>
+			</div>
+		   <div class="row input-row">
+			<div class="input-field col m6">			
+				<script>document.write('<input type="text" id="inputSubnetMask" placeholder="'+bh_info_mark_mask+'" name="subnet_mask" ><label for="inputSubnetMask">'+bh_info_mark_mask+'</label>');</script>
+			</div>
+
+			<div class="input-field col m6">
+				<script>document.write('<input type="text" placeholder="IP" value="10.0.0.138" id="inputServerIP" name="serverip"><label for="inputServerIP">'+bh_basic_pptp_servip+'</label>');</script>
+			</div>
+		   </div>
+		   <div class="row input-row">
+			<div class="input-field col m6 offset-m6">				
+				<script>document.write('<input type="text" placeholder="IP" id="inputGateway" maxlength="15" name="gateway" ><label for="inputGateway">'+bh_sta_routes_gtwip+'</label>');</script>
+			</div>
+			</div>
+		  </div>
+		    <div class="buttons">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return checkL2TP();">
+				<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
+			</button>
+		     </div>
+		</div>
+	</div>
+</div>
+
+
+</form>
+</body>
+
+</html>

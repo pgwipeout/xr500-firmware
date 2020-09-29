@@ -1,0 +1,235 @@
+#! /bin/sh
+
+###############################################################################
+# Script to check and download RAE (Router Analytics Engine) from Netgear site.
+# Please note that this script depends on command tool openssl, curl and jq,
+# check and and ensure you have build curl and jq to your product before use it.
+# 	- 2017/10/27
+#	- @DNI-Iceway
+###############################################################################
+
+
+PIDFILE="/var/run/${0##*/}.pid"
+RAE_DIR="/tmp/router-analytics/"
+
+MODULE_NAME="$(cat /module_name)"
+module_name="$(echo "$MODULE_NAME" | tr '[:upper:]' '[:lower:]')"
+
+default_url_base="https://http.fw.updates1.netgear.com"
+default_url_path="/sw-apps/router-analytics"
+
+policy_file="RAE_Policy.json"
+info_file="fileinfo.txt"
+
+local_policy_file="${RAE_DIR}/${policy_file}"
+local_rae_ver_file="${RAE_DIR}/rae_version"
+local_policy_ver_file="${RAE_DIR}/policy_version"
+
+tmp_policy_file="/tmp/${policy_file}"
+tmp_info_file="/tmp/${info_file}"
+tmp_rae_binary="/tmp/rae.enc"
+
+g_rae_new_version=""
+g_rae_new_file=""
+g_rae_new_file_md5=""
+g_have_new_rae=0
+g_update_rae=0
+g_update_policy=0
+
+rae_password="qwaszxerdfcvtyghbnuijkmo"
+
+https_download_file ()
+{
+	curl -s -k $1 -o $2
+}
+
+trace_log ()
+{
+	echo -e "$@" >&2
+}
+
+check_process_conflict ()
+{
+	if [ -f "$PIDFILE" ] && [ -d "/proc/$(cat "$PIDFILE")" ]; then
+		trace_log "Process is already running, exit!!!"
+		exit 1
+	else
+		echo "$$" > "$PIDFILE"
+	fi
+}
+
+check_and_download_policy ()
+{
+	url="${host}/${path}/${module_name}/${policy_file}"
+	for i in $(seq 1 $count)
+	do
+		if https_download_file "$url" "$tmp_policy_file"; then
+			new_policy_ver="$(jq '.raePolicyVersion' "$tmp_policy_file")"
+			loc_policy_ver="$(jq '.raePolicyVersion' "$local_policy_file")"
+		
+			if [ "$new_policy_ver" != "$loc_policy_ver" ]; then
+				trace_log "New Policy file update from $loc_policy_ver to $new_policy_ver"
+				g_update_policy=1
+			fi
+			
+			return 0
+		fi
+
+		trace_log "Download $url fail $i, retry 60s later!"
+
+		sleep 60
+	done
+
+	return 1
+}
+
+# @1, @2 are all like as "A.B.C.D"
+# @1 - new version
+# @2 - old version
+# return 0 (True) if @1 > @2, else return 1
+cmp_version_string ()
+{
+	new="$1"
+	old="$2"
+
+	[ -z "$new" ] && return 1
+	eval set "$(echo "$new"| sed -r 's/\./ /g')"
+	if [ $# -ne 4 ]; then
+		trace_log "Invalid version string: $new!"
+		return 1
+	else
+		nv1=$1
+		nv2=$2
+		nv3=$3
+		nv4=$4
+	fi
+
+	[ -z "$old" ] && return 0
+	eval set "$(echo "$old"| sed -r 's/\./ /g')"
+	if [ $# -ne 4 ]; then
+		trace_log "Invalid version string: $old!"
+		return 0
+	else
+		ov1=$1
+		ov2=$2
+		ov3=$3
+		ov4=$4
+	fi
+
+	[ "$nv1" -gt "$ov1" ] && return 0
+	[ "$nv1" -eq "$ov1" ] && [ "$nv2" -gt "$ov2" ] && return 0
+	[ "$nv1" -eq "$ov1" ] && [ "$nv2" -eq "$ov2" ] && [ "$nv3" -gt "$ov3" ] && return 0
+	[ "$nv1" -eq "$ov1" ] && [ "$nv2" -eq "$ov2" ] && [ "$nv3" -eq "$ov3" ] && [ "$nv4" -gt "$ov4" ] && return 0
+	return 1
+}
+
+check_fileinfo_and_download_rae ()
+{
+	url="${host}/${path}/${module_name}/${info_file}"
+	for i in $(seq 1 $count)
+	do
+		if https_download_file "$url" "$tmp_info_file"; then
+			## contents of fileinfo.txt like as:
+			#	file=RAE_XR500-V1.0.0.1
+			#	md5=<md5 value>
+			#	size=<size of file>
+			eval "$(cat $tmp_info_file)"
+
+			version="$(echo $file|sed -nr 's/RAE_.*_V(.*)/\1/p')"
+			if [ -z "$version" ]; then
+				trace_log "Incorrect Control file: $tmp_info_file!"
+			else
+				local_verion="$(cat $local_rae_ver_file)"
+
+				if cmp_version_string "$version" "$local_verion"; then
+					trace_log "New RAE found, update!"
+					g_rae_new_version="$version"
+					g_rae_new_file="$file"
+					g_rae_new_file_md5="$md5"
+					g_have_new_rae=1
+				else
+					trace_log "No newer RAE on server!"
+				fi
+				
+				break
+			fi
+		fi
+
+		trace_log "Download $url fail $i, retry 60s later!"
+		sleep 60
+	done
+
+	if [ "$g_have_new_rae" -ne 0 ]; then
+		url="${host}/${path}/${module_name}/${g_rae_new_file}"
+		for i in $(seq 1 $count)
+		do
+			if https_download_file "$url" "$tmp_rae_binary"; then
+				tmp_md5="$(md5sum "$tmp_rae_binary" | cut -d' ' -f1)"
+				if [ "$tmp_md5" = "$g_rae_new_file_md5" ]; then
+					g_update_rae=1
+					return 0
+				fi
+			fi
+		
+			trace_log "Download $url fail $i, retry 60s later!"
+			sleep 60
+		done
+	else
+		if [ -n "$(pidof aws-iot)" ]; then
+			trace_log "aws-iot is running now!"
+		else
+			/etc/init.d/aws start
+		fi
+		return 0
+	fi
+
+	return 1
+}
+
+check_and_update_rae ()
+{
+	mkdir -p "$RAE_DIR"
+
+	host="$(config get rae_url_base)"
+	[ -z "$host" ] && host="$default_url_base"
+	path="$(config get rae_url_path)"
+	[ -z "$path" ] && path="$default_url_path"
+
+	check_and_download_policy
+	check_fileinfo_and_download_rae
+
+	if [ "$g_update_policy" -ne 0 ] || [ "$g_update_rae" -ne 0 ]; then
+		/etc/init.d/aws stop
+		
+		if [ "$g_update_policy" -ne 0 ]; then
+			cp "$tmp_policy_file" "$local_policy_file"
+			echo "$new_policy_ver" > "$local_policy_ver_file"
+		fi
+
+		if [ "$g_update_rae" -ne 0 ]; then
+			openssl enc -d -des3 -in "$tmp_rae_binary" -out /tmp/rae.tgz -k "$rae_password"
+			tar -zxf /tmp/rae.tgz -C /usr/sbin/
+			echo "$g_rae_new_version" > "$local_rae_ver_file"
+			rm -f /tmp/rae.tgz
+		fi
+
+		/etc/init.d/aws update
+		sleep 2
+		/etc/init.d/aws start
+	fi
+
+	# clean all tmporary files
+	rm -f "$tmp_policy_file" "$tmp_info_file" "$tmp_rae_binary"
+}
+
+main ()
+{
+	check_process_conflict
+
+	count=3
+	[ "$(cat ${RAE_DIR}/status)" = "1" ] && count=1000000
+
+	check_and_update_rae
+}
+
+main &

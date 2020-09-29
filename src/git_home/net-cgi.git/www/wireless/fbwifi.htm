@@ -1,0 +1,129 @@
+<% http_header("style/form.css", "/funcs.js") %>
+<% body_header("_fbwifi", "fbwifi.htm", "fbwifi") %>
+<div id="black_over_lay" class="black_overlay">
+</div>
+<div class="page_title">$facebook_head</div>
+<div class="fix_button">
+<TABLE width=100% border=0 cellpadding=0 cellspacing=2>
+<TR>
+	<script>
+		var master="<% cfg_get("http_loginname") %>";
+		if( master == "admin" )
+			document.write('<TD nowrap colspan=2 align=center><input class="cancel_bt" type="button" name="Cancel" value="$cancel_mark" onClick=\'location.href="fbwifi.htm";\'>&nbsp;&nbsp;<input class="apply_bt" type="submit" name="Apply" value="$apply_mark" onclick=\'return check_fbwifi(document.forms[0]);\'></TD>')
+		else
+			document.write('<TD nowrap colspan=2 align=center><input class="cancel1_bt" type="button" name="Cancel" value="$cancel_mark" disabled>&nbsp;&nbsp;<input class="apply1_bt" type="submit" name="Apply" value="$apply_mark" disabled></TD>')
+	</script>
+</TR>
+</TABLE>
+</div>
+<script>
+<% save_timestamp("fbwifi", "config_fbwifi") %>
+var ts="<% cfg_get("fbwifi") %>";
+var fbwifi_enable = "<% cfg_get("fbwifi_enable") %>";
+var get_endis_guestNet="<% cfg_get("wlg1_endis_guestNet") %>";
+var get_endis_guestNet_an="<% cfg_get("wla1_endis_guestNet") %>";
+var endis_wl_radio="<% enable_ap_orNot("bgn") %>";
+var endis_wla_radio_an="<% enable_ap_orNot("an") %>";
+var enable_ap_flag="<% cfg_get("ap_mode") %>";
+var gateway_id="<% cfg_get("fb_gatewayid") %>";
+<% enable_Captive_Portal() %>
+function loadvalue()
+{
+	var cf = document.forms[0];
+	if(fbwifi_enable == "1")
+		cf.enable_fbwifi.checked = true;
+	else
+		cf.enable_fbwifi.checked = false;
+	if(enable_ap_flag == "1"){
+		cf.enable_fbwifi.checked = false;
+		setDisabled(true, cf.enable_fbwifi);
+	}
+	if(gateway_id != "" && parent.open_facebook_page==1)
+	{
+		var str1="https://www.facebook.com/wifiauth/config?gw_id=";
+		window.open(str1.concat(gateway_id));
+		parent.open_facebook_page=0;
+	}
+
+}
+
+function check_fbwifi(form)
+{
+	if(form.enable_fbwifi.checked == true){
+		form.hidden_fbwifi_enable.value = "1";
+		if((get_endis_guestNet == "1" && endis_wl_radio == "1") || (get_endis_guestNet_an == "1" && endis_wla_radio_an == "1"))
+			return true;
+		else{
+			if(confirm("$fb_apply_alert") == true){
+				location.href="WLG_wireless_guest1.htm";
+				return false;
+			}
+			else{
+				form.enable_fbwifi.checked = false;
+				return false;
+			}
+
+		}
+	}
+	else
+		form.hidden_fbwifi_enable.value = "0";
+
+
+
+
+}
+
+function check_config_fbwifi(form)
+{
+	form.action="/func.cgi?/fbwifi.htm timestamp="+ts;
+	form.submit_flag.value="config_fbwifi";
+	parent.open_facebook_page=1;
+	return true;
+}
+</script>
+<input type="hidden" name="hidden_fbwifi_enable">
+<div id="main" class="main_top_button">
+<div class="help_button_sty" style="fill:white" onclick="open_help_button()" onmouseover="this.style.fill='red'" onmouseout="this.style.fill='white'">
+<svg viewbox="0 0 24 24" style="display:block;width:100%;height:100%;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></svg>
+</div>
+<TABLE cellspacing=5 cellPadding=0 width=100% border=0 style="word-break:break-all">
+<TR>
+	<TD colspan=2>$fb_des</TD>
+</TR>
+<TR><TD height="16"></TD></TR>
+<TR>
+        <TD  colspan=2>$fb_plz_visit</TD>
+</TR>
+<TR>
+        <TD  colspan=2>$fb_href</TD>
+</TR>
+<TR><TD height="16"></TD></TR>
+<TR>
+        <TD  colspan=2>
+	<input type="checkbox" name="enable_fbwifi" value = "0" id="enable_fbwifi_en"><label for="enable_fbwifi_en"><b>$fb_enable</b></label></TD>
+</TR>
+<TR>
+	<TD colspan=2>$fb_en_des</TD>
+</TR>
+<TR><TD height="16"></TD></TR>
+<TR>
+        <TD  colspan=2>$fb_config_title</TD>
+</TR>
+<TR><TD height="16"></TD></TR>
+<TR>
+<script>
+	if(fbwifi_enable == "1"){
+		document.write("<TD  colspan=1><input type='submit' class='common_bt' value='Config' onclick='return check_config_fbwifi(document.forms[0])'></TD>");
+	}
+	else{
+		document.write("<TD  colspan=1><input type='button' class='common_gray_bt' value='Config' disabled='true'>&nbsp;$fb_config_des</TD>");
+        
+	}
+</script>
+</TR>
+</TABLE>
+</div>
+<% help_box("0","_fbwifi") %>
+</FORM>
+</BODY>
+</HTML>

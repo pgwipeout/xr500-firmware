@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+</head>
+
+<body>
+<% form_submit("apply", "BRS_wlan_security.html", "hijack_passwd") %>
+
+<script>
+function isValidChar_space(each_char)
+{
+	if( each_char < 32 || each_char > 127)
+		return false;
+}
+
+function checkpasswd(cf)
+{
+	if(cf.sysNewPasswd.value == "")
+	{
+		alert(bh_passwd_not_blank);
+		return false;
+	}
+	if (cf.sysNewPasswd.value.length >= 33 || cf.sysConfirmPasswd.value.length >= 33)
+	{
+		alert(bh_max_pwd_len);
+		return false;
+	}
+	if(cf.sysNewPasswd.value != cf.sysConfirmPasswd.value)
+	{ 
+		alert(bh_pwd_no_match);
+		return false;	
+	}
+
+	cf.hidden_enable_recovery.value="1";
+	if( cf.question1.value == "0" || cf.question2.value == "0")
+	{
+		alert(bh_select_quest);
+		return false;
+	}
+	
+	if( cf.answer1.value == "" || cf.answer2.value == "" )
+	{
+		alert(bh_enter_answer);
+		return false;
+	}
+	if( cf.answer1.value.length > 64 || cf.answer2.value.length > 64 )/* to fix bug 26920 */
+	{
+		alert(bh_invalid_answer);
+		return false;
+	}
+	
+	for(i=0; i< cf.answer1.value.length; i++)/* to fix bug 26920 */
+	{
+		if( isValidChar_space(cf.answer1.value.charCodeAt(i))==false )
+		{
+			alert(bh_invalid_answer);
+			return false;
+		}
+	}
+	for(i=0; i< cf.answer2.value.length; i++)/* to fix bug 26920 */
+	{
+		if( isValidChar_space(cf.answer2.value.charCodeAt(i))==false )
+		{
+			alert(bh_invalid_answer);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+</script>
+<input type="hidden" name="hidden_enable_recovery" value="1" />
+<input type="hidden" name="hid_save_time" value="5"/>
+<div id="container">
+	<div class="dialog-content">
+		<!-- Orbi Admin Account Settings-->
+		<div id="card-orbi-admin-account" class="install-card clearfix">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+		     <div class="content">
+			<div class="desc-title"><script>document.write(bh_admin_account);</script></div>
+			<div class="desc-text"><script>document.write(bh_account_discription);</script></div>
+
+			<div class="row input-row">
+				<div class="input-field col m6">
+					<input type="text" id="username" value="<% cfg_get("http_loginname") %>  " disabled="disabled" class="validate"/>
+					<label for="username"><script>document.write(bh_username);</script></label>
+				</div>
+				<div class="input-field col m6">
+					<input type="password" placeholder="password" autocomplete="off" size="20" name="sysNewPasswd" id="sys_new_passwd" onFocus="this.select();" class="validate"/>
+					<label for="sys_new_passwd"><script>document.write(bh_new_password);</script></label>
+				</div>
+			</div>
+
+			<div class="row input-row">
+				<div class="input-field col m6 offset-m6">
+					<input type="password" placeholder="password" autocomplete="off" size="20" name="sysConfirmPasswd" id="sys_confirm_passwd" onFocus="this.select();" class="validate"/>
+					<label for="sys_confirm_passwd"><script>document.write(bh_passwd_repas);</script></label>
+				</div>
+			</div>
+			<div class="row input-row">
+              <div class="input-field">
+				<select name="question1">
+					<script>document.write('<option selected value="0">'+bh_select_a_question+'</option>'+
+					'<option value="1">'+bh_quest1_1+'</option>'+
+					'<option value="2">'+bh_quest1_2+'</option>'+
+					'<option value="3">'+bh_quest1_3+'</option>'+
+					'<option value="4">'+bh_quest1_4+'</option>'+
+					'<option value="5">'+bh_quest1_5+'</option>'+
+					'<option value="6">'+bh_quest1_6+'</option>'+
+					'<option value="7">'+bh_quest1_7+'</option>'+
+					'<option value="8">'+bh_quest1_8+'</option>'+
+					'<option value="9">'+bh_quest1_9+'</option>');
+					</script>
+				</select>
+				<label><script>document.write(bh_security_question_1);</script></label>
+			  </div>
+			  <div class="input-field">
+				<input type="text" autocomplete="off" maxLength="64" size="30" name="answer1" id="answer1"  onFocus="this.select();" class="validate"/>
+				<label for="answer1"><script>document.write(bh_answer);</script></label>
+			  </div>
+			</div>
+			
+			<div class="row input-row">
+              <div class="input-field">
+				<select name="question2">
+					<script>document.write('<option selected value="0">'+bh_select_a_question+'</option>'+
+					'<option value="1">'+bh_quest2_1+'</option>'+
+					'<option value="2">'+bh_quest2_2+'</option>'+
+					'<option value="3">'+bh_quest2_3+'</option>'+
+					'<option value="4">'+bh_quest2_4+'</option>'+
+					'<option value="5">'+bh_quest2_5+'</option>'+
+					'<option value="6">'+bh_quest2_6+'</option>'+
+					'<option value="7">'+bh_quest2_7+'</option>'+
+					'<option value="8">'+bh_quest2_8+'</option>');
+					</script>
+				</select>
+				<label><script>document.write(bh_security_question_2);</script></label>
+			   </div>
+				<div class="input-field">
+					<input type="text" autocomplete="off" maxLength="64" size="30" name="answer2" id="answer2" onFocus="this.select();" class="validate"/>
+					<label for="answer2"><script>document.write(bh_answer);</script></label>
+				</div>
+			 </div>
+			</div>
+		    <div class="buttons">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return checkpasswd(document.forms[0])">
+				<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
+			</button>
+		    </div>
+		</div>
+	</div>
+</div>
+
+</form>
+</body>
+
+</html>

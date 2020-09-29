@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+<META http-equiv="content-type" content='text/html; charset=UTF-8'>
+<LINK rel="stylesheet" type="text/css" href="style/formframe_wait.css">
+</HEAD>
+<BODY bgcolor=#000 onload="loadvalue();">
+<% refresh_timestamp("l2tp","ether", "pppoe", "pptp") %>
+<script>
+ var ap_on_off = "<% cfg_get("ap_mode") %>";
+  var ap_dyn_get_ip = "<% cfg_get("ap_ether_ip_assign") %>";
+  var ap_ipaddr = "<% cfg_get("ap_ipaddr") %>";
+
+  var extender_on_off = "<% cfg_get("extender_mode") %>";
+  
+  if(ap_on_off == 1 || extender_on_off == 1)
+	var delay_time=50000;
+  else
+	var delay_time=50000;
+  var wait_time_count = 238;
+  var time_increment = delay_time/238;
+function loadvalue()
+{
+	setTimeout("updateProgress()",time_increment);
+}
+function updateProgress()
+{
+	wait_time_count--;
+		//alert(time_increment);
+	if(wait_time_count > 0)
+		setTimeout("updateProgress()",time_increment);
+	else
+		timeout();
+}
+function timeout()
+{
+	var host= window.location.host;
+
+	if( ap_on_off == "1" &&  ap_dyn_get_ip == "0")
+		top.location.href="http://"+ap_ipaddr+"/adv_index.htm";
+	else 
+	{
+		if(host.indexOf("www") != -1)
+		{
+			if( host.indexOf("net") != -1)
+				top.location.href="http://www.routerlogin.com/adv_index.htm";
+			else
+				top.location.href="http://routerlogin.net/adv_index.htm";
+		}
+		else
+		{
+			if(host.indexOf("net") != -1)
+				top.location.href="http://routerlogin.com/adv_index.htm";
+			else
+				top.location.href="http://www.routerlogin.net/adv_index.htm";
+		}
+	}
+}
+</script>
+<div id="formframe_wait_div" >
+<div>$wizard_pls_wait
+<div class="loader">
+<svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+<circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+</svg></div></div></div>
+</BODY>
+</HTML>
+
+

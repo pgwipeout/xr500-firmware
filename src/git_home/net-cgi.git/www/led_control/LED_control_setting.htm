@@ -1,0 +1,69 @@
+<% http_header("style/form.css", "/funcs.js") %>
+<% body_header("", "LED_control_setting.htm", "LED_setting") %>
+<div id="black_over_lay" class="black_overlay">
+</div>
+<div class="page_title">$led_head</div>
+<script>
+var led_option = <% cfg_get("led_blinking_setting")%>;
+function loadvalue()
+{
+	var cf = document.forms[0];
+	if(led_option == '0')
+		cf.led_settings[0].checked = true;
+	else if(led_option == '1')
+		cf.led_settings[1].checked = true;
+	else
+		cf.led_settings[2].checked = true;
+}
+
+function checkLED(cf)
+{
+	if(cf.led_settings[0].checked == true)
+		cf.hid_led_settings.value = "0";
+	else if(cf.led_settings[1].checked == true)
+		cf.hid_led_settings.value = "1";
+	else
+		cf.hid_led_settings.value = "2";
+	return true;
+}
+</script>
+<div class="fix_button">
+<input type="hidden" name="hid_led_settings" />
+<TABLE width=100% border=0 cellpadding=0 cellspacing=2>
+<script>
+var master="<% cfg_get("http_loginname") %>";
+if( master == "admin" )
+	document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel_bt" type="button" name="Cancel" id="cancel" value="$cancel_mark" onClick="location.href=\'LED_control_setting.htm\';">&nbsp;&nbsp;<input class="apply_bt" type="submit" name="Apply" id="apply" value="$apply_mark" onClick="return checkLED(document.forms[0]);"></TD></TR>');
+else
+	document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel1_bt" type="button" name="Cancel" id="cancel" value="$cancel_mark" disabled>&nbsp;&nbsp;<input class="apply1_bt" type="submit" name="Apply" id="apply" value="$apply_mark" disabled></TD></TR>');
+</script>
+</TABLE>
+
+</div>
+<div id="main" class="main_top_button">
+<div class="help_button_sty" style="fill:white" onclick="open_help_button()" onmouseover="this.style.fill='red'" onmouseout="this.style.fill='white'">
+<svg viewbox="0 0 24 24" style="display:block;width:100%;height:100%;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></svg>
+</div>
+<TABLE cellspacing=5 cellPadding=0 width=100% border=0>
+<TR>
+        <TD nowrap>
+        <input onclick='' type="radio" id="led_enable" name="led_settings" value="en_blink"><label for="led_enable">$led_en_blinking</label>
+        </TD>
+</TR>
+<TR>
+        <TD nowrap>
+        <input onclick='' type="radio" id="led_disable" name="led_settings" value="dis_blink" ><label for="led_disable">$led_dis_blinking</label>
+        </TD>
+</TR>
+<TR>
+        <TD nowrap>
+        <input onclick='' type="radio" id="led_turn_off" name="led_settings" value="turn_off" ><label for="led_turn_off">$led_turn_off</label>
+        </TD>
+</TR>
+</table>
+</div>
+<% help_box("0","_led") %>
+</FORM>
+</BODY>
+</HTML>
+

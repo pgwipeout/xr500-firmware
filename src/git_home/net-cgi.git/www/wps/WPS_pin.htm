@@ -1,0 +1,150 @@
+<% echo_set("","/tmp/wps_process_state") %>
+
+<% http_header("style/form.css", "/funcs.js") %>
+<% body_header("_wps", "WPS_status.htm", "wps_pin") %>
+<div id="black_over_lay" class="black_overlay">
+</div>
+<div class="page_title">$add_wps_client_header</div>
+<div id="main" class="main">
+<div class="help_button_sty" style="fill:white" onclick="open_help_button()" onmouseover="this.style.fill='red'" onmouseout="this.style.fill='white'">
+<svg viewbox="0 0 24 24" style="display:block;width:100%;height:100%;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></svg>
+</div>
+<input type="hidden" name="hidden_PIN" />
+<TABLE width=100% border=0 cellpadding=0 cellspacing=3>
+<TR>
+	<TD colSpan=3></TD>
+</TR>
+<TR>
+	<TD colspan=3><img src=/liteblue.gif width=100% height=12></TD>
+</TR>
+<input TYPE="hidden" NAME="wps_in_progress" VALUE="0">
+<TR>
+	<TD nowrap><B>$wps_or_pin :</B></TD>
+</TR>
+<TR>
+	<TD nowrap>
+	<input type=radio name="WPS_type" id="wps_type" value="Push Button" onClick="location.href='WPS.htm'"><label for="wps_type">$wps_push_button</label>
+	</TD>
+</TR>
+<TR>
+	<TD nowrap>
+	<input type=radio name="WPS_type" id="pin_num" value="PIN Number" checked><label for="pin_num">$wps_pin</label>
+	</TD>
+</TR>
+<TR>
+	<TD colspan="3"><P style='margin-left:15pt'>$wps_pin_text1</P></TD>
+</TR>
+<TR>
+	<TD><P style='margin-left:15pt'>$wps_enter_pin :</P></TD>
+	<TD nowrap>
+	<input type="text" name="PIN" size="9" id="wps_pin" maxlength="9" value="" align="left" onFocus="this.select();" onKeyPress="return getkey('wps_pin', event)">
+	</TD>
+	<TD>
+	<P align=center style='margin:0cm;margin-bottom:.0001pt;text-align:center'>
+	<span lang=EN-US style='font-size:9.0pt;font-family:Arial'>
+	<script>
+	var master="<% cfg_get("http_loginname") %>";
+	if( master =="admin" )
+		document.write('<input class="short_common_bt" id="wps_next" type="button" value="$wps_next_mark" name="Next" onclick="check_pin()">&nbsp;&nbsp;');
+	else
+		document.write('<input class="short_common1_bt" id="wps_next" type="button" value="$wps_next_mark" name="Next" disabled>&nbsp;&nbsp;');
+	
+	
+	</script>
+	</span>
+	</P>
+	</TD>	
+</TR>
+<TR>
+	<TD colspan=3><img src=/liteblue.gif width=100% height=12></TD>
+</TR>
+</table>
+
+
+<script language="javascript">
+<!-- hide script from old browsers
+<!--
+parent.wps_process=0;
+function loadvalue()
+{
+	var cf = document.forms[0];
+	if (cf.wps_in_progress.value == "1") {
+		cf.WPS_type[0].disabled = true;
+		cf.WPS_type[1].disabled = true;
+	} else {
+		cf.WPS_type[0].disabled = false;
+		cf.WPS_type[1].disabled = false;
+	}
+}
+
+function check_pin()
+{
+	var cf = document.forms[0];
+	var lpin = cf.PIN.value;
+	var accum = 0;
+	var tmp="";
+
+	/*if( lpin.charAt(4) == ' ' )
+	{
+		lpin = lpin.substring(0, 4) + lpin.substring(5, lpin.length);
+	}*/
+
+	/* to fix bug 33996,clear space('1234 5678' --> '12345678') */
+	for( i = 0; i < lpin.length; i++)
+	{
+		if( lpin.charAt(i) == ' ' || lpin.charAt(i) == '-' )//38293
+			continue;
+		else
+			tmp=tmp+lpin.charAt(i);
+	}
+	lpin =tmp;
+
+	cf.hidden_PIN.value = lpin;
+
+	if (lpin.length != 4 && lpin.length != 8) {
+		alert("$error_4or8");
+		return false;
+	}
+
+	if ( !_isNumeric(lpin) )
+	{
+		alert("$error_wps_pin");
+		return false;	
+	}
+	
+	if (lpin.length == 8) {
+		lpin = parseFloat(cf.hidden_PIN.value);
+		accum += 3 * parseInt(lpin / 10000000) % 10;
+		accum += 1 * parseInt(lpin / 1000000) % 10;
+		accum += 3 * parseInt(lpin / 100000) % 10;
+		accum += 1 * parseInt(lpin / 10000) % 10;
+		accum += 3 * parseInt(lpin / 1000) % 10;
+		accum += 1 * parseInt(lpin / 100) % 10;
+		accum += 3 * parseInt(lpin / 10) % 10;
+		accum += 1 * parseInt(lpin / 1) % 10;
+
+		if (0 != (accum % 10)) {
+			alert("$error_wps_pin");
+			return false;
+		}
+	}
+
+	cf.Next.disabled = true;
+	cf.WPS_type[0].disabled = true;
+	cf.WPS_type[1].disabled = true;
+	parent.enable_action=0;
+	//parent.topframe.location.href="top_nochange.html";
+
+	parent.wps_choice=1;
+	parent.wps_pin_num=tmp;
+
+	cf.submit();
+
+}
+//-->
+</script>
+</div>
+<% help_box("1","_wps") %>
+</FORM>
+</BODY>
+</HTML>

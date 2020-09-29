@@ -1,0 +1,373 @@
+html,
+body {
+  height: 100%;
+  min-height: 100%;  
+}
+body{ 
+  margin:auto; 
+  color: #ffffff;
+  font-family: 'Roboto', 'Noto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;   
+}
+::-webkit-scrollbar-corner,
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar {
+  width: 7.5px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.39);
+  border-radius: 2px;
+}       
+::-webkit-scrollbar:horizontal {
+  height: 7.5px;
+}			
+*:focus {
+    outline: none;
+}
+a { 
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  outline: none;
+  transition: color 0.15s ease-in;
+}
+a:hover {
+  color: #fff; 
+}
+b {
+  font-weight: 500;
+}
+
+#top{display: none;}
+#container { height: 100%; }
+#middle{  
+  height: 100%  !important; 
+  min-height: 0 !important; 
+  display: flex;
+  box-sizing: border-box;
+  /*padding-bottom: 56px;*/
+}
+#formframe_div{
+  position:relative;
+  background: rgba(18,2,3,0.5);
+  flex: 1 1 auto;
+  height: 100%;
+  bottom: 0 !important;
+  box-sizing: border-box;
+  margin-right: 16px;
+}
+#formframe{
+  display: block;
+}
+.footer,
+.footer_double { position: absolute; padding: 8px 16px; height: 40px; display: none; bottom: 0; left: 0; right: 0;   }
+
+.footer_img { display: none; }
+.footer b, .footer_double b{}
+.footer a, .footer_double a{  font-size: 12px; }
+
+.footer #support,
+.footer_double #support { align-self: center; flex: 1;}
+.footer #search,
+.footer_double #search{ text-align: inherit !important; display: flex; align-items: center; }
+
+/* loader */
+#formframe_wait_div  {
+  background: #120203 !important;
+  font-family: 'Roboto', 'Noto', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 20px !important;
+  display: flex;
+}
+#formframe_wait_div br,
+#formframe_wait_div  > div:last-child img {
+  display: none;
+}
+#formframe_wait_div > div {
+  height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader {
+  margin-top: 16px;
+}
+.spinner {
+  animation: rotator 1.4s linear infinite;
+}
+
+@keyframes rotator {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(270deg);
+  }
+}
+
+.path {
+  stroke-dasharray: 187;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
+}
+
+@keyframes colors {
+  0% {
+    stroke: #FFFFFF;
+  }
+  50% {
+    stroke: #FFFFFF;
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 187;
+  }
+  50% {
+    stroke-dashoffset: 46.75;
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: 187;
+    transform: rotate(450deg);
+  }
+}    
+
+
+/* navigation */
+#menu{ 
+  text-align: left; 
+  overflow-y: auto;
+  background: rgba(18,2,3,0.5);
+  padding: 8px 0;
+  color: rgba(255,255,255,0.75);
+  max-height: min-content;
+  flex: 0 0 240px;
+  margin-right: 16px;
+}
+#menu b {
+  font-weight: inherit;
+}
+#menu div[class^='advanced_'],
+#menu div[class*='advanced_'] {
+  width: 100%;
+  cursor:pointer;
+  position: relative;
+  transition: background 150ms ease, color 150ms ease;
+}
+#menu div[class^='advanced_'] span,
+#menu div[class*='advanced_'] span {
+  padding: 14px 16px;
+  display: block;
+}
+
+.menu_common_words{ font-weight: 400;}
+#menu div[class^='advanced_white_open'],
+#menu div[class*='advanced_white_open'] {
+  background: rgba(18,2,3,0.5);
+  color: #da1820;
+}
+
+#menu > div:not(.sub_men):hover  {
+  color: #da1820;
+}
+
+#menu > div[class^='advanced_purple']:hover,
+#menu > div[class*='advanced_purple']:hover,
+#menu div[class^='advanced_purple'],
+#menu div[class*='advanced_purple'] {
+  background: #da1820;
+  color: #fff;
+  overflow:hidden;
+}
+
+#menu div[class^='advanced_grey'],
+#menu div[class*='advanced_grey'] {
+  background: grey;
+}
+
+#menu div[class^='advanced_white'] span,
+#menu div[class*='advanced_white'] span {
+  padding: 14px 12px 14px 36px;
+}
+
+#menu div[class^='advanced_white']:before,
+#menu div[class*='advanced_white']:before {
+  display: block;
+  color: inherit; 
+  font-size: 12px;
+  position: absolute;
+  top: 50%;
+  height: 12px;
+  line-height: 12px;
+  left: 14px;
+  width: 12px;
+  transform: translate3d(0,-50%,0) rotate(0deg);
+  text-align: center;
+  vertical-align: middle;
+  background: transparent;
+  /* fix https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/11635143/ */
+  font-family: "Segoe UI Symbol";
+}
+
+#menu div[class^='advanced_white_open_button']:before,
+#menu div[class*='advanced_white_open_button']:before {
+  content: "\25b6";
+  transform: rotate(90deg) translate3d(0,-50%,0);
+  top: 40%;
+  left: 8px;  
+}
+
+#menu div[class^='advanced_white_close_button']:before,
+#menu div[class*='advanced_white_close_button']:before {
+  content: "\25b6";
+  transform: rotate(0deg) translate3d(0,-50%,0);
+}
+
+dl{ 
+  margin: 0;
+  padding: 0 0 12px;
+  position: relative;
+  text-decoration: none;
+}
+dl dt {
+  font-size: 14px;
+  padding: 4px 16px;
+  width: auto !important;
+}
+.sub_men{ 
+  text-align: left;
+  overflow:hidden; 
+  background: rgba(18,2,3,0.5);
+}
+
+.sub_men a {
+  cursor: pointer;
+  transition: color 0.15s ease-in;
+  display: block;
+}
+
+#readyshare_stor a {
+  cursor: default !important;
+}
+#readyshare_stor a:hover {
+  opacity: 1;
+}
+
+.sub_men span{}
+.sub_men  .sub_back{ width: auto !important; }
+.sub_men  .sub_back a{cursor:pointer;display:block;}
+
+.sub_men dt[class^='sub_back_purple'] a,
+.sub_men dt[class*='sub_back_purple'] a {
+  color: #da1820;
+}
+
+.sub_men  .sub_back_purple{}
+.sub_men  .sub_back_purple a{}
+.sub_men  .sub_back_purple_usb{}
+.sub_men  .sub_back_purple_usb a{}
+
+.sub_men .middle_name{}
+.sub_men .middle_name a{}
+.sub_men .long_name{}
+.sub_men .long_name a{}
+.sub_men .sub_back_purple_double{}
+.sub_men .sub_back_purple_triple{}
+.sub_men .sub_back_purple_usb_double{}
+.sub_men .sub_back_purple_double a, .sub_men .sub_back_purple_triple a, .sub_men .sub_back_purple_usb_double a{}
+.sub_men .sub_back a, .sub_men .middle_name a, .sub_men  .long_name a {}
+.sub_men .sub_back_purple a, .sub_men  .sub_back_purple_double a, .sub_back_purple_triple a, .sub_back_purple_usb a, .sub_back_purple_usb_double a{}
+
+.sub_men .sub_grey{}
+.sub_men .sub_grey a{}
+.sub_men .middle_grey{
+	opacity: 0.5;
+}
+.sub_men .middle_grey a{}
+.sub_men .long_grey{}
+.sub_men .long_grey a{}
+
+input[type=text] {
+  position: relative;
+  outline: none;
+  box-shadow: none;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  -webkit-appearance: none;
+  text-align: inherit;
+  vertical-align: bottom;
+  font-family: 'Roboto', 'Noto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  font-weight: 400;
+  height: 32px;
+  line-height: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.75);
+  transition: all 0.3s;
+  margin: 0 8px;
+}
+input[type=text]:focus {
+  border-bottom: 1px solid #da1820;
+  box-shadow: 0 1px 0 0 #da1820;
+}
+
+.common_button_short,
+#footer #search input[class^='search_button'],
+#footer #search input[class*='search_button'] {
+  background: #da1820;
+  display: inline-block;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  margin: 0 0.29em 0 0;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 0.594em 0.57em;
+  border-radius: 2px;
+  color: #fff;
+}
+
+/* LGO_logout.htm goodby.htm multi_login.htm*/
+#logo{ width: 533px; height: 43px; background: url(../image/tops.gif) no-repeat 0px -76px; position: absolute; left : 0px; top: 0px;}
+#router_name{position:absolute; left: 0px; top: 40px; font-family: Arial; font-size: 18px; font-weight: Bold; color: #000000; text-align: left; }
+#centria-router-name{position:absolute; left: 88px; top: 60px; font-family: Arial; color: #000000; text-align: left; }
+#router-centria{ position:absolute; left: 0px; top: 60px; font-family:Arial; color: #000000; text-align: left; }
+#firm_version{ position:absolute; right: 0px; top: 30px; font-family: Arial; font-size: 14px; font-weight: Bold; color: #000000; text-align: right; }
+
+/* multi_login.htm */
+body.background {
+  background: #120203;
+}
+
+.single_middle,
+.button{ text-align: center; }
+.common_button_short{}
+
+.single_middle {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+}
+.single_middle p {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto 1rem;
+  display: inline-block;
+}

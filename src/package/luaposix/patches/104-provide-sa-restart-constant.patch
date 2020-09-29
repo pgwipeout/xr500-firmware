@@ -1,0 +1,14 @@
+Index: luaposix-release-v33.2.1/ext/posix/signal.c
+===================================================================
+--- luaposix-release-v33.2.1.orig/ext/posix/signal.c	2015-01-04 12:08:20.000000000 +0000
++++ luaposix-release-v33.2.1/ext/posix/signal.c	2017-07-13 17:10:01.452978000 +0100
+@@ -436,6 +436,8 @@
+ #ifdef SA_NODEFER
+ 	LPOSIX_CONST( SA_NODEFER	);
+ #endif
+-
++#ifdef SA_RESTART
++	LPOSIX_CONST( SA_RESTART	);
++#endif
+ 	return 1;
+ }

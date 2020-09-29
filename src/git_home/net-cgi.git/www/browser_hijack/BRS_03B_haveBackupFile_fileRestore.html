@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+<script language="javascript" type="text/javascript">
+var restore_status="<% restore_status() %>";
+
+function statusChecking()
+{
+	if(restore_status == "0" || restore_status == "1")
+	{
+		setTimeout("pageRedirect(1)", 1000);
+	}
+	else if(restore_status == "2")
+	{
+		setTimeout("pageRedirect(2)", 3000);
+	}
+	else if(restore_status == "3")
+	{
+		document.forms[0].submit();
+	}
+}
+
+function pageRedirect(stat)
+{
+	if(stat == 1)
+		this.location.href = "BRS_03B_haveBackupFile_fileRestore.html";
+	else if(stat == 2)
+	{
+		alert(bh_select_correct_config_file);
+		this.location.href = "BRS_03B_haveBackupFile.html";
+	}
+}
+</script>
+</head>
+
+<body onload="statusChecking();">
+<% form_submit("apply", "BRS_03B_haveBackupFile_waitReboot.html", "reboot") %>
+
+<div id="container">
+	<div class="dialog-content">
+		<!-- Restoring Router Settings -->
+		<div id="card-restoring-router-settings" class="install-card clearfix">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+			<img class="card-image" src="images/svg/nighthawk-front.svg">
+		     <div class="content">
+			<div class="desc-title">
+				<script>
+					if(restore_status != "2")
+						document.write(bh_orbi_restore);
+					else
+						document.write(bh_failure_head);
+				</script>
+			</div>
+			<div class="desc-text">
+				<script>
+					if(restore_status != "2")
+						document.write(bh_orbi_restore_wait);
+					else
+						document.write(bh_few_second);
+				</script>
+			</div>
+			<div class="loader">
+				<div class="preloader-wrapper small active">
+					<div class="spinner-layer">
+						<div class="circle-clipper left">
+							<div class="circle"></div>
+							</div><div class="gap-patch">
+							<div class="circle"></div>
+							</div><div class="circle-clipper right">
+							<div class="circle"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="desc-text wait"><script>document.write(bh_orbi_pls_wait);</script></div>
+		     </div>
+      </div>
+	</div>
+</div>
+</form>
+</body>
+
+</html>
+
+

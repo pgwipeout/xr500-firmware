@@ -1,0 +1,41 @@
+Index: luaposix-release-v33.2.1/ext/posix/fcntl.c
+===================================================================
+--- luaposix-release-v33.2.1.orig/ext/posix/fcntl.c
++++ luaposix-release-v33.2.1/ext/posix/fcntl.c
+@@ -21,6 +21,7 @@
+ #include <config.h>
+ 
+ #include <fcntl.h>
++#include <sys/file.h>
+ 
+ #include "_helpers.c"
+ 
+@@ -35,6 +36,19 @@
+ #endif
+ 
+ 
++static int Pflock(lua_State *L){
++  int r;
++  int fd = checkint(L, 1);
++  r = flock( fd, LOCK_EX );
++  return pushresult(L, r, "flock");
++}
++
++static int Pfunlock(lua_State *L){
++  int r;
++  int fd = checkint(L, 1);
++  r = flock( fd, LOCK_UN );
++  return pushresult(L, r, "funlock");
++}
+ 
+ /***
+ Manipulate file descriptor.
+@@ -168,6 +182,8 @@ static const luaL_Reg posix_fcntl_fns[]
+ #if HAVE_POSIX_FADVISE
+ 	LPOSIX_FUNC( Pposix_fadvise	),
+ #endif
++        LPOSIX_FUNC( Pflock ),
++        LPOSIX_FUNC( Pfunlock ),
+ 	{NULL, NULL}
+ };
+ 

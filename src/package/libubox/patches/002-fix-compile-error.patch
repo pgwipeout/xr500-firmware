@@ -1,0 +1,35 @@
+From 7ebbe49756046c87ad2be092de9e3bfa8efaa27e Mon Sep 17 00:00:00 2001
+From: Iceway Zhang <iceway.zhang@dniserver.dnish.net>
+Date: Thu, 10 Aug 2017 11:48:49 -0400
+Subject: [PATCH 1/1] fix a compile topy
+
+Signed-off-by: Iceway Zhang <iceway.zhang@dniserver.dnish.net>
+---
+ examples/json_script-example.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/examples/json_script-example.c b/examples/json_script-example.c
+index 4d252a9..2c8f2e5 100644
+--- a/examples/json_script-example.c
++++ b/examples/json_script-example.c
+@@ -1,7 +1,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
+-#include <json.h>
++#include <json-c/json.h>
+ #include "blobmsg.h"
+ #include "blobmsg_json.h"
+ #include "json_script.h"
+@@ -27,7 +27,7 @@ handle_file(struct json_script_ctx *ctx, const char *filename)
+ {
+ 	json_object *obj;
+ 
+-	obj = json_object_from_file(filename);
++	obj = json_object_from_file((char *)filename);
+ 	if (!obj) {
+ 		fprintf(stderr, "load JSON data from %s failed.\n", filename);
+ 		return NULL;
+-- 
+1.7.4.1
+

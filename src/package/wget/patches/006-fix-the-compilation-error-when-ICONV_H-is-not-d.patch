@@ -1,0 +1,30 @@
+diff -uN wget-1.19/src/url.c wget-1.19.new/src/url.c
+--- wget-1.19/src/url.c 2017-10-20 09:07:31.563428927 -0400
++++ wget-1.19.new/src/url.c     2017-10-20 09:13:34.243428884 -0400
+@@ -1545,6 +1545,7 @@
+   append_null (dest);
+ }
+
++#ifdef HAVE_ICONV
+ static char *
+ convert_fname (char *fname)
+ {
+@@ -1618,6 +1619,7 @@
+
+   return converted_fname;
+ }
++#endif
+
+ /* Append to DEST the directory structure that corresponds the
+    directory part of URL's path.  For example, if the URL is
+@@ -1794,8 +1796,9 @@
+
+   xfree (temp_fnres.base);
+
++#ifdef HAVE_ICONV
+   fname = convert_fname (fname);
+-
++#endif
+   /* Check the cases in which the unique extensions are not used:
+      1) Clobbering is turned off (-nc).
+      2) Retrieval with regetting.

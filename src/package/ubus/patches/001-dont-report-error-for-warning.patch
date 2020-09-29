@@ -1,0 +1,26 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 70a0de6..bd840ed 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 2.6)
+ 
+ PROJECT(ubus C)
+-ADD_DEFINITIONS(-Os -Wall -Werror --std=gnu99 -g3 -Wmissing-declarations)
++ADD_DEFINITIONS(-Os -Wall --std=gnu99 -g3 -Wmissing-declarations)
+ 
+ OPTION(BUILD_LUA "build Lua plugin" ON)
+ OPTION(BUILD_EXAMPLES "build examples" ON)
+diff --git a/lua/CMakeLists.txt b/lua/CMakeLists.txt
+index e4821bf..009b276 100644
+--- a/lua/CMakeLists.txt
++++ b/lua/CMakeLists.txt
+@@ -15,7 +15,7 @@ IF(NOT LUA_CFLAGS)
+ 	ENDIF()
+ ENDIF()
+ 
+-ADD_DEFINITIONS(-Os -Wall -Werror --std=gnu99 -g3 -I.. ${LUA_CFLAGS})
++ADD_DEFINITIONS(-Os -Wall --std=gnu99 -g3 -I.. ${LUA_CFLAGS})
+ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/..)
+ LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/..)
+ 

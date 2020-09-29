@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+<style>
+[type="radio"]:checked +label::after{
+  top:2px;
+  left:0px;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:#de1820;
+}
+</style>
+</head>
+
+<body>
+<% form_submit("func", "BRS_03A_detcInetType.html", "wizard_detwan")  %>
+<% save_timestamp("wizard_detwan", "hijack_to_manual")%>
+<script language="javascript" type="text/javascript">
+var ts="<% cfg_get("hijack_to_manual") %>";
+
+function genieHelpChecking()
+{
+	var cf = document.forms[0];
+
+	if($$('#help_auto_detc').is(":checked"))
+	{
+		return true;
+	}
+	else if($$('#help_my_detc').is(":checked"))
+	{
+		if(confirm(bh_no_genie_help_confirm) == false)
+			return false;
+
+		cf.action = "/apply.cgi?/BRS_security.html timestamp=" + ts;
+		cf.submit_flag.value = "hijack_to_manual";
+		return true;
+	}
+	else if($$('#help_restore').is(":checked"))
+	{
+		this.location.href = "BRS_03B_haveBackupFile.html";
+		return false;
+	}
+	else
+	{
+		alert(bh_select_an_option);
+		return false;
+	}
+	
+}
+
+</script>
+<div id="container">
+	<div class="dialog-content">
+      <!-- Configure Internet Connection-->
+		<div id="card-configure-internet-connection" class="install-card clearfix" style="height:auto;">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+		     <div class="content">
+			<div class="desc-title"><script>document.write(bh_orbi_config_conn);</script></div>
+			<div class="desc-text"><script>document.write(bh_connection_further_action);</script></div>
+			<div class="desc-text text-block-child"><script>document.write(bh_orbi_help_msg);</script></div>
+		   <ul>
+				<li>
+					<input class="with-gap" type="radio" name="WANDetc" id="help_auto_detc" value="AutoDetc" checked />
+					<label for="help_auto_detc"><span><script>document.write(bh_orbi_help_choice_yes);</script></span><script>document.write(bh_orbi_help_choice1);</script></label>
+				</li>
+				<li>
+					<input class="with-gap" type="radio" name="WANDetc" id="help_my_detc" value="MyDetc" />
+					<label for="help_my_detc"><span><script>document.write(bh_orbi_help_choice_no);</script></span><script>document.write(bh_orbi_help_choice2);</script></label>
+				</li>
+				<li>
+					<input class="with-gap" type="radio" name="WANDetc" id="help_restore" value="Restore" />
+					<label for="help_restore"><span><script>document.write(bh_orbi_help_choice_save);</script></span><script>document.write(bh_orbi_help_choice3);</script></label>
+				</li>
+		   </ul>		 
+		   </div>
+
+		   <div class="buttons">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return genieHelpChecking();">
+				<span><script>document.write(bh_orbi_next_mark)</script></span><i class="material-icons">navigate_next</i>
+			</button>
+		   </div>
+		</div>
+	</div>
+</div>
+
+</form>
+</body>
+
+</html>

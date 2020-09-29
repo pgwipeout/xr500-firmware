@@ -1,0 +1,20 @@
+<% http_header("style/form.css", "/funcs.js") %>
+<% body_header("", "lang_check.html", "select_language") %>
+<input type=hidden name=hidden_lang_avi>
+<input type=hidden name=browser_or_top>
+<input type=hidden name=language_in_flash>
+<script>
+	var browser_lang = "<% get_browser_language() %>";
+
+	function loadvalue()
+	{
+		var form=document.forms[0];
+		form.hidden_lang_avi.value=browser_lang;
+		form.submit();
+
+	}
+
+</script>
+</FORM>
+</BODY>
+</HTML>

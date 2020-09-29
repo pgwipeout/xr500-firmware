@@ -1,0 +1,137 @@
+iframe, 
+body {
+ 	background: transparent;
+ 	color: #fff;
+
+
+}
+body,
+td { 
+    font-family: 'Roboto', sans-serif;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+a {
+ 	color: #fff;  
+}
+
+.page_title {
+	color: inherit;
+}
+
+#top,
+#topframe {
+ 	display: none;   
+}
+
+#menu {
+ 	display: none;
+}
+
+.container_center {
+ 	top: 0;
+ 	left: 0;
+    background: rgba(18,2,3,0.5);
+}
+
+#middle {
+ 	top: 0;   
+}
+
+#formframe_div {
+ 	left: 0;
+}
+
+.close_help #help_button,
+.help_switch_img,
+td > img {
+ 	display: none;   
+}
+
+#help_switch,
+.fix_button {
+    background: transparent;
+}
+
+.page_title {
+ 	font-size: 20px;  
+    height: 56px;
+    line-height: 56px;
+    padding-left: 16px;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+}
+
+.main_top_button {
+ 	padding: 0 16px;   
+}
+
+.apply_bt,
+.cancel_bt {
+ 	background: #da1820; 
+    font-family: 'Roboto', sans-serif;
+    border-radius: 2px;
+    font-weight: 500;
+    font-size: 16px;
+    padding: 0.594em 0.57em;   
+    height: auto;
+}
+
+.apply_bt {
+    
+}
+
+select,
+input {
+    border-bottom: 1px solid #fff;
+    outline: none;
+	box-shadow: none;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    text-align: inherit;
+    vertical-align: bottom;
+    font-family: 'Roboto', 'Noto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    border-bottom: 1px solid #fff;
+}
+
+input:focus,
+select:focus {
+ 	border-bottom: 2px solid #da1820;
+    margin-bottom: 0;
+}
+
+tr td {
+ 	padding: 0 0 4px;   
+}
+
+tr td:first-child {
+ 	width: 400px;   
+}
+
+input[type=checkbox], input[type=radio] {
+    display: inline-block;
+    font-size: 12px;
+    line-height: 20px;
+    margin: 0 8px 1px 0;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    -webkit-border-radius: 0.25em;
+    vertical-align: middle;
+    -webkit-appearance: none;
+    border: 2px solid #fff;
+}
+input[type=checkbox]:checked, input[type=radio]:checked {
+    border-color: #da1820;
+}
+input[type=radio] {
+ 	border-radius: 50%;   
+}

@@ -1,0 +1,27 @@
+From 108ed10bcb054bb7072dcff5b81bece7c5939454 Mon Sep 17 00:00:00 2001
+From: Iain Fraser <iainf@netduma.com>
+Date: Wed, 22 Nov 2017 17:42:49 +0000
+Subject: [PATCH 1/2] Stop fd leaking by closing fd on all execution paths.
+
+---
+ libubus-io.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/libubus-io.c b/libubus-io.c
+index 9320bf3..9892fe3 100644
+--- a/libubus-io.c
++++ b/libubus-io.c
+@@ -314,6 +314,10 @@ void __hidden ubus_handle_data(struct uloop_fd *u, unsigned int events)
+ 			break;
+ 	}
+ 
++	/* do not leak fds when get_next_msg fails */
++	if(!uloop_cancelled)
++		close(recv_fd);
++
+ 	if (u->eof)
+ 		ctx->connection_lost(ctx);
+ }
+-- 
+1.7.4.1
+

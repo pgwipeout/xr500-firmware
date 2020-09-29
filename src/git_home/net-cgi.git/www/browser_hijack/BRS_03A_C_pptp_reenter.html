@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<script language="javascript" type="text/javascript" src="script/funcs.js"></script>
+<% hijack_language() %>
+<% deleteFiles("/tmp/ping_result_error", "/tmp/ping_ip_result_error", "/tmp/ping_gateway_result_error")%>
+<% deleteFiles("/tmp/ping_result", "/tmp/wget_file_result") %>
+<script>
+var hijack_process="<% cfg_get("hijack_process") %>";
+function checkPPTP()
+{
+	var forms = document.getElementsByTagName("form");
+        var cf = forms[0];
+	
+	var pptp_name = document.getElementById("pptp_username");
+	var pptp_passwd = document.getElementById("pptp_passwd");
+	var pptp_idletime = document.getElementById("pptp_idletime");
+
+	if(pptp_name.value == "")
+	{
+		alert(bh_login_name_null);
+		return false;
+	}
+
+	var i;
+	for(i=0;i<pptp_passwd.value.length;i++)
+	{
+		if(isValidChar(pptp_passwd.value.charCodeAt(i))==false)
+		{
+			alert(bh_password_error);
+			return false;
+		}
+	}
+	if(pptp_idletime.value.length <= 0)
+	{
+		alert(bh_idle_time_null);
+		return false;
+	}
+	else if(!_isNumeric(pptp_idletime.value))
+	{
+		alert(bh_invalid_idle_time);
+		return false;
+	}
+
+	if(!checkIPaddr())
+		return false;
+
+	return true;
+}
+
+function checkIPaddr()
+{
+	var forms = document.getElementsByTagName("form");
+        var cf = forms[0];
+
+	cf.ip_address.value = cf.myip.value;
+	cf.gateway.value = cf.mygw.value;
+
+	if(cf.ip_address.value != "")
+	{
+		cf.WANAssign.value = 1;
+
+		/* To fix Bug27179: [New GUI][CD-less]DUT should pop up error message if Gateway IP Address
+		 * and My IP Address are in different network. */
+		if(checkipaddr(cf.ip_address.value)==false)
+		{
+			alert(bh_invalid_myip);
+			return false;
+		}
+		var myip_array = cf.ip_address.value.split(".");
+		var pptp_mask="255.255.255.0";
+
+		if( parseInt(cf.myip_array[0].value) < 128 )
+			pptp_mask="255.0.0.0";
+		else if( parseInt(cf.myip_array[0].value) < 192 )
+			pptp_mask="255.255.0.0";
+		else
+			pptp_mask="255.255.255.0";
+
+		cf.pptp_subnet.value=pptp_mask;
+
+		if(cf.gateway.value != "" && checkgateway(cf.gateway.value) == false)
+		{
+			alert(bh_invalid_gateway);
+			return false;
+		}
+		if(cf.gateway.value != "")
+		{
+			if(isSameIp(cf.ip_address.value,cf.gateway.value) == true)
+			{
+				alert(bh_invalid_gateway);
+				return false;
+			}
+			if(isGateway(cf.ip_address.value,cf.pptp_subnet.value,cf.gateway.value) == false)
+			{
+				alert(bh_invalid_gateway);
+				return false;
+			}
+		}
+	}
+	else
+		cf.WANAssign.value=0;
+	
+	return true;
+}
+
+/*function gotto_link(sub, id)
+{
+	if(sub != "None")
+		top.open_or_close_sub(sub);
+	top.click_adv_action(id);
+}*/
+
+function manuallyConfig()
+{
+	if(confirm(bh_no_genie_help_confirm) == false)
+			return false;
+	
+	var cf = document.forms[0];
+
+	//if( hijack_process == "1" )
+	//{
+		cf.action = "/apply.cgi?/BRS_security.html timestamp=" + ts;
+		cf.submit_flag.value = "hijack_to_manual";
+	//}
+	//else
+		//gotto_link("setup", "internet");
+
+	return true;
+}
+</script>
+
+</head>
+
+<body>
+<% form_submit("apply", "BRS_log12_incorrect_try_again.html", "hijack_pptp") %>
+<% save_timestamp("hijack_pptp", "hijack_to_manual") %>
+<script language="javascript" type="text/javascript">var ts="<% cfg_get("hijack_pptp") %>";</script>
+
+<input type="hidden" name="WANAssign" value="0" />
+<input type="hidden" name="pptp_subnet" value="" />
+<input type="hidden" name="ip_address" value="" />
+<input type="hidden" name="gateway" value="" />
+<div id="container">
+	<div class="dialog-content">
+		<!-- Incorrect ISP-->
+		<div id="card-incorrect-ISP" class="install-card clearfix">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+			
+		    <div class="content">
+			<div class="desc-title"><script>document.write(bh_orbi_incorrect_user_pwd);</script></div>
+			<div class="desc-text"><script>document.write(bh_orbi_enter_info_again);</script></div>
+
+		  <div class="row input-row">
+			<div class="input-field col m6">
+				<script>document.write('<input type="text" placeholder="'+bh_pppoe_login_name+'>" id="pptp_username" maxlength="60" name="pptp_username" class="validate"><label for="pptp_username">'+bh_pptp_login_name+'</label>');</script>
+			</div>
+
+			<div class="input-field col m6">
+				<script>document.write('<input type="password" placeholder="'+bh_ddns_passwd+'" id="pptp_passwd" maxlength="16" name="pptp_passwd" class="validate"><label for="pptp_passwd">'+bh_ddns_passwd+'</label>');</script>
+			</div>
+		  </div>
+		  <div class="row input-row">
+			<div class="input-field col m6">
+				<script>document.write('<input type="number" placeholder="'+bh_in_minutes+'" class="ip-box" id="pptp_idletime" name="pptp_idletime" min="0" class="validate"><label for="pptp_idletime">'+bh_basic_pppoe_idle+'</label>');</script>
+			</div>
+
+			<div class="input-field col m6">
+				<script>document.write('<input name="myip" placeholder="IP" id="myip"  type="text" class="validate"><label for="myip">'+bh_info_mark_ip+'</label>');</script>
+ 			</div>
+		   </div>
+		  <div class="row input-row">
+			<div class="input-field col m6">
+				<script>document.write('<input name="mygw" placeholder="IP" id="mygw"  type="text" class="validate"><label for="mygw">'+bh_sta_routes_gtwip+'</label>');</script>
+			</div>
+			<div class="input-field col m6">
+				<script>document.write('<input type="text" value="10.0.0.138" id="pptp_serv_ip" name="pptp_serv_ip"><label for="pptp_serv_ip">'+bh_basic_pptp_servip+'</label>');</script>
+			</div>
+		  </div>
+		  <div class="row input-row">
+			<div class="input-field col m6 offset-m6">
+			<script>document.write('<input type="text" id="inputConID" placeholder="'+bh_basic_pptp_connection_id+'" name="connection_ID"><label for="inputConID">'+bh_basic_pptp_connection_id+'</label>');</script>
+			</div>
+		  </div>
+		</div>
+		    <div class="buttons">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-left" onclick="return manuallyConfig();">
+				<i class="material-icons">settings</i><span><script>document.write(bh_orbi_config_conn_mark);</script></span>
+			</button>
+			<button class="waves-effect btn-flat button-nav-skip button-nav button-nav-second-block" onclick="return checkPPTP();">
+				<span><script>document.write(bh_orbi_tryagain_mark);</script></span>
+			</button>
+		    </div>
+		</div>
+	</div>
+</div>
+
+</form>
+</body>
+
+</html>

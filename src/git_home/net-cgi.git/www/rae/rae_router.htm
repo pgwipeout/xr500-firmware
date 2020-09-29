@@ -1,0 +1,82 @@
+<% http_header("style/form2.css", "/funcs.js","/jquery-1.7.2.min.js") %>
+<% body_header("_rae", "rae_waiting.htm", "rae_router") %>
+<style type="text/css">
+.link_a{background-color: #702b86; margin-left: 0px; color: #f2f2f2;  font: -webkit-small-control; padding-left:20px; padding-right:20px; border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px;}
+.blue_a{COLOR: blue; TEXT-DECORATION: underline}
+
+.boxline{width:auto !important;position: relative;display:flex;flex: 1 1 33.333%;padding: 0 16px;justify-content:space-around;}
+.box_select {width: 160px; height: 150px; float: left; position: relative; margin-left: 20px; margin-top: 20px;}
+.box_select .radio_box{width: 90%; height: 20px; font-size: 13px; font-weight: bold;  position: relative; top: 10px; padding-left: 10%;}
+.box_select .icon_unselect, .box_select .icon_select{width:100px; height: 100px; position: absolute; bottom: 10px; left: 20px; cursor: pointer;}
+.box_select .icon_unselect img, .box_select .icon_select img{width:100px; height:100px}
+.box {width: 130px; height: 110px; float: left; position: relative; margin-left: 20px; margin-top: 30px; }
+.box .radio_box{width: 90%; height: 20px; font-size: 11px; font-weight: bold; position: relative; top: 10px; padding-left: 10%;}
+.box .icon_unselect, .box .icon_select{width:60px; height: 60px; position: absolute; bottom: 10px; left: 20px; cursor: pointer;}
+.box .icon_unselect img, .box .icon_select img{width:60px; height:60px}
+.icon_unselect {border-radius:8px;}
+.icon_select { background-color: #de1820; ;border-radius:8px;}
+
+
+</style>
+<div id="black_over_lay" class="black_overlay">
+</div>
+<div class="page_title"><% rae_page_title() %></div>
+<div class="fix_button">
+<TABLE width=100% border=0 cellpadding=0 cellspacing=2>
+<TR>
+	<TD nowrap align=center>
+	<script>
+		var master="<% cfg_get("http_loginname") %>";
+		if( master=="admin" )
+			document.write('<input class="new_cancel_bt ui-corner-all" type="reset" name="Cancel" value="$cancel_mark" onClick="location.href=\'rae_main.htm\';"><input class="new_apply_bt ui-corner-all" type="submit" name="Apply" value="$apply_mark" onClick="return click_apply();">');
+		else
+			document.write('<input class="new_greycancel_bt ui-corner-all" type="reset" name="Cancel" value="$cancel_mark" disabled><input class="new_greyapply_bt ui-corner-all" type="submit" name="Apply" value="$apply_mark" disabled>');
+	</script>
+	</TD>
+</TR>
+</TABLE>
+</div>
+<script language="javascript" type="text/javascript">
+function loadvalue()
+{
+
+}
+function click_apply()
+{
+	var cf = document.forms[0];
+	if(cf.pre_mode.value == "router")
+		return false;
+	else
+		return true;
+}
+
+</script>
+<div id="main" class="main_top_button">
+<div class="help_button_sty" style="fill:white" onclick="open_help_button()" onmouseover="this.style.fill='red'" onmouseout="this.style.fill='white'">
+<svg viewbox="0 0 24 24" style="display:block;width:100%;height:100%;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></svg>
+</div>
+
+<% rae_radios("1") %>
+		<div id="content1" style="font-size:14px;">
+			<table>
+				<tr><td  align="left">$rae_rou_set</td></tr>
+				<tr><td height="10px"></td></tr>
+				<tr><td>
+				<input class="new_apply_bt2 ui-corner-all" type="button" name="learn_router" value="$learn_more" onclick="window.open('rae_learn.htm','newwindow','resizable=no,scrollbars=yes,toolbar=no,menubar=no,status=no,location=no,alwaysRaised=yes,z-look=yes,width=800,height=600,left=200,top=100').focus();" >
+				</td></tr>
+			</table>
+		</div>
+		<div id="content3" style="font-size:14px;">
+			<table>
+				<tr><td>$rae_to_set:</td></tr>
+				<tr><td><input type="button"  name="internet" value="$int_setup" class="wireless_bt2 ui-corner-all" onclick="gotto_link('setup', 'internet');"></td></tr>
+				<tr><td height="5px"></td></tr>
+				<tr><td><input type="button"  name="wireless" value="$wls_setup" class="wireless_bt2 ui-corner-all" onclick="gotto_link('setup', 'wireless');"></td></tr>
+			</table>
+		</div>
+	<div class="foot"><img src="image/router_map_1.gif" style="padding-left:30px; padding-top:40px"></div>
+</div>
+<% help_box("0","_rae_router") %>
+</form>
+</body>
+</html>

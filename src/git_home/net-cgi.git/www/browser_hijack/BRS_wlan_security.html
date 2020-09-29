@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+</head>
+
+<body onload="loadvalue()">
+<script>
+var get_smart_connect = "<% cfg_get("enable_smart_connect") %>";
+function loadvalue()
+{
+	var cf = document.forms[0];
+	var wl_sectype="<% cfg_get("wl_sectype") %>";
+	if(wl_sectype=="1")
+		location.href="BRS_orbi_complete.html";
+	else
+		document.getElementById("container").style.display="";
+	if(get_smart_connect == "1")
+	{
+		document.getElementById("check_same").checked = true
+		document.getElementById("samediv").style.display="";
+		document.getElementById("5gssid").style.display="none";
+		document.getElementById("5gpass").style.display="none";
+	}
+}
+
+function isValidChar_space(each_char)
+{
+	if( each_char < 32 || each_char > 127)
+		return false;
+}
+function isValidHex(each_char)
+{
+	var macVals = new Array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9","A", "B", "C", "D", "E", "F", "a", "b", "c", "d", "e", "f");
+	var len = macVals.length;
+	var i = 0;
+	var ret = false;
+	for ( i = 0; i < len; i++ )
+		if ( each_char == macVals[i] ) break;
+	if ( i < len )
+		ret = true;
+	return ret;
+}
+
+function checkpsk(passphrase, passphrase_len)
+{
+	var len = passphrase.value.length;
+	if ( len == 64 )
+	{
+		for(i=0;i<len;i++)
+		{
+			if(isValidHex(passphrase.value.charAt(i))==false)
+			{
+				alert(bh_notallowpassps);
+				return false;
+			}
+		}
+	}
+	else
+	{
+		if(len < 8 )
+		{
+			alert(bh_passphrase_short8);
+			return false;
+		}
+		if(len > 63)
+		{
+			alert(bh_passphrase_long63);
+			return false;
+		}
+		for(i=0;i<passphrase.value.length;i++)
+		{
+			if(isValidChar_space(passphrase.value.charCodeAt(i))==false)
+			{
+				alert(bh_notallowpassps);
+				return false;
+			}
+		}
+	}
+	passphrase_len.value=len;
+	return true;
+}
+
+function check_ssid(ssid)
+{
+	var tmp_ssid=ssid;
+	var ssid_len = tmp_ssid.length;
+	for(i=0;i<tmp_ssid.length;i++)
+	{
+		if(tmp_ssid.charCodeAt(i)==32)
+			ssid_len--;
+	}
+	if(tmp_ssid == "" || ssid_len == 0)
+	{
+		alert(bh_ssid_null);
+		return false;
+	}
+	for(i=0;i<tmp_ssid.length;i++)
+	{
+		if(isValidChar_space(tmp_ssid.charCodeAt(i))==false)
+		{
+			alert(bh_ssid_not_allowed);
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+function checkwlan(cf)
+{
+	if(check_ssid(cf.wl_ssid.value) == false || check_ssid(cf.wla_ssid.value) == false)
+		return false;
+	if( checkpsk(cf.wl_password, cf.wl_sec_wpaphrase_len)== false)
+			return false;
+	if( checkpsk(cf.wla_password, cf.wla_sec_wpaphrase_len)== false)
+			return false;
+	var d = new Date();
+	cf.hid_apply_time.value = Math.floor(d.getTime()/1000);
+	if(parent.smart_connect_flag == "1")
+	{
+		if(document.getElementById("check_same").checked == true)
+			cf.hid_same_ssid.value = "1";
+	}
+	return true;
+}
+function checksameid()
+{
+	if(document.getElementById("check_same").checked == true)
+	{
+		document.getElementById("5gssid").style.display="none";
+		document.getElementById("5gpass").style.display="none";
+	}else
+	{
+		document.getElementById("5gssid").style.display="";
+		document.getElementById("5gpass").style.display="";
+	}
+}
+function check_smart_ssid(){
+	var cf=document.forms[0];
+	if(get_smart_connect =="0"){
+		if(cf.wl_ssid.value==cf.wla_ssid.value)
+			cf.wla_ssid.value +="5G";
+}
+}
+</script>
+<% form_submit("apply", "BRS_wlan_plsWait.html", "hijack_wlan") %>
+<input type="hidden" name="wl_sec_wpaphrase_len" />
+<input type="hidden" name="wla_sec_wpaphrase_len" />
+<input type="hidden" name="hid_apply_time" />
+<input type="hidden" name="hid_same_ssid" value="0"/>
+<input type="hidden" name="hid_save_time" value="6">
+<div id="container" style="display:none">
+	<div class="dialog-content">
+		<!-- Orbi Setup WiFi-->
+		<div id="card-orbi-setup-wifi" class="install-card clearfix" style="height:auto;">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+		     <div class="content">
+			<div class="desc-title"><script>document.write(bh_orbi_wlan);</script></div>
+			<div class="desc-text"><script>document.write(bh_orbi_wlan_msg);</script></div>
+
+			<div class="input-field">			
+				<script>document.write('<input type="text" placeholder="'+bh_orbi_ssid+'" onblur="check_smart_ssid()" name="wl_ssid" id="wl_ssid" maxlength="32" value="<% cfg_get_ssid_value("wl_ssid") %>"/><label for="wl_ssid">2.4GHz '+bh_orbi_ssid+'</label>');</script>
+			</div>
+
+			<div class="input-field">			
+				<script>document.write('<input type="text" name="wl_password" placeholder="'+bh_ddns_passwd+'" id="wl_password" maxlength="64" value="<% get_wifi_pwd("2.4G") %>"/><label for="wl_password">2.4GHz '+bh_ddns_passwd+'</label>');</script>
+			</div>
+			
+			<div class="input-field" id="5gssid">							
+				<script>document.write('<input type="text" placeholder="'+bh_orbi_ssid+'" onblur="check_smart_ssid()" name="wla_ssid" id="wla_ssid" maxlength="32" value="<% cfg_get_ssid_value("wla_ssid") %>"/><label for="wla_ssid">5GHz '+bh_orbi_ssid+'</label>');</script>
+			</div>
+			
+			<div class="input-field" id="5gpass">			
+				<script>document.write('<input type="text" placeholder="'+bh_ddns_passwd+'" name="wla_password" id="wla_password" maxlength="64" value="<% get_wifi_pwd("5G") %>"/><label for="wla_password">5GHz '+bh_ddns_passwd+'</label>');</script>
+			</div>
+			
+                     </div>
+			<div style="margin-left:auto;margin-right:auto;max-width:80%;text-align:left;display:none;" id="samediv" >
+			 <input type="checkbox" id="check_same" onclick="checksameid();">
+			 <label for="check_same"><script>document.write(bh_use_same_ssid)</script></label>
+			</div>
+		     <div class="buttons">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return checkwlan(document.forms[0]);">
+				<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
+			</button>
+		     </div>
+			<!--button class="waves-effect btn-flat button-nav-skip">
+				<span>SKIP</span>
+			</button-->
+		</div>
+	</div>
+</div>
+</form>
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<% echo_set("","/tmp/wps_process_state") %>
+<% cfg_set("client_name","") %>
+
+<% http_header("style/form.css", "/funcs.js") %>
+<% body_header("_wps", "WPS_status.htm", "wps") %>
+<div id="black_over_lay" class="black_overlay">
+</div>
+<div class="page_title">$add_wps_client_header</div>
+<div id="main" class="main">
+<div class="help_button_sty" style="fill:white" onclick="open_help_button()" onmouseover="this.style.fill='red'" onmouseout="this.style.fill='white'">
+<svg viewbox="0 0 24 24" style="display:block;width:100%;height:100%;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></svg>
+</div>
+<% table_header() %> 
+$bluebar
+
+<input type="hidden" name="wps_in_progress" value="0">
+<TR>
+	<TD nowrap><B>$wps_or_pin</B></TD>
+</TR>
+<TR>
+	<TD nowrap>
+	<input type=radio name="WPS_type" id="wps_type" value="Push Button" checked><label for="wps_type">$wps_push_button</label></TD>
+</TR>
+<TR>
+	<TD><P style='margin-left:15pt'>
+	<script>
+		if( "<% cfg_get("quick_wps_fastlane") %>" == "fastlane" )
+			document.write("$wps_fastlane_push_button_text");
+		else
+			document.write("$wps_push_button_text");
+	</script>
+	</P></TD>
+</TR>
+<TR>
+	<TD colspan=3>
+	<P class=MsoNormal align=center style='margin:0cm;margin-bottom:.0001pt;text-align:center'>
+	<span lang=EN-US style='font-size:9.0pt;font-family:Arial'>
+	<script>
+	var master="<% cfg_get("http_loginname") %>";
+	if(master=="admin")
+		document.write('<input type="button" name="wps_button" id="wps_button" style="background:url(/image/buttons.gif) no-repeat -340px 0; width:50px; height:30px;" onClick="disableButton();" />');
+	else
+		document.write('<input type="button" name="wps_button" id="wps_button" style="background:url(/image/buttons.gif) no-repeat -308px 0; width:30px; height:30px;" disabled >');
+		
+	</script>
+	</span>
+	</P>
+	</TD>
+</TR>   
+<TR>
+	<TD nowrap align=left>
+	<input type=radio name="WPS_type" id="pin_num" value="PIN Number" onClick="location.href='WPS_pin.htm'"><label for="pin_num">$wps_pin</label>
+	</TD>
+</TR>
+$bluebar
+</table>
+
+<script language="javascript">
+parent.wps_charcount=0;
+parent.wps_process=0;
+function loadvalue()
+{
+	var cf = document.forms[0];
+	if (cf.wps_in_progress.value == "1") {
+		cf.WPS_type[0].disabled = true;
+		cf.WPS_type[1].disabled = true;
+		cf.wps_button.disabled = true;
+	} else {
+		cf.WPS_type[0].disabled = false;
+		cf.WPS_type[1].disabled = false;
+		cf.wps_button.disabled = false;
+	}
+}
+function disableButton()
+{
+	var cf = document.forms[0];
+	cf.WPS_type[0].disabled = true;
+	cf.WPS_type[1].disabled = true;
+	cf.wps_button.disabled = true;
+	parent.enable_action=0;
+	//top.topframe.location.href="top_nochange.html";
+	parent.wps_choice=0;
+	parent.wps_pin_num="";	
+	document.forms[0].submit();
+}
+</script>
+</div>
+<% help_box("1","_wps") %>
+</FORM>
+</BODY>
+</HTML>

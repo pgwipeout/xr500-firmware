@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+</head>
+
+<body>
+
+<div id="container">
+
+	<div class="dialog-content">
+
+	<!-- Welcome -->
+		<div id="card-welcome" class="install-card clearfix">
+			<div class="logos">
+				<img class="netgear-logo" src="images/svg/netgear.svg">
+				<% hijack_logo_title() %>
+			</div>
+			<img class="card-image" src="images/svg/nighthawk-front.svg">
+		     <div class="content">
+			<div class="desc-title"><script>document.write(bh_orbi_welcome);</script></div>
+			<div class="desc-text"><script>document.write(bh_orbi_welcome_msg1);</script></div>
+			<div class="desc-text text-block-child"><script>document.write(bh_orbi_welcome_msg2);</script></div>
+		     </div>
+		     <div class="buttons">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" type="button" onclick="location.href='BRS_01_checkNet_ping.html';">
+				<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
+			</button>
+		     </div>
+		</div>
+	</div>
+</div>
+</body>
+
+</html>

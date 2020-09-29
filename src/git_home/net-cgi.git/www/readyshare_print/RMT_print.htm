@@ -1,0 +1,38 @@
+<html>
+<head>
+    <link rel="stylesheet" href="/style/form.css">
+    <script language=javascript type=text/javascript src="/funcs.js"></script>
+    <title>Remote Share Printing</title>
+    <meta http-equiv=content-type content='text/html; charset=UTF-8'>
+</head>
+
+<body onLoad="please_wait(false);">
+<div id="black_over_lay" class="black_overlay">
+</div>
+<div class="page_title">$usb_share_print</div>
+<div id="main" class="main">
+<div class="help_button_sty" style="fill:white" onclick="open_help_button()" onmouseover="this.style.fill='red'" onmouseout="this.style.fill='white'">
+<svg viewbox="0 0 24 24" style="display:block;width:100%;height:100%;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></svg>
+</div>
+    <table width="100%" border="0" cellpadding="0" cellspacing="3">
+        <tr>
+            <td colspan="2">
+                <img src="/liteblue.gif" width="100%" height="12">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+		    <p>$usb_share_print_prompt2</p>
+		    <p><b>$usb_share_print_prompt1</b></p>
+		    <p>$usb_share_print_prompt3</p>
+		    <p>$usb_share_print_prompt4<br>
+		    $usb_share_print_prompt5</p>
+		    <p>$usb_share_print_prompt6</p>
+		    <p>$usb_share_print_prompt7</p>
+	    </td>
+        </tr>
+    </table>
+</div>
+<% help_box("1","_print_share") %>
+</body>
+</html>

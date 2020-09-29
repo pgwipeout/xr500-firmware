@@ -1,0 +1,9 @@
+{
+	"logout":"$logout_head",
+	"upgrade":"$mobile_detect_install",
+	"home":"$hom",
+	"my_router":"$my_router",
+	"traffic_meter":"$traffic_head",
+	"qos":"$plc_qos_head"
+
+}

@@ -1,0 +1,49 @@
+Index: haserl-0.9.35/src/h_lua.c
+===================================================================
+--- haserl-0.9.35.orig/src/h_lua.c	2017-10-16 16:03:40.363901091 +0100
++++ haserl-0.9.35/src/h_lua.c	2017-10-16 16:04:11.427901090 +0100
+@@ -142,6 +142,31 @@
+   }
+ }
+ 
++/*
++* By design all content is effectively cached indefintely unless explicitly
++* stated otherwise via GET parameter.
++*
++* We do not bother with ETAGs because the cache is designed to be permanent.
++*/
++static void send_cache_header(lua_State *L){
++  int docache = 1;
++  #define CACHE_DURATION  31536000
++
++  lua_getglobal( L, "GET" );
++  lua_getfield( L, -1, "cache" );
++  if( lua_isnumber( L, -1 ) )
++    docache = lua_tonumber( L, -1 );
++  lua_pop( L, 2 );
++
++  if( docache ){
++    printf( "Cache-Control: max-age=%u\r\n", CACHE_DURATION );
++  } else {
++    printf( "Cache-Control: no-cache, no-store, must-revalidate\r\n" );
++    printf( "Pragma: no-cache\r\n");
++    printf( "Expires: 0\r\n" );
++  }
++}
++
+ void
+ lua_doscript (buffer_t * script, char *name)
+ {
+@@ -157,7 +182,11 @@
+   /* force the string to be null terminated */
+   buffer_add (script, "\0", 1);
+ 
+-  printf("content-type: text/html\r\n\r\n");
++  /* send header response */
++  printf("content-type: text/html\r\n");
++  send_cache_header( lua_vm );
++  printf("\r\n\r\n");
++
+   status = luaL_loadbuffer (lua_vm, (char *) script->data,
+ 			    strlen ((char *) script->data), name) ||
+ 

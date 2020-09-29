@@ -1,0 +1,67 @@
+<% http_header("style/form.css", "/funcs.js", "/plc_qos_mac.js") %>
+<% body_header("_plc_qos_mac", "PLC_dev_configure.htm", "plc_qos_mac_add") %>
+<div id="black_over_lay" class="black_overlay">
+</div>
+<div class="page_title">$plc_qos_mac_head</div>
+
+<div class="fix_button">
+<TABLE width=100% border=0 cellpadding=0 cellspacing=2>
+<TR>
+        <TD nowrap colspan="2" align="center">
+	<input class="cancel_bt" type="button" name="Cancel" value="$cancel_mark" onClick='location.href="PLC_dev_configure.htm";'>&nbsp;&nbsp;
+        <input class="apply_bt" type="submit" name="ok" value="$ok_mark" onClick="return check_qos_mac(document.forms[0]);">
+        </TD>
+</TR>
+</TABLE>
+</div>
+<div id="main" class="main_top_button">
+<div class="help_button_sty" style="fill:white" onclick="open_help_button()" onmouseover="this.style.fill='red'" onmouseout="this.style.fill='white'">
+<svg viewbox="0 0 24 24" style="display:block;width:100%;height:100%;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></svg>
+</div>
+<% table_header() %>
+
+<script>
+<% refresh_timestamp("plc_dev_config") %>
+<% save_timestamp("plc_qos_mac_add", "plc_qos_mac_edit") %>
+var ts='<% cfg_get("plc_qos_mac_add") %>';
+
+<% plc_qos_mac_items() %>
+
+var add_edit_flag = "<% cfg_get("plc_qos_mac_flag") %>";
+var select_num = "<% cfg_get("plc_qos_mac_select") %>";
+
+function loadvalue()
+{
+	var cf = document.forms[0]
+	if(add_edit_flag == "edit")
+	{
+		var str = eval('qos_mac_Array' + select_num);
+		var each_info = str.split(' ');
+
+		cf.qos_mac_priority.value = each_info[0];
+		cf.plc_qos_mac_addr.value = each_info[1];
+	}
+}
+</script>
+
+<TR>
+	<TD nowrap align="left" width="20%">$qos_mac</TD>
+	<TD nowrap align="left"><input type="text" name="plc_qos_mac_addr" value="" maxlength="17" size="20" onKeyPress="return getkey('mac',event)"></TD>
+</TR>
+<TR>
+	<TD nowrap align="left">$qos_priority</TD>
+	<TD nowrap align="left"><select name="qos_mac_priority">
+				<option value="Highest">$qos_highest</option>
+				<option value="High">$qos_high</option>
+				<option value="Normal">$qos_normal</option>
+				<option value="Low">$qos_low</option>
+				</select>
+	</TD>
+</TR>
+$bluebar
+</TABLE>
+</div>
+
+</FORM>
+</BODY>
+</HTML>

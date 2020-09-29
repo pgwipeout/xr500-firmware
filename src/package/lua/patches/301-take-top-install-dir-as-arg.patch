@@ -1,0 +1,13 @@
+Index: lua-5.1.5/Makefile
+===================================================================
+--- lua-5.1.5.orig/Makefile	2017-05-01 19:49:02.542926522 +0100
++++ lua-5.1.5/Makefile	2017-05-01 19:50:00.262926536 +0100
+@@ -9,7 +9,7 @@
+ 
+ # Where to install. The installation starts in the src and doc directories,
+ # so take care if INSTALL_TOP is not an absolute path.
+-INSTALL_TOP= /usr/local
++INSTALL_TOP?= /usr/local
+ INSTALL_BIN= $(INSTALL_TOP)/bin
+ INSTALL_INC= $(INSTALL_TOP)/include
+ INSTALL_LIB= $(INSTALL_TOP)/lib

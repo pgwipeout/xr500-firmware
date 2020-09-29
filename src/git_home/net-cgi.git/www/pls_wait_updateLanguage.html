@@ -1,0 +1,68 @@
+<html>
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=<% lang_charset() %>" />
+<% hijack_language() %>
+<LINK rel="stylesheet" href="style/form.css">
+<LINK rel="stylesheet" type="text/css" href="style/formframe_wait.css">
+
+<script language="javascript" type="text/javascript">
+/* qutoe the script file funcs.js will increase the page loading time, and the page will show blank, so copy the 
+   function isCDLESS() isWIZARD() getText() here */
+function isCDLESS()
+{
+        var flag = top/* cant change */.location.href.indexOf("BRS_index.htm") > -1 ;
+        return flag;
+}
+
+function isWIZARD()
+{
+        var flag = top.location.href.indexOf("adv_index.htm") != -1&& top.setup_wizard_flag == 1;
+        return flag;
+}
+function getText(str1, str2)
+{
+        if ( typeof(str1) != "undefined" && (isCDLESS() || isWIZARD()))
+                return str1;
+        else
+                return str2;
+}
+function printText(str1, str2)
+{
+        document.write(getText(str1, str2));
+}
+function makeStr(strSize, fillChar)
+{
+	var temp = "";
+	for (i=0; i < strSize ; i ++)
+		temp = temp + fillChar;
+	return temp;
+}
+
+var delay_time = 15000; // 15 seconds
+
+function updateProgress()
+{
+	location.href="/change_language_result.htm";
+}
+
+function loadvalue()
+{
+	setTimeout("updateProgress()",delay_time);
+}
+</script>
+</head>
+<body onload="loadvalue()" style="background-color:#000">
+<div id="main" class="main">
+<form>
+<div id="formframe_wait_div" >
+<div><script>printText(bh_wait_update_lang, "$wait_update_lang");</script>
+<div class="loader">
+<svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+<circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+</svg></div></div></div>
+
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+Index: libubox-2016-11-29/lua/uloop.c
+===================================================================
+--- libubox-2016-11-29.orig/lua/uloop.c	2017-08-31 07:11:34.000000000 +0100
++++ libubox-2016-11-29/lua/uloop.c	2017-09-13 14:31:26.583279142 +0100
+@@ -360,6 +360,13 @@
+ 	proc->p.cb = ul_process_cb;
+ 	uloop_process_add(&proc->p);
+ 
++	/* add pid to metatable of userdata for easy killing */
++	lua_getmetatable(L,-1);
++	lua_pushstring(L, "pid");
++	lua_pushinteger(L, pid);
++	lua_settable( L, -3 );
++	lua_pop(L, 1);
++
+ 	return 1;
+ }
+ 

@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+</head>
+<body onLoad="check_bandwidth()">
+<% form_submit("apply", "BRS_set_bandwidth.html", "ookla_speedtest_cancel") %>
+
+<script>
+var wait_time = 0;
+var max_waiting = 120;
+function check_bandwidth()
+{
+	if(wait_time <= 20){
+		wait_time = wait_time + 2;
+		setTimeout("check_bandwidth()", 2000);
+		return;
+	}
+	$$.get("QOS_speedtest_result.htm", function(data){
+		var speed = new Array();
+		speed =  data.split(";");
+		if((speed[0] == "" || speed[1] == "") && wait_time < max_waiting){
+			wait_time = wait_time + 2;
+			setTimeout("check_bandwidth()", 2000);
+		}else
+			location.href = "BRS_set_bandwidth.html";
+	})
+}
+
+</script>
+<div id="container">
+	<div class="dialog-content">
+		 <div id="card-qos-internet" class="install-card">
+          <div class="logos">
+		  <img class="netgear-logo" src="images/svg/netgear.svg" onerror="this.onerror=null; this.src='images/duma-os.png'">
+		<% hijack_logo_title() %>
+          </div>
+		<div class="content">
+		<div class="qos">
+            <div class="qos-panel">
+		    <div class="desc-title"><script>document.write(bh_check_speed)</script></div>
+		    <div class="desc-text"><script>document.write(bh_checking_speed)</script></div>
+              <div class="loader">
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer">
+                      <div class="circle-clipper left">
+                        <div class="circle"></div>
+                      </div><div class="gap-patch">
+                        <div class="circle"></div>
+                      </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                      </div>
+                    </div>
+                  </div>
+              </div>                 
+
+            </div>
+		</div>
+		</div>
+			<div class="buttons">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" >
+				<span><script>document.write(bh_cancel_mark)</script></span>
+			</button>
+			</div>		
+		</div>
+	</div>
+</div>
+</form>
+</body>
+
+</html>

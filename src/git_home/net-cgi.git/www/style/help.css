@@ -1,0 +1,56 @@
+BODY {
+	padding: 16px;
+	background-color: #120203;
+  margin:auto; 
+  color: #ffffff;
+  font-family: 'Roboto', 'Noto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;   
+}
+
+::-webkit-scrollbar-corner,
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar {
+  width: 7.5px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.39);
+  border-radius: 2px;
+}
+           
+::-webkit-scrollbar:horizontal {
+  height: 7.5px;
+}			
+
+hr {
+  background: rgba(255,255,255,0.15);
+  height: 1px;
+  border: none;
+}
+
+a {
+  text-decoration: underline
+}
+
+P {
+	LIST-STYLE-POSITION: outside;
+}
+H1 {
+	FONT-WEIGHT: 500; FONT-SIZE: 20px;
+}
+
+H2 {
+	FONT-WEIGHT: 500;
+}
+
+UL {
+	LIST-STYLE-POSITION: outside;
+}
+OL {
+	LIST-STYLE-POSITION: outside;
+}
+.helpfile{ font-weight: Bold; color: #9d98ff; }

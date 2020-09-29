@@ -1,0 +1,101 @@
+// Utility Color Classes
+
+//.success {
+//
+//}
+
+// Google Color Palette defined: http://www.google.com/design/spec/style/color.html
+
+$netduma-red: (
+  "base":       #de1821,
+  "base-dark":  #54090d,
+  "base-darker":#120203,
+  "lighten-5":  #fdeaeb,
+  "lighten-4":  #f8c1c3,
+  "lighten-3":  #f3989b,
+  "lighten-2":  #ee6e73,
+  "lighten-1":  #ea454b,
+  "darken-1":   #d0181e,
+  "darken-2":   #b9151b,
+  "darken-3":   #a21318,
+  "darken-4":   #8b1014,  
+);
+
+$green: (
+  "base":       #4CAF50,
+  "lighten-5":  #E8F5E9,
+  "lighten-4":  #C8E6C9,
+  "lighten-3":  #A5D6A7,
+  "lighten-2":  #81C784,
+  "lighten-1":  #66BB6A,
+  "darken-1":   #43A047,
+  "darken-2":   #388E3C,
+  "darken-3":   #2E7D32,
+  "darken-4":   #1B5E20,
+  "accent-1":    #B9F6CA,
+  "accent-2":    #69F0AE,
+  "accent-3":    #00E676,
+  "accent-4":    #00C853
+);
+
+$shades: (
+  "black":        #000000,
+  "white":        #FFFFFF,
+  "transparent":  transparent
+);
+
+$colors: (
+  "netduma-red": $netduma-red,
+  "green": $green,
+  "shades": $shades
+) !default;
+
+
+// Color Classes
+
+@each $color_name, $color in $colors {
+  @each $color_type, $color_value in $color {
+    @if $color_type == "base" {
+      .#{$color_name} {
+        background-color: $color_value !important;
+      }
+      .#{$color_name}-text {
+        color: $color_value !important;
+      }
+    }
+    @else if $color_name != "shades" {
+      .#{$color_name}.#{$color_type} {
+        background-color: $color_value !important;
+      }
+      .#{$color_name}-text.text-#{$color_type} {
+        color: $color_value !important;
+      }
+    }
+  }
+}
+
+// Shade classes
+@each $color, $color_value in $shades {
+  .#{$color} {
+    background-color: $color_value !important;
+  }
+  .#{$color}-text {
+    color: $color_value !important;
+  }
+}
+
+
+// usage: color("name_of_color", "type_of_color")
+// to avoid to repeating map-get($colors, ...)
+
+@function color($color, $type) {
+  @if map-has-key($colors, $color) {
+    $curr_color: map-get($colors, $color);
+    @if map-has-key($curr_color, $type) {
+      @return map-get($curr_color, $type);
+    }
+  }
+  @warn "Unknown `#{name}` in $colors.";
+  @return null;
+}
+

@@ -1,0 +1,92 @@
+Index: haserl-0.9.35/src/h_lua.c
+===================================================================
+--- haserl-0.9.35.orig/src/h_lua.c	2015-02-15 22:16:35.000000000 +0000
++++ haserl-0.9.35/src/h_lua.c	2017-09-11 16:06:39.560861999 +0100
+@@ -83,17 +83,85 @@
+   buffer_add (buf, str, strlen (str));
+ }
+ 
++static void load_library(lua_State *L, const char *lib, const char* global)
++{
++  lua_getglobal( L, "require" );
++  lua_pushstring( L, lib );
++  lua_call(L, 1, 1);
++  lua_setglobal( L, global );
++}
++
++static void append_package_path(lua_State *L, const char *path)
++{
++  lua_getglobal( L, "package" );
++  lua_getfield( L, -1, "path" );
++  lua_pushstring( L, path );
++  lua_concat( L, 2 );
++  lua_setfield( L, -2, "path" );
++  lua_pop( L, 1 );
++}
++
++static void load_json(lua_State *L, const char *path, const char* global)
++{
++  lua_getglobal( L, "json" );
++  lua_getfield( L, -1, "load" );
++  lua_pushstring( L, path );
++  lua_call( L, 1, 1 );
++  lua_setglobal( L, global );
++  lua_pop( L, 1 );
++}
++
++/*
++* GET.lang determines lang, defaults to English.
++*/
++static void load_lang_table(lua_State *L){
++  char buffer[PATH_MAX];
++  #define LANG_PATH "/www/language/dumaoslang-%s.json"
++  snprintf( buffer, PATH_MAX, LANG_PATH, "en" );
++
++  lua_getglobal( L, "GET" );
++  lua_getfield( L, -1, "lang" );
++  if( lua_isstring( L, -1 ) ){
++    const char *lang = lua_tostring( L, -1 );
++    if( !strstr( lang, "." ) || !strstr( lang, "/" ) )
++      snprintf( buffer, PATH_MAX, LANG_PATH, lua_tostring( L, -1 ) );
++  }
++
++  lua_pop( L, 2 );
++
++  if( !access( buffer, F_OK ) ){
++    load_json( lua_vm, buffer, "i18n" );
++
++    /* allow i18n field to be accessed as read-only globals */
++    lua_getglobal( L, "_G" );
++    lua_newtable( L );
++    lua_getglobal( L, "i18n" );
++    lua_setfield( L, -2, "__index" );
++    lua_setmetatable( L, -2 );
++    lua_pop( L, 1 );
++  }
++}
++
+ void
+ lua_doscript (buffer_t * script, char *name)
+ {
+   int status;
+-  /* force the string to be null terminated */
+ 
++  /* load JSON library */
++  append_package_path( lua_vm, ";/dumaos/api/libs/?.lua" );
++  load_library( lua_vm, "json", "json" );
++
++  /* load translation */
++  load_lang_table( lua_vm );
++
++  /* force the string to be null terminated */
+   buffer_add (script, "\0", 1);
+ 
++  printf("content-type: text/html\r\n\r\n");
+   status = luaL_loadbuffer (lua_vm, (char *) script->data,
+ 			    strlen ((char *) script->data), name) ||
+-    lua_pcall (lua_vm, 0, LUA_MULTRET, 0);
++
++  lua_pcall (lua_vm, 0, LUA_MULTRET, 0);
+ 
+   if (status && !lua_isnil (lua_vm, -1))
+     {

@@ -1,0 +1,62 @@
+#!/bin/sh
+
+#
+# (C) 2017 NETDUMA Software
+# Kian Cross <kian.cross@netduma.com>
+# Iain Fraser <iainf@netduma.com>
+#
+
+export LD_PRELOAD="/dumaos/ngcompat/libconfighook.so"
+
+top_function=`echo '(function () {
+  function getTop(frameWindow) {
+    try {
+      var parentWindow = frameWindow.parent;
+
+      if (frameWindow.netgear_version !== undefined) {
+        return frameWindow;
+      }
+
+      if (parentWindow === frameWindow) {
+        return frameWindow;
+      }
+
+      if (parentWindow.origin !== frameWindow.origin) {
+        return frameWindow;
+      }
+
+      return getTop(parentWindow);
+    } catch (e) {
+      return top;
+    }
+  }
+
+  return getTop(window);
+})()' | tr -d '\n' | sed -u 's/  */ /g'` # Strips line breaks and multiple spaces.
+
+# ¢ character is just a random token,
+# chosen because very unlikely to have been
+# used anywhere else in the file.
+replace_top_sed_script="
+  s#\"multi_login.html\"#\"/multi_login.html\"#g
+  s#location.href=\"index.htm\"#location.href=\"/\"#g
+
+  s/top\.html/¢\.html/g
+  s/top\.css/¢\.css/g
+  s/top\.js/¢\.js/g
+  s/top\.htm/¢\.htm/g
+
+
+  s/top\./${top_function}\./g
+
+  s/¢\.html/top\.html/g
+  s/¢\.css/top\.css/g
+  s/¢\.js/top\.js/g
+  s/¢\.htm/top\.htm/g
+"
+
+if [ -n "$SOAPAction" -o -n "$SOAPACTION" -o -n "$SOAP_ACTION" ] ; then
+/usr/sbin/net-cgi-unfiltered "$@"
+else
+/usr/sbin/net-cgi-unfiltered "$@" | sed -u '/X-Frame-Options: SAMEORIGIN/d' | sed -u "$replace_top_sed_script"
+fi

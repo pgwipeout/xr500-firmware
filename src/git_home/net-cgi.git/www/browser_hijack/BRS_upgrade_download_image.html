@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+</head>
+<body onload="loadvalue()">
+<% form_submit("func", "BRS_upgrade_write_image.html", "write_image")%>
+<% save_timestamp("write_image", "hijack_save_time") %>
+<div id="container">
+	<div class="dialog-content">
+		<!--checking new formware-->
+          <div id="card-checking-for-updates" class="install-card">
+            <div class="logos">
+		    <img class="netgear-logo" src="images/svg/netgear.svg" onerror="this.onerror=null; this.src='images/duma-os.png'">
+		    <% hijack_logo_title() %>
+            </div>
+            <img class="card-image" src="images/svg/nighthawk-front.svg" onerror="this.onerror=null; this.src='images/robot.png'">
+	    <div class="content">
+		    <div class="desc-title"><script>document.write(bh_firmware_updating)</script></div>
+	     <div class="desc-text" id="upg_msg"></div>
+			
+		    <div class="loader" id="loader_img">
+			    <div class="preloader-wrapper small active">
+				    <div class="spinner-layer">
+					    <div class="circle-clipper left">
+						    <div class="circle"></div>
+						    </div><div class="gap-patch">
+						    <div class="circle"></div>
+						    </div><div class="circle-clipper right">
+						    <div class="circle"></div>
+					    </div>
+				    </div>
+			    </div>
+		    </div>
+            <div class="desc-text" id="wait_text"><script>document.write(bh_orbi_pls_wait);</script></div>
+		   </div>
+			<div class="buttons">
+				<button id="next_btn" class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return toInternet();" style="display:none;">
+					<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
+				</button>
+			</div>
+          </div>
+	</div>
+</div>
+<script>
+var ts="<% cfg_get("hijack_save_time") %>";
+var wan_status="<% detwan_valid() %>";//fix bug 25310,[Netgear]Auto-Update issue
+var ftp_status="<% detftp_valid() %>";//fix bug 26101
+var delay_time=2000;//msecs
+
+var percComplete = 0;
+
+function display_upg_fail(msg)
+{
+		document.getElementById("upg_msg").innerHTML = msg;
+		document.getElementById("next_btn").style.display = "";
+		document.getElementById("loader_img").style.display = "none";
+		document.getElementById("wait_text").style.display = "none";
+}
+
+function loadvalue()
+{
+	if(wan_status == 0 || ftp_status == 0)
+	{
+		display_upg_fail(bh_auto_fail_no_internet);
+	}
+	else
+		detec_status();
+}
+
+function createXMLHttpRequest()
+{
+        if(typeof XMLHttpRequest == "undefined")
+                XMLHttpRequest = function(){
+                        try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}
+                                catch(e){}
+                        try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}
+                                catch(e){}
+                        try{return new ActiveXObject("Msxml2.XMLHTTP");}
+                                catch(e){}
+                        return false;
+                }
+        return new XMLHttpRequest();
+}
+
+function detec_status()
+{
+	var url = "get_upgrade_status.txt?ts=" + new Date().getTime();
+	var xmlHttp = createXMLHttpRequest();
+	xmlHttp.onreadystatechange=function()
+	{
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200)
+		{
+			var result = xmlHttp.responseText;
+			var ret_info = result.split("*");
+			var img_status = ret_info[1];
+			var md5 = ret_info[2];
+
+			if (img_status < 1000)
+			{	
+				document.getElementById("upg_msg").innerHTML=bh_downloading_ver;		
+				setTimeout("detec_status()",delay_time);
+			}
+			else if (img_status >= 1000 && img_status < 2000)
+			{
+				percComplete = img_status - 1000;
+				if(percComplete >= 100 && md5 == 1 )
+				{	
+					document.getElementById("upg_msg").innerHTML=bh_downloading_ver;
+					document.forms[0].submit();
+				}
+				else
+				{
+					if( percComplete >= 100 )
+						percComplete = 99;
+					document.getElementById("upg_msg").innerHTML=bh_downloading_ver;
+					setTimeout("detec_status()",delay_time);
+				}	
+			}
+			else if (img_status == 10008)
+			{
+				display_upg_fail(bh_upg_md5_check_error);
+			}
+			else if (img_status >= 10000)
+			{
+				display_upg_fail(bh_download_confile_fail);
+			}
+		}
+	}
+	xmlHttp.open("GET", url, true);
+	xmlHttp.send();
+}
+
+function toInternet()
+{
+	var cf = document.forms[0];
+	cf.action="/apply.cgi?/to_internet_no_auth.htm timestamp="+ts;
+	cf.submit_flag.value = "hijack_save_time";
+	cf.target = "_top";
+	return true;
+}
+</script>
+</form>
+</body>
+</html>

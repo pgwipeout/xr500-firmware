@@ -1,0 +1,53 @@
+<% http_header("style/form.css", "/funcs.js","style/formframe_wait.css") %>
+<style>
+body{
+margin: 0; border:none; background-color:#120203;background-image: url(../images/svg/bg.svg); background-attachment: fixed; background-size: cover; background-repeat: no-repeat; width:100%; height:100%
+}
+</style>
+<body>
+<script>
+var result="<% cat_rm_file("/tmp/umount_result") %>";
+
+try {
+	var dec_href = decodeURI(location.href);
+}
+catch(e) {
+	var dec_href = location.href;
+}
+getDevName=dec_href.indexOf("dev_name=",0);
+getOpenerUrl=dec_href.indexOf("opener=",0);
+len=dec_href.length-getDevName-9;
+opener_len=getDevName-getOpenerUrl-8;
+dev_name=dec_href.substr(getDevName+9,len);
+opener_url=dec_href.substr(getOpenerUrl+7,opener_len);
+//dev_name=dev_name.replace(/%20/g,"&nbsp;").replace(/%A0/g,"&nbsp;");
+
+if (result == "") {
+	setTimeout('refresh_page()', 3000);
+	document.write('<body style="background-color:black"">');
+	document.write('<div id="formframe_wait_div" >');
+        document.write('<div>$wizard_pls_wait ');
+        document.write('<div class="loader">');
+        document.write('<svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">');
+        document.write('<circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>');
+        document.write('</svg></div></div></div> ');
+        document.write('</body>');
+} else if (result == "0") {
+		if(opener.parent.have_green_download == 1 && (opener.parent.is_ru_version==1 || opener.parent.is_pr_version==1))
+		alert("$greendl_common_alert_halted");
+		document.write("$samba_remove_disk_ok");
+		opener.parent.formframe.location.href=opener_url;
+} else if (result == "1"){
+	document.write("$samba_remove_disk_failed");
+	opener.parent.formframe.location.href=opener_url;
+}
+
+function refresh_page()
+{
+	refresh_url = "USB_disk_rm.htm?opener=" + opener_url + "&dev_name=" + dev_name;
+	encodeURI(refresh_url);
+	location.href = refresh_url;
+}
+</script>
+</BODY>
+</HTML>
