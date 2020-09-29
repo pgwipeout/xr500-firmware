@@ -1,15 +1,24 @@
---- openssl-1.0.2h/Makefile.org	2016-05-26 14:12:33.000000000 +0800
-+++ openssl-1.0.2h.org/Makefile.org	2016-05-26 14:19:40.000000000 +0800
-@@ -154,7 +154,7 @@
+--- a/Makefile
++++ b/Makefile
+@@ -139,7 +139,7 @@ FIPSCANLIB=
+ 
+ BASEADDR=0xFB00000
+ 
+-DIRS=   crypto ssl engines apps test tools
++DIRS=   crypto ssl engines apps tools
+ ENGDIRS= ccgost
+ SHLIBDIRS= crypto ssl
+ 
+@@ -157,7 +157,7 @@ SDIRS=  \
  
  # tests to perform.  "alltests" is a special word indicating that all tests
  # should be performed.
 -TESTS = alltests
-+TESTS = 
++TESTS =
  
  MAKEFILE= Makefile
  
-@@ -168,7 +168,7 @@
+@@ -171,7 +171,7 @@ SHELL=/bin/sh
  
  TOP=    .
  ONEDIRS=out tmp
@@ -18,7 +27,7 @@
  WDIRS=  windows
  LIBS=   libcrypto.a libssl.a
  SHARED_CRYPTO=libcrypto$(SHLIB_EXT)
-@@ -271,7 +271,7 @@
+@@ -276,7 +276,7 @@ reflect:
  
  sub_all: build_all
  
@@ -27,7 +36,18 @@
  
  build_libs: build_libcrypto build_libssl openssl.pc
  
-@@ -523,7 +523,7 @@
+@@ -542,7 +542,7 @@ dist:
+ 	@$(MAKE) SDIRS='$(SDIRS)' clean
+ 	@$(MAKE) TAR='$(TAR)' TARFLAGS='$(TARFLAGS)' $(DISTTARVARS) tar
+ 
+-install: all install_docs install_sw
++install: all install_sw
+ 
+ install_sw:
+ 	@$(PERL) $(TOP)/util/mkdir-p.pl $(INSTALL_PREFIX)$(INSTALLTOP)/bin \
+--- a/Makefile.org
++++ b/Makefile.org
+@@ -540,7 +540,7 @@ dist:
  	@$(MAKE) SDIRS='$(SDIRS)' clean
  	@$(MAKE) TAR='$(TAR)' TARFLAGS='$(TARFLAGS)' $(DISTTARVARS) tar
  

@@ -261,9 +261,6 @@ load_qcawifi() {
 	region=`artmtd -r region | grep REGION | cut -d" " -f2`
 	[ "$region" = "US" ] && append umac_args "new_fcc_rule=1"
 
-	config_get specified_BDF qcawifi specified_BDF
-	[ "x$specified_BDF" = "xPR" ] && append umac_args "use_pr_bd=1"
-
 	find_qca_wifi_dir _qca_wifi_dir
 	for mod in $(cat ${_qca_wifi_dir}/33-qca-wifi*); do
 
@@ -301,6 +298,66 @@ unload_qcawifi() {
 	done
 }
 
+set_boarddata() {
+	local country_code="$1"
+
+	REGULATORY_DOMAIN=FCC_ETSI
+	IPQ4019_BDF_DIR=/lib/firmware/IPQ4019/hw.1
+	QCA9984_BDF_DIR=/lib/firmware/QCA9984/hw.1
+	QCA9888_BDF_DIR=/lib/firmware/QCA9888/hw.2
+
+	config_get wl_super_wifi qcawifi wl_super_wifi
+	config_get wla_super_wifi qcawifi wla_super_wifi
+	if [ "$wl_super_wifi" == "1" ] || [ "$wla_super_wifi" == "1" ]; then
+		REGULATORY_DOMAIN=SUPER_WIFI
+	else
+		case "$country_code" in
+			5001)
+				REGULATORY_DOMAIN=Canada
+				;;
+			5000)
+				REGULATORY_DOMAIN=AU
+				;;
+			412)
+				REGULATORY_DOMAIN=Korea
+				;;
+			356)
+				REGULATORY_DOMAIN=INS
+				;;
+			458|156|702|764)
+				REGULATORY_DOMAIN=SRRC
+				;;
+		esac
+	fi
+
+	if [ -d $IPQ4019_BDF_DIR/$REGULATORY_DOMAIN ]; then
+		/bin/cp -f $IPQ4019_BDF_DIR/$REGULATORY_DOMAIN/* $IPQ4019_BDF_DIR/
+	elif ([ "$wl_super_wifi" == "1" ] || [ "$wla_super_wifi" == "1" ]) &&
+	     [ -d $IPQ4019_BDF_DIR/SRRC ]; then
+		/bin/cp -f $IPQ4019_BDF_DIR/SRRC/* $IPQ4019_BDF_DIR/
+	elif [ -d $IPQ4019_BDF_DIR/FCC_ETSI ]; then
+		/bin/cp -f $IPQ4019_BDF_DIR/FCC_ETSI/* $IPQ4019_BDF_DIR/
+	fi
+
+	if [ -d $QCA9984_BDF_DIR/$REGULATORY_DOMAIN ]; then
+		/bin/cp -f $QCA9984_BDF_DIR/$REGULATORY_DOMAIN/* $QCA9984_BDF_DIR/
+	elif ([ "$wl_super_wifi" == "1" ] || [ "$wla_super_wifi" == "1" ]) &&
+	     [ -d $QCA9984_BDF_DIR/SRRC ]; then
+		/bin/cp -f $QCA9984_BDF_DIR/SRRC/* $QCA9984_BDF_DIR/
+	elif [ -d $QCA9984_BDF_DIR/FCC_ETSI ]; then
+		/bin/cp -f $QCA9984_BDF_DIR/FCC_ETSI/* $QCA9984_BDF_DIR/
+	fi
+
+	if [ -d $QCA9888_BDF_DIR/$REGULATORY_DOMAIN ]; then
+		/bin/cp -f $QCA9888_BDF_DIR/$REGULATORY_DOMAIN/* $QCA9888_BDF_DIR/
+	elif ([ "$wl_super_wifi" == "1" ] || [ "$wla_super_wifi" == "1" ]) &&
+	     [ -d $QCA9888_BDF_DIR/SRRC ]; then
+		/bin/cp -f $QCA9888_BDF_DIR/SRRC/* $QCA9888_BDF_DIR/
+	elif [ -d $QCA9888_BDF_DIR/FCC_ETSI ]; then
+		/bin/cp -f $QCA9888_BDF_DIR/FCC_ETSI/* $QCA9888_BDF_DIR/
+	fi
+}
+
 
 disable_qcawifi() {
 	local device="$1"
@@ -328,7 +385,16 @@ disable_qcawifi() {
 			local parent=$(cat /sys/class/net/${dev}/parent)
 			[ -n "$parent" -a "$parent" = "$device" ] && { \
 				[ -f "/var/run/wifi-${dev}.pid" ] &&
-					kill "$(cat "/var/run/wifi-${dev}.pid")"
+					kill "$(cat "/var/run/wifi-${dev}.pid")" || {
+						pids=`ps | grep hostapd | grep "\-d\{1,4\}" | awk '{print $1}'`
+						for pid in $pids; do
+							found=`cat /proc/$pid/cmdline | grep ${dev}`
+							[ -n "$found" ] && {
+								echo "Kill debug enabled hostapd for interface ${dev}"
+								kill $pid
+							}
+						done
+					}
 				[ -f "/var/run/hostapd_cli-${dev}.pid" ] &&
 					kill "$(cat "/var/run/hostapd_cli-${dev}.pid")"
 				ifconfig "$dev" down
@@ -357,10 +423,21 @@ disable_qcawifi() {
 	return 0
 }
 
+reload_check_qcawifi() {
+    [ ! -d /sys/module/umac ] && {
+        echo "umac module is expected to be inserted, but not, so load WiFi modules again"
+        load_qcawifi
+    } || {
+        echo "No reload qcawifi modules"
+    }
+}
 
 enable_qcawifi() {
 	local device="$1"
 	echo "$DRIVERS: enable radio $1" >/dev/console
+
+	config_get country "$device" country
+	set_boarddata "$country"
 
 	config_get_bool module_reload qcawifi module_reload 1
 	if [ "$2" != "dni" ]; then	    # wifi up
@@ -372,8 +449,8 @@ enable_qcawifi() {
 		    sleep 3
 		    load_qcawifi
 		}
-	else				    # wlan up
-		echo "qcawifi modules are not reloaded"
+	else
+		reload_check_qcawifi
 	fi
 
 	find_qcawifi_phy "$device" || return 1
@@ -2230,6 +2307,118 @@ EOF
 	done
 }
 
+guest_lan_restricted_access()
+{
+    devices=$@
+    add=0
+    ETH_P_ARP=0x0806
+    ETH_P_RARP=0x8035
+    ETH_P_IP=0x0800
+    ETH_P_IPv6=0x86dd
+    IPPROTO_ICMP=1
+    IPPROTO_UDP=17
+    IPPROTO_ICMPv6=58
+    DHCPS_DHCPC=67:68
+    DHCP6S_DHCP6C=546:547
+    PORT_DNS=53
+
+    bridge="$(/bin/config get lan_ifname)" #byod and guest br
+    ip_addr=$(ifconfig $bridge |awk -F '[ :]+' 'NR==2 {print $4}')
+    netmask=$(ifconfig $bridge |awk -F '[ :]+' 'NR==2 {print $8}')
+
+    if [ -z $ip_addr ]; then
+        echo "NO IP INPUT"
+        return
+    fi
+
+    mask=0
+    ip=0
+    CIDR=0
+    for var in 1 2 3 4
+    do
+        cnt=$(echo $netmask | awk -F '.' '{print $'$var'}')
+        ipt=$(echo $ip_addr | awk -F '.' '{print $'$var'}')
+        if [ "$cnt" -gt 255 -o "$cnt" -lt 0 -o "$ipt" -gt 255 -o "$ipt" -lt 0 ]; then
+            return
+        fi
+        mask=$(( mask + (cnt << (4-var)*8) ))
+        ip=$(( ip + (ipt << (4-var)*8) ))
+    done
+
+    for var in $(seq 31 -1 0)
+    do
+        cnt=$((mask & (1 << var) ))
+        [ $cnt -eq 0 ] && break
+        CIDR=$((CIDR + 1))
+    done
+
+    ip=$(( ip & (0xffffffff << (32 - CIDR))))
+    ip1=$((ip >> 24 & 0xff))
+    ip2=$((ip >> 16 & 0xff))
+    ip3=$((ip >> 8 & 0xff))
+    ip4=$((ip & 0xff))
+
+    subnet=$ip1.$ip2.$ip3.$ip4/$CIDR
+
+    ebtables -P FORWARD ACCEPT
+    ebtables -L | grep  "GUEST" |grep "j" > /tmp/wifi_rules
+    while read loop
+    do
+        ebtables -D INPUT $loop 2>/dev/null >/dev/null
+        ebtables -D FORWARD $loop 2>/dev/null >/dev/null
+    done < /tmp/wifi_rules
+    rm  /tmp/wifi_rules
+    ebtables -X GUEST
+
+    ebtables -N GUEST
+    ebtables -P GUEST DROP
+    ebtables -A GUEST -p "$ETH_P_ARP" -j ACCEPT
+    ebtables -A GUEST -p "$ETH_P_RARP" -j ACCEPT
+    ebtables -A GUEST -p $ETH_P_IPv6 --ip6-proto "$IPPROTO_UDP" --ip6-dport "$PORT_DNS" -j ACCEPT
+    ebtables -A GUEST -p $ETH_P_IPv6 --ip6-proto "$IPPROTO_UDP" --ip6-dport "$DHCP6S_DHCP6C" -j ACCEPT
+    ebtables -A GUEST -p $ETH_P_IP --ip-proto "$IPPROTO_UDP" --ip-dport "$PORT_DNS" -j ACCEPT
+    ebtables -A GUEST -p $ETH_P_IP --ip-proto "$IPPROTO_UDP" --ip-dport "$DHCPS_DHCPC" -j ACCEPT
+
+# del old ipv6 rule
+    ebtables -L | grep  "DROP" |grep "IPv" > /tmp/wifi_rules
+    while read loop
+    do
+        ebtables -D INPUT $loop 2>/dev/null >/dev/null
+        ebtables -D FORWARD $loop 2>/dev/null >/dev/null
+    done < /tmp/wifi_rules
+    rm  /tmp/wifi_rules
+
+    lan_ipaddr=$(ifconfig $bridge | grep "inet addr" |awk '{print $2}'|awk -F ':' '{print $2}')
+    lan_ipv6addr=$(ifconfig $bridge | grep Scope:Link | awk '{print $3}' | awk -F '/' '{print $1}')
+    lan_globalipv6addr=$(ifconfig $bridge | grep Scope:Global | awk '{print $3}' | awk -F '/' '{print $1}')
+
+    for device in ${devices}; do
+    config_get vifs "$device" vifs
+    for vif in $vifs; do
+            config_get_bool lan_restricted "$vif" lan_restricted
+            if [ "$lan_restricted" = "1" ]; then
+                config_get ifname "$vif" ifname
+        if [ "x$subnet" != "x" ]; then
+            ebtables -A FORWARD -p IPv4 -i "$ifname" --ip-dst "$subnet" -j GUEST
+            ebtables -A INPUT -p IPv4 -i "$ifname" --ip-dst "$subnet" -j GUEST
+            add=1
+        fi
+        for ipv6addr in $lan_globalipv6addr; do 
+            ebtables -A INPUT -i "$ifname" -p "$ETH_P_IPv6" --ip6-dst "$ipv6addr" -j DROP
+            ebtables -A FORWARD -p IPv6 -i "$ifname" --ip6-dst "$ipv6addr" -j GUEST
+            # ebtables -A INPUT -p IPv6 -i "$ifname" --ip6-dst "$ipv6addr" -j GUEST # useless as will be dropped by previous rule, i.e., two line above
+        done
+        ebtables -A INPUT -i "$ifname" -p "$ETH_P_IPv6" --ip6-dst "$lan_ipv6addr" -j DROP
+        ebtables -A INPUT -i "$ifname" -p "$ETH_P_IP" --ip-dst "$lan_ipaddr" -j DROP
+        ebtables -A FORWARD -i "$ifname" -p "$ETH_P_IPv6" --ip6-dst "$lan_ipv6addr" -j GUEST
+            fi
+    done
+    done
+
+    if [ $add -eq 0 ]; then
+        ebtables -X GUEST
+    fi
+}
 wl_lan_restricted_access()
 {
     devices=$@
@@ -2285,6 +2474,19 @@ wl_lan_restricted_access()
         done
     done
 
+# del old ipv6 rule
+    ebtables -L | grep  "DROP" |grep "IPv" > /tmp/wifi_rules
+    while read loop
+    do
+        ebtables -D INPUT $loop 2>/dev/null >/dev/null
+        ebtables -D FORWARD $loop 2>/dev/null >/dev/null
+    done < /tmp/wifi_rules
+    rm  /tmp/wifi_rules
+
+    lan_ipaddr=$(ifconfig $bridge | grep "inet addr" |awk '{print $2}'|awk -F ':' '{print $2}')
+    lan_ipv6addr=$(ifconfig $bridge | grep Scope:Link | awk '{print $3}' | awk -F '/' '{print $1}')
+    lan_globalipv6addr=$(ifconfig $bridge | grep Scope:Global | awk '{print $3}' | awk -F '/' '{print $1}')
+
     for device in ${devices}; do
         config_get vifs "$device" vifs
         for vif in $vifs; do
@@ -2301,6 +2503,8 @@ wl_lan_restricted_access()
             fi
         done
     done
+# Add for Guest restriction, # bug 83529
+    guest_lan_restricted_access "${devices}"
 }
 
 clear_wifi_ebtables()
@@ -2335,4 +2539,14 @@ clear_wifi_ebtables()
         ebtables -D FORWARD $loop;
     done < /tmp/wifi_rules
     rm  /tmp/wifi_rules
+}
+
+lan_restricted_access_qcawifi()
+{
+    wl_lan_restricted_access $@
+}
+
+clear_lan_restricted_access_qcawifi()
+{
+    clear_wifi_ebtables
 }

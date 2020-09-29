@@ -180,6 +180,50 @@ static inline bool ecm_front_end_acceleration_rejected(struct sk_buff *skb)
 	return false;
 }
 
+/*
+ * ecm_front_end_flow_and_return_directions_get()
+ *	Gets the flow and return flows directions respect to conntrack entry.
+ */
+static inline void ecm_front_end_flow_and_return_directions_get(struct nf_conn *ct, ip_addr_t flow_ip, int ip_version, int *flow_dir, int *return_dir)
+{
+	ip_addr_t ct_src_ip;
+
+	if (ip_version == 4) {
+		uint32_t flow_ip_32;
+		uint32_t ct_src_ip_32;
+		ECM_NIN4_ADDR_TO_IP_ADDR(ct_src_ip, ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3.ip);
+
+		/*
+		 * Print the IP addresses for debug purpose.
+		 */
+		ECM_IP_ADDR_TO_HIN4_ADDR(flow_ip_32, flow_ip);
+		ECM_IP_ADDR_TO_HIN4_ADDR(ct_src_ip_32, ct_src_ip);
+		DEBUG_TRACE("flow_ip: %pI4h ct_src_ip: %pI4h\n", &flow_ip_32, &ct_src_ip_32);
+	} else if (ip_version == 6) {
+		ECM_NIN6_ADDR_TO_IP_ADDR(ct_src_ip, ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3.in6);
+
+		/*
+		 * Print the IP addresses for debug purpose.
+		 */
+		DEBUG_TRACE("flow_ip: " ECM_IP_ADDR_OCTAL_FMT " ct_src_ip: " ECM_IP_ADDR_OCTAL_FMT "\n",
+				ECM_IP_ADDR_TO_OCTAL(flow_ip), ECM_IP_ADDR_TO_OCTAL(ct_src_ip));
+	} else {
+		DEBUG_ASSERT(NULL, "Invalid ip version");
+	}
+
+	if (ECM_IP_ADDR_MATCH(ct_src_ip, flow_ip)) {
+		*flow_dir = IP_CT_DIR_ORIGINAL;
+		*return_dir = IP_CT_DIR_REPLY;
+		DEBUG_TRACE("flow_ip and ct_src_ip match\n");
+	} else {
+		*flow_dir = IP_CT_DIR_REPLY;
+		*return_dir = IP_CT_DIR_ORIGINAL;
+		DEBUG_TRACE("flow_ip and ct_src_ip do not match\n");
+	}
+
+	DEBUG_TRACE("flow_dir: %d return_dir: %d\n", *flow_dir, *return_dir);
+}
+
 extern void ecm_front_end_conntrack_notifier_stop(int num);
 extern int ecm_front_end_conntrack_notifier_init(struct dentry *dentry);
 extern void ecm_front_end_conntrack_notifier_exit(void);

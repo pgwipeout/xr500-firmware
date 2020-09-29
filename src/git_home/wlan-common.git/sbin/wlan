@@ -432,6 +432,21 @@ wifi_mac() {
 	}
 }
 
+wifi_lanrestrict() {
+    local enable=${2}
+    for driver in ${DRIVERS}; do
+            if [ "$enable" = "on" ]; then
+                    if eval "type lan_restricted_access_${driver}" 2>/dev/null >/dev/null; then
+                            eval "lan_restricted_access_${driver}" "$DEVICES"
+                    fi
+            elif [ "$enable" = off ]; then
+                    if eval "type clear_lan_restricted_access_${driver}" 2>/dev/null >/dev/null; then
+                            eval "clear_lan_restricted_access_${driver}"
+                    fi
+            fi
+    done
+}
+
 show_usage() {
     cat <<EOF
 Usage: wlan <command> [<arguments>]
@@ -480,5 +495,6 @@ case "$1" in
 	up) wifi_updown "enable" "$2";;
 	statistic ) wifi_statistic ;;
 	mac ) wifi_mac ;;
+	lanrestrict) wifi_lanrestrict "$@";;
 	*) show_usage ;;
 esac

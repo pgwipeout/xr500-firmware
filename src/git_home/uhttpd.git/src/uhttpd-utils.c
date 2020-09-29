@@ -847,6 +847,46 @@ struct auth_realm * uh_auth_add(char *path, char *user, char *pass)
 	return NULL;
 }
 
+int have_invalid_char(char *str)
+{
+	char *p;
+
+	p = str;
+
+	if(p)
+	{
+		if(strstr(p, "/bin/") || 
+			strstr(p, "/sbin/") ||
+			strstr(p, "/etc/") ||
+			strstr(p, "/../")
+			)
+			return 1;
+
+		while (*p)
+		{
+			if(*p == '\'' || *p == '`')
+				return 1;
+
+			p++;
+		}	
+	}
+
+	return 0;
+}
+
+int is_invalid_param(char *file, char *host, char *remote_addr, char *auth, char *cookie)
+{
+	if( have_invalid_char(file) ||
+			have_invalid_char(host) ||
+			have_invalid_char(remote_addr) ||
+			have_invalid_char(auth) ||
+			have_invalid_char(cookie)
+	  )
+		return 1;
+	else
+		return 0;
+}
+
 int uh_cgi_auth_check(
 		struct client *cl, struct http_request *req, struct path_info *pi,
 		int ignorepath, int islua
@@ -921,9 +961,18 @@ int uh_cgi_auth_check(
 
 		}
 
-		file = req->url;
+		if (pi)
+			file = pi->phys;
+		else
+			file = req->url;
 
-		snprintf(command, sizeof(command), "net-cgi -a -f %s -n '%s' -d %s -p '%s' -k%s", file, host?:"", remote_addr, auth?:"", cookie?:"");
+		
+		if( is_invalid_param(file, host, remote_addr, auth, cookie))
+		{
+			ret = AUTH_TIMEOUT;
+			goto resp;
+		}
+		snprintf(command, sizeof(command), "net-cgi -a -f '%s' -n '%s' -d '%s' -p '%s' -k'%s'", file, host?:"", remote_addr, auth?:"", cookie?:"");
 
 		debug_printf("authdebug", "uhttpd-----------%s\n", command);	
 		fp = popen(command, "r");
@@ -941,6 +990,7 @@ int uh_cgi_auth_check(
 		else
 			ret = AUTH_TIMEOUT;
 
+resp:		
 		if( ret == AUTH_OK )
 			return 1;
 		else if( ret == AUTH_MULTI )

@@ -466,14 +466,14 @@ static void uh_dispatch_dumaos_static_request(
 	if( !uh_cgi_auth_check(cl, req, pin, 1, 0) )
 		return;
 
-	if( !strstr(pin->phys, "/www/nd-js/") ){
+//	if( !strstr(pin->phys, "/www/nd-js/") ){
 		for( i = 0; i < ( sizeof( ND_i18n_extensions ) / sizeof( char* ) ); i++ ){
 			if( strstr(pin->name, ND_i18n_extensions[i]) ){
 				do_uh_cgi_request( cl, req, pin, NULL, conf, argv[0], argv);
 				return;
 			}
 		}
-	}
+//	}
 
 	uh_file_request(cl, req, pin);
 }
@@ -489,7 +489,7 @@ static void uh_dispatch_request(
 		"/desktop/",
 		"/json/",
 		"/libs/",
-	/*	"/www/css", */
+		"/css",
 		"/custom-elements/"
 	};
 

@@ -32,7 +32,7 @@ bh_plz_wait_process="此程序可能需要一到兩分鐘；請稍候..."
 //BRS_03A_A_noWan.html
 bh_no_cable="路由器的網際網路連接埠未插入乙太網路纜線。"
 
-bh_wizard_setup_nowan_check="請務必將纜線牢固插入寬頻數據機連接埠和路由器的網際網路連接埠。"
+bh_wizard_setup_nowan_check="確認纜線穩固地插入寬頻數據機連接埠，以及路由器的網際網路連接埠。"
 
 bh_click_try_again="檢查乙太網路纜線後，請按一下<b>重試</b>。"
 
@@ -615,7 +615,7 @@ bh_ssid_not_allowed="該字元不允許用於 SSID。"
 //orbi
 bh_orbi_check_conn="Checking for Internet connection."
 bh_orbi_nowan="路由器的網際網路連接埠未插入乙太網路纜線。"
-bh_orbi_nowan_msg="請務必將纜線牢固插入寬頻數據機連接埠和路由器的網際網路連接埠。"
+bh_orbi_nowan_msg="確認纜線穩固地插入寬頻數據機連接埠，以及路由器的網際網路連接埠。"
 bh_orbi_tryagain_msg="Do you want NETGEAR installation assistant to try again?"
 bh_orbi_next_mark="NEXT"
 bh_orbi_config_conn="Configuring Your Internet Connection"
@@ -626,7 +626,7 @@ bh_orbi_help_choice_no="No, manually enter settings,"
 bh_orbi_help_choice2="I want to manually enter the configuration settings using the NETGEAR installation assistant."
 bh_orbi_help_choice_save="No, use saved settings,"
 bh_orbi_help_choice3="我想載入儲存的路由器配置設定。"
-bh_orbi_nowan_msg1="請務必將纜線牢固插入寬頻數據機連接埠和路由器的網際網路連接埠。"
+bh_orbi_nowan_msg1="確認纜線穩固地插入寬頻數據機連接埠，以及路由器的網際網路連接埠。"
 bh_orbi_nowan_msg2="After you check the Ethernet cable, click the <b>TRY AGAIN</b> button."
 bh_orbi_tryagain_mark="TRY AGAIN"
 bh_orbi_pppoe_conn="偵測到 PPPoE 網際網路連線"

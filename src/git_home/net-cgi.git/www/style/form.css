@@ -544,6 +544,387 @@ cursor:pointer;
 
 .msg_nousb{ float:left; height:22px; line-height:22px; margin-left: 5px; color:#FF0000;}
 .download_bts{float:right; text-align:left; width:65%}
+sterBt {
+  cursor: pointer;
+  color: rgb(166,38,37);
+}
+#forgetBt{
+  cursor: pointer;
+  color: rgb(166,38,37);
+}
+.funjsq{
+  margin-left: 130px;
+  margin-top: 50px;
+  float: left;
+  position: absolute;
+}
+.funjsq_tab{
+  text-align: center;
+}
+.funjsq_tab input[type="text"],
+.funjsq_tab input[type="password"]{
+  margin: 3px;
+  height: 20px;
+  width: 180px;
+}
+.plz_wait {
+  /*margin-top: -400px;*/
+  margin-left: -80px;
+  font-size: 15px;
+}
+.funjsq_title{
+  font-size:  23px;
+  font-weight: bold;
+  margin: 15px 50px;
+}
+.funjsq_title2{
+  font-size: 16px;
+  margin: 8px 20px;
+}
+.funjsq_type{
+  width: 560px;
+  height: 380px;
+  background: rgb(141,141,141);
+  margin-left: -100px;
+  border-radius: 8px;
+}
+.funjsq_select{
+  width: 56%;
+  float: left;
+  height: 96%;
+  margin: 4px 0 0 4px;
+  background: rgb(241,241,241);
+  border-radius: 8px;
+}
+.funjsq_sel{
+  margin: 4px 15px;
+}
+.funjsq_service{
+  width: 40%;
+  float: right;
+  height: 96%;
+  margin: 4px 4px 0 0;
+  background: rgb(241,241,241);
+  border-radius: 8px;
+}
+.funjsq_pay{
+  margin: 80px 0 0 100px;
+  width: 460px;
+  height: 300px;
+  border-style: solid;
+  border-color: #1965b1;
+}
+.funjsq_pay div:first-child {
+  float: right;
+  font-size: 18px;
+  margin: 55px 90px;
+}
+.funjsq_pay span {
+  float: right;
+  font-size: 14px;
+  margin: -35px 72px;
+}
+#funjsq_account{
+  height: 55px;
+  width: 180px;
+  margin: 20px 0 8px 15px;
+}
+#account_info{
+  width: 90px;
+  float: left;
+  margin-top: 30px;
+}
+#pay_bt{
+  background: rgb(166,62,3);
+  width: 32px;
+  float: left;
+  margin-top: 30px;
+  text-align: center;
+}
+.funjsq_bt{
+  background: rgb(117,150,5);
+  border-radius: 5px;
+  color: rgb(208,232,122);
+  height: 40px;
+  margin: 6px 0px;
+}
+.funjsq_bt.disabled {
+  background: gray;
+  color: white;
+}
+#funjsq_start_bt{
+  margin: 6px 0 15px 210px;
+}
+#funjsq_service_bt{
+  margin: 10px 80px;
+}
+#funjsq_icon1{
+  background: rgba(0,0,0,0) url("../image/funjsq_icon.gif") no-repeat scroll 0 0;
+  height: 50px;
+  width: 50px;
+  float: left;
+}
+.funjsq_pay_title{
+  font-size: 18px;
+  margin: 30px 0px 10px 0px;
+}
+.funjsq_pay_subtitle{
+  width: 65px;
+  background: grey;
+  border-radius: 8px;
+  margin: 5px;
+  color: white;
+  text-align: center;
+}
+.funjsq_pay_sel{
+  width: 400px;
+  margin-top: 10px;
+}
+.funjsq_pay_opt{
+  float: left;
+  font-size: 15px;
+  margin-left: 15px;
+}
+.funjsq_pay_div{
+  height: 50px;
+}
+.funjsq_pay_type{
+  width: 400px;
+  height: 320px;
+  background: rgb(141,141,141);
+  border-radius: 8px;
+}
+/*funjsq_pay2.htm*/
+.tab {
+  top: 2px;
+  bottom: 3px;
+  width: 100%;
+  overflow: auto;
+  position: absolute;
+}
+.tab ul {
+  list-style: none outside none;
+}
+.tab h1 {
+  color: #0db59c;
+  margin-left: 40px;
+  font-size: 1.2rem;
+}
+.pay li {
+  margin: 0.5rem 0;
+}
+.pay li p > em {
+  background: none repeat scroll 0 0 #aaa;
+  border-radius: 10px;
+  color: #fff;
+  padding: 0 0.4rem;
+}
+.pay li > span.active {
+  border: 3px solid #1965b1;
+  color: #1965b1;
+}
+.pay li > span{
+  border: 3px solid #e5e5e5;
+  display: inline-block;
+  margin: 0.2rem;
+  padding: 0.4rem 0.8rem;
+}
+.pay span {
+  font-size: 0.8rem;
+}
+.pay .text p:nth-last-child(1){
+  color: #999;
+}
+.pay .text p span {
+  color: #72a7c3;
+}
+.pay p {
+  margin: 0.4rem 0;
+}
+.sum {
+  border-bottom: 1px solid #ccc;
+  display: inline-block;
+  line-height: 1rem;
+}
+.sum b {
+  font-size: 1.5rem;
+  margin: 0 0.3rem;
+  color: #f74d4a;
+}
+.payButton > input{
+  background: none repeat scroll 0 0 #1965b1;
+  border-radius: 8px;
+  color: #fff;
+  display: block;
+  font-size: 1rem;
+  margin: 1.2rem auto;
+  padding:0.2rem 0.8rem;
+  position: relative;
+}
+#payTrouble {
+  background: none repeat scroll 0 0 rgb(255,210,0);
+  color: black;
+  font-size: 1.0rem;
+  padding:0.4rem 1.5rem;
+  margin-left: 100px;
+  margin-top: 90px;
+}
+#payFinish {
+  background: none repeat scroll 0 0 #1965b1;
+  color: white;
+  font-size: 1.0rem;
+  margin: 1.4rem auto;
+  padding:0.4rem 1.5rem;
+}
+.payButton {
+  margin-left: 250px;
+  width: 170px;
+}
+#returnBt {
+  float: left;
+}
+#payBt {
+  float: right;
+}
+.alipay {
+  background: url("../image/alipay.jpg") no-repeat scroll 50% 50% / 80% auto rgba(0,0,0,0);
+  text-indent: -9999px;
+  width: 6rem;
+}
+.icon_fail {
+  background: rgba(0,0,0,0) url("../image/funjsq_icon.gif") no-repeat scroll -70px 0;
+  height: 84px;
+  width: 84px;
+  margin: 15px 50px;
+}
+.icon_access {
+  background: rgba(0,0,0,0) url("../image/funjsq_icon.gif") no-repeat scroll -155px 0;
+  height: 84px;
+  width: 84px;
+  margin: 10px 50px;
+}
+.icon_success {
+  background: rgba(0,0,0,0) url("../image/funjsq_icon.gif") no-repeat scroll -240px 0;
+  height: 84px;
+  width: 84px;
+  margin: 15px 50px;
+}
+.progress {
+  position: absolute;
+  z-index: 100;
+  margin-top: 38px;
+  margin-left: 30px;
+}
+#pluginBt {
+  margin-left: 50px;
+}
+#status_info {
+  font-size: 13px;
+  color: rgb(0,156,225);
+}
+#WeChatImg {
+  width: 170px;
+  float: right;
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+.pay_alert {
+  margin-top: 95px;
+}
+#payIssueImg {
+  width: 80px;
+  float: left;
+  position: absolute;
+  left: 140px;
+  top: 130px;
+}
+.circleProgress_wrapper{
+  width: 84px;
+  height: 84px;
+  margin: 23px auto;
+  position: relative;
+}
+
+.wrapper{
+  width: 42px;
+  height: 87px;
+  position: absolute;
+  top:0;
+  overflow: hidden;
+}
+.right{
+  right:0;
+}
+.left{
+  left:0;
+}
+.circleProgress{
+  width: 67px;
+  height: 67px;
+  border:10px solid rgb(241,241,241);
+  border-radius: 50%;
+  position: absolute;
+  top:0;
+  -webkit-transform: rotate(45deg);
+}
+.rightcircle{
+            border-top:10px solid rgb(150,197,238);
+            border-right:10px solid rgb(150,197,238);
+            right:0;
+            -webkit-animation: circleProgressLoad_right 30s linear infinite;
+}
+.leftcircle{
+  border-bottom:10px solid rgb(150,197,238);
+  border-left:10px solid rgb(150,197,238);
+  left:0;
+  -webkit-animation: circleProgressLoad_left 30s linear infinite;
+}
+@-webkit-keyframes circleProgressLoad_right{
+  0%{
+                /*border-top:20px solid #ED1A1A;
+                border-right:20px solid #ED1A1A;*/
+                -webkit-transform: rotate(-135deg);
+  }
+  50%{
+               /* border-top:20px solid rgb(232, 232, 12);
+                border-right:20px solid rgb(232, 232, 12);
+                border-left:20px solid rgb(81, 197, 81);
+                border-bottom:20px solid rgb(81, 197, 81);*/
+                -webkit-transform: rotate(45deg);
+  }
+  100%{
+                /*border-left:20px solid green;
+                border-bottom:20px solid green;*/
+                -webkit-transform: rotate(45deg);
+  }
+}
+@-webkit-keyframes circleProgressLoad_left{
+  0%{
+                /*
+       border-bottom:20px solid #ED1A1A;
+                border-left:20px solid #ED1A1A;
+                */
+                -webkit-transform: rotate(-135deg);
+  }
+  50%{
+        /*
+                border-bottom:20px solid rgb(232, 232, 12);
+                border-left:20px solid rgb(232, 232, 12);
+                border-top:20px solid rgb(81, 197, 81);
+                border-right:20px solid rgb(81, 197, 81);
+        */
+                -webkit-transform: rotate(-135deg);
+  }
+  100%{
+        /*
+                border-top:20px solid green;
+                border-right:20px solid green;
+                border-bottom:20px solid green;
+                border-left:20px solid green;
+        */
+                -webkit-transform: rotate(45deg);
+  }
 
 table {
   font-size: inherit;

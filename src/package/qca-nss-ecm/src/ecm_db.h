@@ -23,6 +23,8 @@
 
 uint32_t ecm_db_time_get(void);
 void ecm_db_connection_defunct_all(void);
+void ecm_db_connection_decelerate_all(void);
+
 #ifdef ECM_DB_XREF_ENABLE
 void ecm_db_traverse_node_from_connection_list_and_decelerate(struct ecm_db_node_instance *node);
 void ecm_db_traverse_node_to_connection_list_and_decelerate(struct ecm_db_node_instance *node);

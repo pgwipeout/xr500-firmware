@@ -1,0 +1,113 @@
+From ddba41d50f5e0845012f36aa4355a0ad013f8432 Mon Sep 17 00:00:00 2001
+From: Pengyu Zhou <pengyu.zhou@dniserver.dnish.net>
+Date: Thu, 1 Feb 2018 06:53:07 -0500
+Subject: [PATCH] disable the insecure http, ftp download
+
+root cause: opkg update will try to download from http server of openwrt
+solution: change url, http -> https by force, disable ftp
+tested on: xr500
+
+Signed-off-by: Pengyu Zhou <pengyu.zhou@dniserver.dnish.net>
+---
+ libopkg/opkg_download.c |   38 +++++++++++++++++++++++++++++---------
+ libopkg/opkg_download.h |    2 ++
+ 2 files changed, 31 insertions(+), 9 deletions(-)
+
+diff --git a/libopkg/opkg_download.c b/libopkg/opkg_download.c
+index b0ad744..24af24a 100644
+--- a/libopkg/opkg_download.c
++++ b/libopkg/opkg_download.c
+@@ -91,8 +91,17 @@ opkg_download(const char *src, const char *dest_file_name,
+     char *src_with_query = NULL;
+     char *tmp_file_location;
+ 
+-    opkg_msg(NOTICE,"Downloading %s.\n", src);
++    if (str_starts_with(src, "ftp:")) {
++		opkg_msg(NOTICE,"Download from ftp server is not secure. It is forbidden.\n", src);
++		return -1; // ftp not secure, forbid
++	}
+ 
++	if (str_starts_with(src, "http://")) {
++		opkg_msg(NOTICE,"Downloading https://%s.\n", src + HTTP_CHARS_CNT);
++	} else {
++		opkg_msg(NOTICE,"Downloading %s.\n", src);
++	}
++		
+     if (str_starts_with(src, "file:")) {
+ 	const char *file_src = src + 5;
+ 	opkg_msg(INFO, "Copying %s to %s...", file_src, dest_file_name);
+@@ -101,7 +110,7 @@ opkg_download(const char *src, const char *dest_file_name,
+         free(src_basec);
+ 	return err;
+     }
+-
++		
+     sprintf_alloc(&tmp_file_location, "%s/%s", conf->tmp_dir, src_base);
+     free(src_basec);
+     err = unlink(tmp_file_location);
+@@ -110,31 +119,42 @@ opkg_download(const char *src, const char *dest_file_name,
+ 	free(tmp_file_location);
+ 	return -1;
+     }
+-
++		
+     if (conf->http_proxy) {
+ 	opkg_msg(DEBUG, "Setting environment variable: http_proxy = %s.\n",
+ 		conf->http_proxy);
+ 	setenv("http_proxy", conf->http_proxy, 1);
+     }
+-    if (conf->ftp_proxy) {
++	if (conf->ftp_proxy) {
+ 	opkg_msg(DEBUG, "Setting environment variable: ftp_proxy = %s.\n",
+ 		conf->ftp_proxy);
+ 	setenv("ftp_proxy", conf->ftp_proxy, 1);
+     }
+-    if (conf->no_proxy) {
++	if (conf->no_proxy) {
+ 	opkg_msg(DEBUG,"Setting environment variable: no_proxy = %s.\n",
+ 		conf->no_proxy);
+ 	setenv("no_proxy", conf->no_proxy, 1);
+     }
+-    if (conf->http_query &&
++	if (conf->http_query &&
+ 	(str_starts_with(src, "http://") || str_starts_with(src, "https://"))) {
+-	    sprintf_alloc(&src_with_query, "%s?%s", src, conf->http_query);
++		// http -> https by force
++		if (str_starts_with(src, "http://")) { 
++			sprintf_alloc(&src_with_query, "https://%s?%s", 
++						  src + HTTP_CHARS_CNT, conf->http_query);
++		} else {
++			sprintf_alloc(&src_with_query, "%s?%s", src, conf->http_query);
++		}
+ 		opkg_msg(DEBUG,"Setting http query: http_query = %s.\n",
+ 			conf->http_query);
+ 		opkg_msg(DEBUG, "URL with query: %s\n", src_with_query);
+     } else {
+-	    src_with_query = xstrdup(src);
+-    }
++		if (str_starts_with(src, "http://")) {
++			// http -> https by force
++			sprintf_alloc(&src_with_query, "https://%s", src + HTTP_CHARS_CNT);
++		} else {
++			src_with_query = xstrdup(src);
++		}
++	}
+ 
+ #ifdef HAVE_CURL
+     CURLcode res;
+diff --git a/libopkg/opkg_download.h b/libopkg/opkg_download.h
+index 91b990e..961eb7f 100644
+--- a/libopkg/opkg_download.h
++++ b/libopkg/opkg_download.h
+@@ -21,6 +21,8 @@
+ #include "config.h"
+ #include "pkg.h"
+ 
++#define HTTP_CHARS_CNT 7 // characters count in "http://"
++
+ typedef void (*opkg_download_progress_callback)(int percent, char *url);
+ typedef int (*curl_progress_func)(void *data, double t, double d, double ultotal, double ulnow);
+ 
+-- 
+1.7.4.1
+

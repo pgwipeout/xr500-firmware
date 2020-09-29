@@ -3745,6 +3745,41 @@ void ecm_db_connection_defunct_all(void)
 }
 EXPORT_SYMBOL(ecm_db_connection_defunct_all);
 
+
+
+/* decelerate
+ * ecm_db_connection_decelerate_all()
+ *	Decelerate all connections.
+ *
+ * Some userspace change requires all connections to go through the kernel
+ * again, e.g. reclassificaiton required.
+ */
+void ecm_db_connection_decelerate_all(void)
+{
+	struct ecm_db_connection_instance *ci, *cin;
+	struct ecm_front_end_connection_instance *feci;
+
+	DEBUG_INFO("Decelerating all\n");
+
+	/*
+	 * Iterate all connections
+	 */
+	ci = ecm_db_connections_get_and_ref_first();
+	while (ci) {
+		feci = ecm_db_connection_front_end_get_and_ref(ci);
+		if( feci && feci->decelerate )
+			feci->decelerate( feci );
+
+		cin = ecm_db_connection_get_and_ref_next(ci);
+
+		feci->deref(feci);
+		ecm_db_connection_deref(ci);
+		ci = cin;
+	}
+	DEBUG_INFO("Decelerating complete\n");
+}
+
+
 /*
  * ecm_db_connection_generate_hash_index()
  * 	Calculate the hash index.

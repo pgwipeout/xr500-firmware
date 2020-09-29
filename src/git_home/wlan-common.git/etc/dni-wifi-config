@@ -393,9 +393,6 @@ if [ -n "$DNI_CONFIG" ]; then
 
     eval country_code=\$country_code_`dniconfig get wl_country`
 
-    if [ "$country_code" = "156" ]; then
-        specified_BDF=PR
-    fi
     wps_device_name=`dniconfig get netbiosname`
     wl_dtim_wo_guest=`dniconfig get wl_dtim_wo_guest`
     wl_dtim_w_guest=`dniconfig get wl_dtim_w_guest`

@@ -4,7 +4,7 @@ XR500
 
 2) List the version number of the firmware/software that correlates with the open source code archive.
 
-XR500-V2.1.0.6
+XR500-V2.2.0.4
 
 7) List the main HW platform utilized such as CPU, main chipset, RF chipset, DSP, Switch IC¡­etc.
 
@@ -254,7 +254,7 @@ lvm2 2.02.91, GPL, No
 
 ncurses, 5.7, GPL, No
 
-openssl, 0.9.8p, GPL, Yes
+openssl, 1.0.2n, GPL, Yes
 
 sqlite3, 3.6.16, GPL, No
 

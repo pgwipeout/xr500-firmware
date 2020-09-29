@@ -40,6 +40,15 @@ mkdir -p /tmp/mnt
 ubinum=`ubinfo -a|grep overlay_volume -B 5 |grep "Volume ID" |awk '{print $5}' |cut -b 4`
 [ "x$ubinum" = "x" ] && ubinum=0
 mount -t ubifs ubi$ubinum:overlay_volume /tmp/overlay
+if [ $? -ne 0 ]; then
+	ubinize -m 2048 -p 128KiB -o /tmp/ubi.image /etc/netgear.cfg
+	mtdn=`grep netgear /proc/mtd | awk -F ':' '{print $1}' | awk -F 'd' '{print $2}'`
+	ubidetach /dev/ubi_ctrl -m $mtdn
+	flash_erase /dev/mtd$mtdn 0 0
+	nandwrite -p /dev/mtd$mtdn /tmp/ubi.image
+	ubiattach /dev/ubi_ctrl -m $mtdn
+	mount -t ubifs ubi$ubinum:overlay_volume /tmp/overlay
+fi
 mount -o move /tmp/overlay /overlay 2>&-
 if [ "x`cat /firmware_time`" != "x`cat /overlay/.firmware_time`" ]; then
 	crashmtd=`grep crashdump /proc/mtd | awk -F ':' '{print $1}' | awk -F 'd' '{print $2}'`

@@ -73,6 +73,7 @@ var broadband_wan_type="<% cfg_get("dango_det_wan_type") %>";
 var download_type = "<% cfg_get("download_type") %>";
 var wan_type="<% cfg_get("wan_proto") %>";
 
+var funjsq_no_need_login = "<% cfg_get("funjsq_no_need_login") %>";
 //Failover & Loadbalance
 var multi_wan_mode="none";  // none, multi
 var multi_wan_mode_ether="0";//0:unconfigured, 1:configured
@@ -177,10 +178,11 @@ function loadvalue()
 		<% advanced_sub_menu("rae", "sub_back", "rae_rm", "advanced_rae") %>
 		<% advanced_sub_menu("qos", "sub_back", "qos_head", "qos_setup", "qos") %>
 		<% advanced_sub_menu("devname", "sub_back", "edit_devname", "advanced_devname")%>
+		<% advanced_menu_funjsq() %>
 	</dl>
 	</div>
 	
-	<div id="moniter_bt" class="advanced_white_close_button" onclick="open_or_close_sub('moniter');"><b><span id="moniter">Monitoring</span></b></div>
+	<div id="moniter_bt" class="advanced_white_close_button" onclick="open_or_close_sub('moniter');"><b><span id="moniter">$monitoring_head</span></b></div>
 	<div id="moniter_sub" class="sub_men"  style="display: none">
 	<dl>
 		<% advanced_sub_menu("traffic", "sub_back", "traffic_head", "advanced_traffic", "traffic") %>

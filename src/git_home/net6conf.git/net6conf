@@ -152,6 +152,7 @@ start() {
 	#under ppoev6 we check if there is lan v6 ip,if no ,we reload the server.
 	local lan6_ip=`ifconfig $bridge |grep "inet6 addr" |grep -v "Link" |awk '{print $3}'`
 	[ "x$wan6_type" = "xpppoe" ] && [ "x$lan6_ip" = "x" ] && /etc/net6conf/6service reload 
+	[ "x$lan6_ip" != "x" ] && start_guest_lanrestrict
 
 	if [ "x$logo_test" = "x1" -a "x$wan6_type" = "xfixed" ]; then
 		local ip6_cmd="/usr/sbin/ip6tables"

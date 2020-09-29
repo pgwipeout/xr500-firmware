@@ -57,6 +57,11 @@
 #endif
 
 /*
+* DumaOS flags
+*/
+#define	DUMAOS_DISABLE_TURBO	0x1
+
+/*
  * Debug output levels
  * 0 = OFF
  * 1 = ASSERTS / ERRORS
@@ -1756,6 +1761,46 @@ unsigned int ecm_nss_ported_ipv4_process(struct net_device *out_dev, struct net_
 	struct ecm_classifier_process_response prevalent_pr;
 	int protocol = (int)orig_tuple->dst.protonum;
 	__be16 *layer4hdr = NULL;
+	uint32_t hiword,loword, qos_incident, qos_reflect;
+
+	/*
+	* NETDUMA Software patch
+        * Qdisc (as opposed to a class) always have a 0 minor number. It appears that the
+        * nss firmware operates differently to qdisc. Filters jump straight to qdisc instead
+        * of starting from the top and working down classes.
+        *
+        * Since the classificaiton always jumps to a qdisc the minor number will always
+        * be 0 and tehrefore redundant. Allowing us to use the following encoding:
+	*	HIWORD( skb->priority ) -> qdisc major number for LAN destined packets
+	*	LOWORD( skb->priority ) -> qdisc minor number for WAN destined packets
+	*/
+	hiword = ( skb->priority >> 16 ) & 0xffff;
+	loword = skb->priority & 0xffff;
+	if( !strcmp( "br0", out_dev->name ) ){
+		qos_incident = hiword << 16;
+		qos_reflect = loword << 16;
+	} else {
+		qos_incident = loword << 16;
+		qos_reflect = hiword << 16;
+	}
+	skb->priority = qos_incident;
+
+	/*
+	* NETDUMA Software DumaOS integration. Use fwmark over cmark precisely
+	* because it is *not* persistent. If some classifier intially decides that
+	* to disable turbo then later on allows turbo. With cmark it can't just
+	* reset the turbo field as another classifier may have set it. The solution
+	* is simple, everytime packet goes through router classifier wishing it not
+	* to be accelerated must set the turbo flag.
+	*/
+#if 0
+	if( ct && ( ct->mark & DUMAOS_DISABLE_TURBO ) )
+		return NF_ACCEPT;
+#else
+	if( skb && ( skb->mark & DUMAOS_DISABLE_TURBO ) )
+		return NF_ACCEPT;
+#endif
+
 
 	if (protocol == IPPROTO_TCP) {
 		/*
@@ -1766,11 +1811,19 @@ unsigned int ecm_nss_ported_ipv4_process(struct net_device *out_dev, struct net_
 			DEBUG_WARN("TCP packet header %p\n", skb);
 			return NF_ACCEPT;
 		}
+
+		/*
+		* DNI can request via DumaOS to toggle acceleration. That way when a feature such as
+		* service blocking is disabled we can allow hardware acceleration. Providing more
+		* flexibility for the user - @NETDUMA_Iain
+		*/
+#if 0
 		//DNI need these port pkt directly for blocksite.
 		if (ntohs(tcp_hdr->source) == 80 || ntohs(tcp_hdr->dest) == 80 ||
 			ntohs(tcp_hdr->source) == 119 || ntohs(tcp_hdr->dest) == 119) {
 			return NF_ACCEPT;
 		}
+#endif
 
 
 		layer4hdr = (__be16 *)tcp_hdr;
@@ -2352,10 +2405,10 @@ unsigned int ecm_nss_ported_ipv4_process(struct net_device *out_dev, struct net_
 	DEBUG_TRACE("%p: process begin, skb: %p\n", ci, skb);
 	prevalent_pr.process_actions = 0;
 	prevalent_pr.drop = false;
-	prevalent_pr.flow_qos_tag = skb->priority;
-	prevalent_pr.return_qos_tag = skb->priority;
 	prevalent_pr.accel_mode = ECM_CLASSIFIER_ACCELERATION_MODE_ACCEL;
 	prevalent_pr.timer_group = ci_orig_timer_group = ecm_db_connection_timer_group_get(ci);
+	prevalent_pr.flow_qos_tag = qos_incident;
+	prevalent_pr.return_qos_tag = qos_reflect;
 
 	assignment_count = ecm_db_connection_classifier_assignments_get_and_ref(ci, assignments);
 	for (aci_index = 0; aci_index < assignment_count; ++aci_index) {
@@ -2424,6 +2477,10 @@ unsigned int ecm_nss_ported_ipv4_process(struct net_device *out_dev, struct net_
 			prevalent_pr.timer_group = aci_pr.timer_group;
 		}
 
+                /*
+                * NETDUMA Software. Always use skb->priority for QoS tag.
+                */
+#if 0
 		/*
 		 * Qos tag (the last classifier i.e. the highest priority one) will 'win'
 		 */
@@ -2433,6 +2490,7 @@ unsigned int ecm_nss_ported_ipv4_process(struct net_device *out_dev, struct net_
 			prevalent_pr.flow_qos_tag = aci_pr.flow_qos_tag;
 			prevalent_pr.return_qos_tag = aci_pr.return_qos_tag;
 		}
+#endif
 
 #ifdef ECM_CLASSIFIER_DSCP_ENABLE
 		/*
@@ -2460,6 +2518,7 @@ unsigned int ecm_nss_ported_ipv4_process(struct net_device *out_dev, struct net_
 #endif
 	}
 	ecm_db_connection_assignments_release(assignment_count, assignments);
+
 
 	/*
 	 * Change timer group?

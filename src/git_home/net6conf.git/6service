@@ -345,6 +345,7 @@ write_config() {
 				$IP -6 addr add $glip/$prefix_len dev $bridge
 			fi
 		fi
+		start_guest_lanrestrict
 	fi
 }
 

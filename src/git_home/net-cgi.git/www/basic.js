@@ -451,6 +451,14 @@ function click_action(id)
 			basic_menu_color_change('internet');
 			goto_formframe('check_mobile_internet_wait.htm');
 		}
+		else if( id == "funjsq" )
+               {
+                       basic_menu_color_change('funjsq');
+                       if(funjsq_no_need_login != "1")
+                               goto_formframe("funjsq_login.htm");
+                       else
+                               goto_formframe("funjsq_select.htm");
+               }
 
         }
 }

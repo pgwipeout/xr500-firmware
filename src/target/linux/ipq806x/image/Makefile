@@ -5,25 +5,22 @@ include $(INCLUDE_DIR)/image.mk
 
 MODULE_NAME=XR500
 HW_VERSION=XR500
-FW_VERSION=V2.1.0.6
-LG_VERSION=V1.0.0.320
+FW_VERSION=V2.2.0.4
+LG_VERSION=V1.0.0.322
 CLOUD_VERSION=20171220
 HW_ID="29764958+0+256+512+4x4+4x4+cascade"
 ifndef FW_REGION
 	FW_REGION=""
 endif
 
-# 2015/03/19
-# Torby and Tony confirmed that Netgear have sent new requirement out to resize
-# whole kernel and rootfs to 32MB.
-# Leave 4MB to kernel and others will be reserved to rootfs and bad block.
-#
 # * page size = 2KB, block size = 128KB.
-# * kernel + rootfs = 32MB = 256 blocks
-# * bad blocks = 2MB = 16 blocks
+# * kernel + rootfs + (reserved for bad blocks) = 50MB = 400 blocks
+#   (According to "firmware" partition in
+#    target/linux/ipq806x/patches-3.4/0100-use-dni-partition-table.patch)
+# * currently reserved for bad blocks = 17MB = 136 blocks
 # Partitions have to align to block size.
 MAX_KERNEL_SIZE=$(shell echo $$((17 * 128 * 1024))) # kernel blocks * 128 * 1024
-MAX_IMAGE_SIZE=$(shell echo $$((252 * 128 * 1024))) # (kernel blocks + rootfs blocks) * 128 *1024
+MAX_IMAGE_SIZE=$(shell echo $$((264 * 128 * 1024))) # (kernel blocks + rootfs blocks) * 128 *1024
 
 UBIFS_OPTS = -m 2048 -e 124KiB -c 4096 -U -F
 UBINIZE_OPTS = -m 2048 -p 128KiB

@@ -1565,6 +1565,8 @@ static inline void ecm_nss_ipv4_process_one_conn_sync_msg(struct nss_ipv4_conn_s
 	int aci_index;
 	int assignment_count;
 	struct ecm_classifier_rule_sync class_sync;
+	int flow_dir;
+	int return_dir;
 
 	/*
 	 * Look up ecm connection with a view to synchronising the connection, classifier and data tracker.
@@ -1821,6 +1823,8 @@ sync_conntrack:
 	NF_CT_ASSERT(ct->timeout.data == (unsigned long)ct);
 	DEBUG_TRACE("%p: NSS Sync: conntrack connection\n", ct);
 
+	ecm_front_end_flow_and_return_directions_get(ct, flow_ip, 4, &flow_dir, &return_dir);
+
 	/*
 	 * Only update if this is not a fixed timeout
 	 */
@@ -1848,11 +1852,11 @@ sync_conntrack:
 #endif
 	if (acct) {
 		spin_lock_bh(&ct->lock);
-		atomic64_add(sync->flow_rx_packet_count, &acct[IP_CT_DIR_ORIGINAL].packets);
-		atomic64_add(sync->flow_rx_byte_count, &acct[IP_CT_DIR_ORIGINAL].bytes);
+		atomic64_add(sync->flow_rx_packet_count, &acct[flow_dir].packets);
+		atomic64_add(sync->flow_rx_byte_count, &acct[flow_dir].bytes);
 
-		atomic64_add(sync->return_rx_packet_count, &acct[IP_CT_DIR_REPLY].packets);
-		atomic64_add(sync->return_rx_byte_count, &acct[IP_CT_DIR_REPLY].bytes);
+		atomic64_add(sync->return_rx_packet_count, &acct[return_dir].packets);
+		atomic64_add(sync->return_rx_byte_count, &acct[return_dir].bytes);
 		spin_unlock_bh(&ct->lock);
 	}
 

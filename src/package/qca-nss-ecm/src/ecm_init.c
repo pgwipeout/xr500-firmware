@@ -83,6 +83,79 @@ extern void ecm_classifier_pcc_exit(void);
 #endif
 
 /*
+ * Debugfs dentry object.
+ */
+static struct dentry *ecm_nd_dentry;
+
+/*
+ * output of decelerate file, just ack we're alive and well
+ */
+static int ecm_nd_get_decel(void *data, u64 *val)
+{
+	DEBUG_TRACE("ecm_nd_get_decel called\n");
+	*val = 777;
+	return 0;
+}
+
+/*
+ * write to decelerate file, for not decelerate all connections. In future
+ * take filter as input.
+ */
+
+extern void ecm_db_connection_decelerate_all(void);
+static int ecm_nd_set_decel(void *data, u64 val)
+{
+	DEBUG_TRACE("ecm_nd_set_decel called with %d\n", (int)val);
+	if( !val )
+		return 0;
+	ecm_db_connection_decelerate_all();
+	return 0;
+}
+
+
+/*
+ * Debugfs attribute for the nl classifier enabled flag.
+ */
+DEFINE_SIMPLE_ATTRIBUTE(ecm_nd_decelerate, ecm_nd_get_decel, ecm_nd_set_decel, "%llu\n");
+
+/*
+* init NETDUMA Software interface
+*/
+
+int ecm_netduma_init(struct dentry *dentry){
+	ecm_nd_dentry = debugfs_create_dir("ecm_netduma", dentry);
+	if (!ecm_nd_dentry) {
+		DEBUG_ERROR("Failed to create ecm netduma classifier directory in debugfs\n");
+		return -1;
+	}
+
+
+	if (!debugfs_create_file("decelerate", S_IRUGO | S_IWUSR, ecm_nd_dentry,
+					NULL, &ecm_nd_decelerate)) {
+		DEBUG_ERROR("Failed to create ecm nd decelerate in debugfs\n");
+		debugfs_remove_recursive(ecm_nd_dentry);
+		return -1;
+	}
+
+	return 0;
+}
+
+/*
+* cleanup NETDUMA Software interface
+*/
+
+void ecm_netduma_exit(void)
+{
+	/*
+	 * Remove the debugfs files recursively.
+	 */
+	if (ecm_nd_dentry) {
+		debugfs_remove_recursive(ecm_nd_dentry);
+	}
+}
+
+
+/*
  * ecm_init()
  */
 static int __init ecm_init(void)
@@ -171,9 +244,17 @@ static int __init ecm_init(void)
 	}
 #endif
 
+	ret = ecm_netduma_init(ecm_dentry);
+	if (0 != ret) {
+		goto err_netduma;
+	}
+
 	printk(KERN_INFO "ECM init complete\n");
 	return 0;
 
+
+err_netduma:
+	ecm_netduma_exit();
 #ifdef ECM_STATE_OUTPUT_ENABLE
 err_state:
 	ecm_front_end_conntrack_notifier_exit();
@@ -213,6 +294,7 @@ err_cls_default:
 err_db:
 	debugfs_remove_recursive(ecm_dentry);
 
+
 	printk(KERN_INFO "ECM init failed: %d\n", ret);
 	return ret;
 }
@@ -229,6 +311,9 @@ static void __exit ecm_exit(void)
 	ecm_front_end_conntrack_notifier_stop(1);
 	DEBUG_INFO("stop front_end_ipv4\n");
 	ecm_front_end_ipv4_stop(1);
+
+	ecm_netduma_exit();
+
 #ifdef ECM_IPV6_ENABLE
 	DEBUG_INFO("stop front_end_ipv6\n");
 	ecm_front_end_ipv6_stop(1);

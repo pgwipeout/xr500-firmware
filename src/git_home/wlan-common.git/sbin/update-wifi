@@ -641,18 +641,22 @@ generate_lbd()
 
 # config driver parameters
 uci set wireless.qcawifi=qcawifi
-if [ "$wl_super_wifi" == "1" ]; then
+uci set wireless.qcawifi.wl_super_wifi=${wl_super_wifi}
+uci set wireless.qcawifi.wla_super_wifi=${wla_super_wifi}
+
+if [ "$wl_super_wifi" == "1" ] ||
+   ([ "$wlg_power_limit" == "0" ] && [ "$wlg_tpscale" == "0" ]); then
     uci set wireless.qcawifi.wl_tpscale=-1
 else
     uci set wireless.qcawifi.wl_tpscale=${wlg_tpscale}
 fi
-if [ "$wla_super_wifi" == "1" ]; then
+
+if [ "$wla_super_wifi" == "1" ] ||
+   ([ "$wla_power_limit" == "0" ] && [ "$wla_tpscale" == "0" ]); then
     uci set wireless.qcawifi.wla_tpscale=-1
 else
     uci set wireless.qcawifi.wla_tpscale=${wla_tpscale}
 fi
-
-[ -n "$specified_BDF" ] && uci set wireless.qcawifi.specified_BDF=$specified_BDF
 
 if [ "$wl_cb_if_onoff" != "on" ]; then
     uci set wireless.qcawifi.atf_mode=0

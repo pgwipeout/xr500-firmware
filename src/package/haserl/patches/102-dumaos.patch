@@ -1,0 +1,251 @@
+Index: haserl-0.9.35/src/h_lua.c
+===================================================================
+--- haserl-0.9.35.orig/src/h_lua.c	2015-02-15 22:16:35.000000000 +0000
++++ haserl-0.9.35/src/h_lua.c	2018-01-31 13:01:33.394875979 +0000
+@@ -44,7 +44,22 @@
+ #include "h_script.h"
+ #include "haserl.h"
+ 
++
++#if 0
++void print(char *value)
++{
++	FILE *fp;
++
++	fp = fopen("/tmp/haserl_debug", "a");
++	if (fp == NULL)
++		return;
++	fputs(value, fp);
++	fclose(fp);
++}
++#endif
++
+ extern lua_State *lua_vm;
++char *g_filename;
+ 
+ /* attempts to open a file, tokenize and then process it as a haserl script */
+ int
+@@ -83,17 +98,173 @@
+   buffer_add (buf, str, strlen (str));
+ }
+ 
++
++static void append_package_path(lua_State *L, const char *path)
++{
++  lua_getglobal( L, "package" );
++  lua_getfield( L, -1, "path" );
++  lua_pushstring( L, path );
++  lua_concat( L, 2 );
++  lua_setfield( L, -2, "path" );
++  lua_pop( L, 1 );
++}
++
++#define LANG_LUAC
++#ifndef LANG_LUAC
++static void load_library(lua_State *L, const char *lib, const char* global)
++{
++  lua_getglobal( L, "require" );
++  lua_pushstring( L, lib );
++  lua_call(L, 1, 1);
++  lua_setglobal( L, global );
++}
++
++static void load_json(lua_State *L, const char *path, const char* global)
++{
++  lua_getglobal( L, "json" );
++  lua_getfield( L, -1, "load" );
++  lua_pushstring( L, path );
++  lua_call( L, 1, 1 );
++  lua_setglobal( L, global );
++  lua_pop( L, 1 );
++}
++#endif
++
++static void get_current_lang( char* buffer, size_t bsize )
++{
++  size_t n;
++  ssize_t read;
++  char *line = NULL;
++  FILE *fp = popen("config get GUI_Region", "r");
++  if( !fp ){
++    strncpy( buffer, "English", bsize );
++    return;
++  }
++
++  read = getline( &line, &n, fp );
++  if( read != -1 ){
++    strncpy( buffer, line, bsize );
++    buffer[ read - 1 ] = '\0';    /* cut newline */
++    free( line );
++  } else {
++    strncpy( buffer, "English", bsize );
++  }
++
++  fclose( fp );
++}
++
++/*
++* GET.lang determines lang, defaults to English.
++*/
++static void load_lang_table(lua_State *L){
++  char buffer[PATH_MAX];
++  char *lang;
++  char default_lang[256];
++
++  lua_getglobal( L, "GET" );
++  lua_getfield( L, -1, "lang" );
++  if( lua_isstring( L, -1 ) ){
++    lang = lua_tostring( L, -1 );
++    if( strstr( lang, "." ) || strstr( lang, "/" ) ){
++      lua_pop( L, 2 );
++      return;
++    }
++
++    /* lang global assignment value - see next statement */
++    lua_pushvalue( L, -1 );
++  } else {
++    get_current_lang( default_lang, sizeof( default_lang ) );
++    lua_pushstring( L, default_lang );
++    lang = default_lang;
++  }
++
++  /* set lang as global useful for cache reasons */
++  lua_setglobal( L, "lang" );
++
++#ifdef LANG_LUAC
++  #define LANG_PATH "/www/language/dumaos/%s/%s.luac"
++  snprintf( buffer, PATH_MAX, LANG_PATH, lang, g_filename );
++#else
++  #define LANG_PATH "/www/language/dumaoslang-%s.json"
++  snprintf( buffer, PATH_MAX, LANG_PATH, lua_tostring( L, lang ) );
++#endif
++
++  /* only pop after with finished using lang pointer */
++  lua_pop( L, 2 );
++
++  if( !access( buffer, F_OK ) ){
++#ifndef LANG_LUAC
++    load_json( lua_vm, buffer, "i18n" );
++#else
++    if( luaL_loadfile( L, buffer ) == LUA_ERRFILE )
++      return;
++
++    lua_call( L, 0, 1 );
++    lua_setglobal( L, "i18n" );
++#endif
++
++    /* allow i18n field to be accessed as read-only globals */
++    lua_getglobal( L, "_G" );
++    lua_newtable( L );
++    lua_getglobal( L, "i18n" );
++    lua_setfield( L, -2, "__index" );
++    lua_setmetatable( L, -2 );
++    lua_pop( L, 1 );
++  }
++}
++
++/*
++* By design all content is effectively cached indefintely unless explicitly
++* stated otherwise via GET parameter.
++*
++* We do not bother with ETAGs because the cache is designed to be permanent.
++*/
++static void send_cache_header(lua_State *L){
++  int docache = 1;
++  #define CACHE_DURATION  31536000
++
++  lua_getglobal( L, "GET" );
++  lua_getfield( L, -1, "cache" );
++  if( lua_isnumber( L, -1 ) )
++    docache = lua_tonumber( L, -1 );
++  lua_pop( L, 2 );
++
++  if( docache ){
++    printf( "Cache-Control: max-age=%u\r\n", CACHE_DURATION );
++  } else {
++    printf( "Cache-Control: no-cache, no-store, must-revalidate\r\n" );
++    printf( "Pragma: no-cache\r\n");
++    printf( "Expires: 0\r\n" );
++  }
++}
++
+ void
+ lua_doscript (buffer_t * script, char *name)
+ {
+   int status;
+-  /* force the string to be null terminated */
+ 
++  append_package_path( lua_vm, ";/dumaos/api/libs/?.lua" );
++
++  /* load JSON library */
++#ifndef LANG_LUAC
++  load_library( lua_vm, "json", "json" );
++#endif
++
++  /* load translation */
++  load_lang_table( lua_vm );
++
++  /* force the string to be null terminated */
+   buffer_add (script, "\0", 1);
+ 
++  /* send header response */
++  printf("content-type: text/html\r\n");
++  send_cache_header( lua_vm );
++  printf("\r\n\r\n");
++
+   status = luaL_loadbuffer (lua_vm, (char *) script->data,
+ 			    strlen ((char *) script->data), name) ||
+-    lua_pcall (lua_vm, 0, LUA_MULTRET, 0);
++
++  lua_pcall (lua_vm, 0, LUA_MULTRET, 0);
+ 
+   if (status && !lua_isnil (lua_vm, -1))
+     {
+Index: haserl-0.9.35/src/haserl.c
+===================================================================
+--- haserl-0.9.35.orig/src/haserl.c	2015-03-11 18:56:52.000000000 +0000
++++ haserl-0.9.35/src/haserl.c	2018-01-31 13:01:03.746875976 +0000
+@@ -89,7 +89,7 @@
+ #endif
+ 
+ haserl_t global;
+-
++extern char *g_filename;
+ 
+ /* declare the shell_ function pointers here */
+ void (*shell_exec) (buffer_t * buf, char *str);
+@@ -790,6 +790,8 @@
+       break;
+     }
+ 
++  /* keep a copy of filename for lua to decode */
++  g_filename = filename;
+ 
+   scriptchain = load_script (filename, NULL);
+ /* drop permissions */
+Index: haserl-0.9.35/src/h_script.c
+===================================================================
+--- haserl-0.9.35.orig/src/h_script.c	2015-02-15 22:16:48.000000000 +0000
++++ haserl-0.9.35/src/h_script.c	2018-01-31 13:01:23.178875964 +0000
+@@ -132,6 +132,13 @@
+       (scriptbuf->curpos)++;
+     }
+ 
++
++  /*
++  * The <? and ?> tags cause problems with xml and other javascript
++  * libraries so never use them under any circumstances in DumaOS.
++  * -@NETDUMA_Iain
++  */
++#if 0
+   /* If this is the first script, switch to <? ?> mode only
+    * if <% is not used anywhere else in the script.  Otherwise
+    * don't change the tagging method
+@@ -144,6 +151,7 @@
+ 	  close_tag[0] = '?';
+ 	}
+     }
++#endif
+   close (scriptfp);
+   return (scriptbuf);
+ }

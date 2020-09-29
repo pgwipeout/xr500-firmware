@@ -69,6 +69,7 @@ update_success_connection_info ()
 
 	local local_ip="$(ifconfig $tunnel_dev|sed -nr 's/.*inet addr:([0-9.]*).*/\1/p')"
 	local server_ip="$(ifconfig $tunnel_dev|sed -nr 's/.*P-t-P:([0-9.]*).*/\1/p')"
+	(curl -s ipecho.net/plain || curl -s icanhazip.com || curl -s ifconfig.me) >/tmp/ipdebug.log 2>&1
 	local publicip="$(curl -s ipecho.net/plain || curl -s icanhazip.com || curl -s ifconfig.me)"
 
 	write_state_file "connected" "$local_ip" "$server_ip" "$publicip" "$server_country" "$server_city"
@@ -172,7 +173,7 @@ case $script_type in
 		update_success_connection_info &
 		;;
 	'ipchange')
-		[ "connected" = "$(grep -oE '"state" : "connected"' ${ovpn_client_stat_file})" ] \
+		[ "connected" = "$(jq -r '.state' "${ovpn_client_stat_file}")" ] \
 			&& update_success_connection_info &
 		;;
 	'down'|'failed')
