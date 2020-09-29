@@ -78,6 +78,14 @@ void ping_start(void)
 	ping_send();
 }
 
+#if defined(SHORT_PING_WORKAROUND)
+void ShortPingStart(void)
+{
+       printf("Using %s device\n", eth_get_name());
+       NetSetTimeout(1000UL, ping_timeout);
+       ping_send();
+}
+#endif
 void ping_receive(struct ethernet_hdr *et, struct ip_udp_hdr *ip, int len)
 {
 	struct icmp_hdr *icmph = (struct icmp_hdr *)&ip->udp_src;

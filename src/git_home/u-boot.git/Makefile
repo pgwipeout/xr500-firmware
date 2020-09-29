@@ -64,6 +64,12 @@ else
 XECHO = :
 endif
 
+ifeq ($(strip $(verbose)),)
+MAKEFLAGS += --no-print-directory
+silent=@
+export silent
+endif
+
 #########################################################################
 #
 # U-boot build supports producing a object files to the separate external
@@ -211,11 +217,7 @@ endif
 #########################################################################
 # U-Boot objects....order is important (i.e. start must be first)
 
-ifeq ($(BOARD),wndr3700v3)
-OBJS  = $(CPUDIR)/wndr3700v3/start.o
-else
 OBJS  = $(CPUDIR)/start.o
-endif
 ifeq ($(CPU),x86)
 OBJS += $(CPUDIR)/start16.o
 OBJS += $(CPUDIR)/resetvec.o
@@ -378,7 +380,7 @@ BOARD_SIZE_CHECK =
 endif
 
 # Always append ALL so that arch config.mk's can add custom ones
-ALL-y += $(obj)u-boot.srec $(obj)u-boot.bin $(obj)System.map $(U_BOOT_SRAM)
+ALL-y += $(obj)u-boot.srec $(obj)u-boot.bin $(obj)System.map
 
 ALL-$(CONFIG_NAND_U_BOOT) += $(obj)u-boot-nand.bin
 ALL-$(CONFIG_ONENAND_U_BOOT) += $(obj)u-boot-onenand.bin
@@ -401,25 +403,14 @@ $(obj)u-boot.hex:	$(obj)u-boot
 		$(OBJCOPY) ${OBJCFLAGS} -O ihex $< $@
 
 $(obj)u-boot.srec:	$(obj)u-boot
-		$(OBJCOPY) -O srec $< $@
+		@$(call compile,$(OBJCOPY) -O srec $< $@)
 
 $(obj)u-boot.bin:	$(obj)u-boot
-		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+		@$(call compile,$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@)
 		$(BOARD_SIZE_CHECK)
 
 $(obj)u-boot.mbn:	$(obj)u-boot.bin
-		if [ x$(CONFIG_SYS_BOARD) = "xhw29764841p0p128p256p3x3p4x4" ]; then \
-			echo "Old version of mkheader.py is adopted"; \
-			python tools/mkheader.py $(CONFIG_SYS_TEXT_BASE) $< $@; \
-		elif [ x$(CONFIG_SYS_BOARD) = "xhw29764958p0p128p512p3x3p4x4" ] || \
-		     [ x$(CONFIG_SYS_BOARD) = "xhw29764958p0p128p512p4x4p4x4pcascade" ] || \
-		     [ x$(CONFIG_SYS_BOARD) = "xhw29764958p0p128p512p4x4p4x4pxDSL" ]; then \
-			echo "v1.3-fc1 version of mkheader.py is adopted"; \
-			python tools/mkheader-v1.3-fc1.py $(CONFIG_SYS_TEXT_BASE) $(CONFIG_IPQ_APPSBL_IMG_TYPE) $< $@; \
-		else \
-			echo "ERROR: Unexpected product: $(CONFIG_SYS_BOARD)"; \
-			exit 1; \
-		fi
+		@$(call compile,python tools/mkheader-v1.3-fc1.py $(CONFIG_SYS_TEXT_BASE) $(CONFIG_IPQ_APPSBL_IMG_TYPE) $< $@)
 
 $(obj)u-boot.ldr:	$(obj)u-boot
 		$(CREATE_LDR_ENV)
@@ -512,7 +503,8 @@ endif
 
 $(obj)u-boot:	depend \
 		$(SUBDIR_TOOLS) $(OBJS) $(LIBBOARD) $(LIBS) $(LDSCRIPT) $(obj)u-boot.lds
-		$(GEN_UBOOT)
+		@echo -e "$(CYN)Linking$(GRN) $@...$(NRM)"
+		$(silent)$(GEN_UBOOT)
 ifeq ($(CONFIG_KALLSYMS),y)
 		smap=`$(call SYSTEM_MAP,u-boot) | \
 			awk '$$2 ~ /[tTwW]/ {printf $$1 $$3 "\\\\000"}'` ; \
@@ -539,7 +531,7 @@ $(LDSCRIPT):	depend
 		$(MAKE) -C $(dir $@) $(notdir $@)
 
 $(obj)u-boot.lds: $(LDSCRIPT)
-		$(CPP) $(CPPFLAGS) $(LDPPFLAGS) -ansi -D__ASSEMBLY__ -P - <$^ >$@
+		@$(call compile,$(CPP) $(CPPFLAGS) $(LDPPFLAGS) -ansi -D__ASSEMBLY__ -P - <$^ >$@)
 
 nand_spl:	$(TIMESTAMP_FILE) $(VERSION_FILE) depend
 		$(MAKE) -C nand_spl/board/$(BOARDDIR) all
@@ -565,7 +557,7 @@ depend dep:	$(TIMESTAMP_FILE) $(VERSION_FILE) \
 		$(obj)include/autoconf.mk \
 		$(obj)include/generated/generic-asm-offsets.h \
 		$(obj)include/generated/asm-offsets.h
-		for dir in $(SUBDIRS) $(CPUDIR) $(LDSCRIPT_MAKEFILE_DIR) ; do \
+		$(silent)for dir in $(SUBDIRS) $(CPUDIR) $(LDSCRIPT_MAKEFILE_DIR) ; do \
 			$(MAKE) -C $$dir _depend ; done
 
 TAG_SUBDIRS = $(SUBDIRS)
@@ -630,23 +622,23 @@ $(obj)include/autoconf.mk: $(obj)include/config.h
 $(obj)include/generated/generic-asm-offsets.h:	$(obj)include/autoconf.mk.dep \
 	$(obj)lib/asm-offsets.s
 	@$(XECHO) Generating $@
-	tools/scripts/make-asm-offsets $(obj)lib/asm-offsets.s $@
+	@$(call compile,tools/scripts/make-asm-offsets $(obj)lib/asm-offsets.s $@)
 
 $(obj)lib/asm-offsets.s:	$(obj)include/autoconf.mk.dep \
 	$(src)lib/asm-offsets.c
 	@mkdir -p $(obj)lib
-	$(CC) -DDO_DEPS_ONLY \
+	@$(call compile,$(CC) -DDO_DEPS_ONLY \
 		$(CFLAGS) $(CFLAGS_$(BCURDIR)/$(@F)) $(CFLAGS_$(BCURDIR)) \
-		-o $@ $(src)lib/asm-offsets.c -c -S
+		-o $@ $(src)lib/asm-offsets.c -c -S)
 
 $(obj)include/generated/asm-offsets.h:	$(obj)include/autoconf.mk.dep \
 	$(obj)$(CPUDIR)/$(SOC)/asm-offsets.s
 	@$(XECHO) Generating $@
-	tools/scripts/make-asm-offsets $(obj)$(CPUDIR)/$(SOC)/asm-offsets.s $@
+	@$(call compile,tools/scripts/make-asm-offsets $(obj)$(CPUDIR)/$(SOC)/asm-offsets.s $@)
 
 $(obj)$(CPUDIR)/$(SOC)/asm-offsets.s:	$(obj)include/autoconf.mk.dep
 	@mkdir -p $(obj)$(CPUDIR)/$(SOC)
-	if [ -f $(src)$(CPUDIR)/$(SOC)/asm-offsets.c ];then \
+	$(silent)if [ -f $(src)$(CPUDIR)/$(SOC)/asm-offsets.c ];then \
 		$(CC) -DDO_DEPS_ONLY -DDO_SOC_DEPS_ONLY \
 		$(CFLAGS) $(CFLAGS_$(BCURDIR)/$(@F)) $(CFLAGS_$(BCURDIR)) \
 			-o $@ $(src)$(CPUDIR)/$(SOC)/asm-offsets.c -c -S; \

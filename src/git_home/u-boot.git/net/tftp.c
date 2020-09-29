@@ -16,9 +16,7 @@
 #endif
 #include <dni_common.h>
 
-#ifdef CONFIG_SYS_NMRP
 #include "nmrp.h"
-#endif
 
 /* Well known TFTP port # */
 #define WELL_KNOWN_PORT	69
@@ -104,19 +102,15 @@ static int	TftpFinalBlock;	/* 1 if we have sent the last block */
 #define STATE_RECV_WRQ	6
 #define STATE_SEND_WRQ	7
 
-#ifdef CONFIG_SYS_NMRP
 uchar TestNmrpIP[2] = {192,168};
 static int Nmrp_Waiting_TimeoutCount = 0;
 static int nmrpconfflag = 1;
-#endif
 
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 #define STATE_WRQ 10
 #define STATE_BAD_IMAGE_TYPE 11
 #define STATE_BAD_IMAGE_CHKSUM 12
 static int TftpClientPort;
 static uchar ImageCheckSum = 0;
-#endif
 
 /* default TFTP block size */
 #define TFTP_BLOCK_SIZE		512
@@ -202,7 +196,6 @@ store_block(unsigned block, uchar *src, unsigned len)
 	} else
 #endif /* CONFIG_SYS_DIRECT_FLASH_TFTP */
 	{
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 		if(NetRunTftpServer)
 		{
 			uchar *dest=(uchar *)(load_addr + offset);
@@ -213,7 +206,6 @@ store_block(unsigned block, uchar *src, unsigned len)
 			}
 		}
 		else
-#endif
 		(void)memcpy((void *)(load_addr + offset), src, len);
 	}
 #ifdef CONFIG_MCAST_TFTP
@@ -449,7 +441,6 @@ TftpSend(void)
 		pkt += 18 /*strlen("File has bad magic")*/ + 1;
 		len = pkt - xp;
 		break;
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 		case STATE_BAD_IMAGE_TYPE:
 			xp = pkt;
 			s = (ushort *)pkt;
@@ -470,10 +461,8 @@ TftpSend(void)
 			pkt += 21 /*"File has bad checksum"*/ +1;
 			len = pkt -xp;
 			break;
-#endif
 	}
 
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 	if (NetRunTftpServer)
 	{
 		NetSendUDPPacket(TftpClientEther, TftpClientIP, TftpClientPort,TftpOurPort,len);
@@ -489,7 +478,6 @@ TftpSend(void)
 		}
 	}
 	else
-#endif
 	NetSendUDPPacket(NetServerEther, TftpRemoteIP, TftpRemotePort,
 			 TftpOurPort, len);
 }
@@ -914,7 +902,6 @@ TftpStartServer(void)
 }
 #endif /* CONFIG_CMD_TFTPSRV */
 
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 static int TftpServerWaiting = 1;
 static uint TftpLedCount = 0;
 
@@ -926,7 +913,6 @@ TftpServerTimeout (void)
 	workaround_duplicate_tftp_data_packet_bug_of_nmrp_server();
 	if(TftpServerWaiting)
 	{
-#ifdef CONFIG_SYS_NMRP
 		if(NmrpState == STATE_CONFIGING )
 		{
 			if(nmrpconfflag){
@@ -945,23 +931,62 @@ TftpServerTimeout (void)
 				NetSetTimeout((NMRP_TIMEOUT_REQ*CONFIG_SYS_HZ)/2,TftpServerTimeout);
 			}
 		}else{
-#endif
 		TftpLedCount++;
 		if ((TftpLedCount % 2)== 1)
 		{
 			printf("Upgrade Mode\b\b\b\b\b\b\b\b\b\b\b\b");
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+	defined(CONFIG_HW29765285P16P0P256) || \
+	defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+	defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+	defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+	defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4)
 			/*power LED (GREEN) 0.25 second on */
 			board_power_led(0);
+#endif
+#if defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4)
+			/*power LED (RED) 0.25 second on */
+			board_test_led(0);
+#endif
+#if defined(CONFIG_LATE_ETHERNET_CALBE_PLUGGING_UGLY_HACK)
+			DECLARE_GLOBAL_DATA_PTR;
+			eth_init(gd->bd);
+#endif
 			NetSetTimeout ((CONFIG_SYS_HZ*1)/4, TftpServerTimeout);
 		}else{
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+	defined(CONFIG_HW29765285P16P0P256) || \
+	defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+	defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+	defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+	defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4)
 			/* power LED (GREEN) 0.75 second off */
 			board_power_led(1);
+#endif
+#if defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2)
+			/* power LED (RED) 0.75 second off */
+			board_test_led(1);
+#endif
 			printf("            \b\b\b\b\b\b\b\b\b\b\b\b");
 			NetSetTimeout ((CONFIG_SYS_HZ*3)/4, TftpServerTimeout);
 		}
-#ifdef CONFIG_SYS_NMRP
 	}
-#endif
 	}
 	else{
 		if (++TftpTimeoutCount > TIMEOUT_COUNT) {
@@ -1107,9 +1132,7 @@ TftpServerHandler(uchar * pkt, unsigned dest, IPaddr_t sip, unsigned src,
 void
 TftpServerStart(void)
 {
-#ifdef CONFIG_SYS_NMRP
 	if(NmrpState != STATE_CONFIGING)
-#endif
 	puts ("\nThe Router is in TFTP Server Firmware Recovery mode NOW!\n");
 
 	printf("Listening on Port : 69, IP Address: %pI4 ...\n", &NetOurIP);
@@ -1131,7 +1154,6 @@ TftpServerStart(void)
 	memset(TftpClientEther, 0, 6);
 	TftpClientIP = 0;
 }
-#endif
 
 #ifdef CONFIG_MCAST_TFTP
 /* Credits: atftp project.

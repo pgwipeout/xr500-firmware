@@ -177,10 +177,8 @@
 #define IH_MAGIC	0x27051956	/* Image Magic Number		*/
 #define IH_NMLEN		32	/* Image Name Length		*/
 
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 #define HEADER_REAL_LEN 0x7E
 #define HEADER_LEN  (HEADER_REAL_LEN + (HEADER_REAL_LEN % 4))
-#endif
 
 /*
  * Legacy format image header,

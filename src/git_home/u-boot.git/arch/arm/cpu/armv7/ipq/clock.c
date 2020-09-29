@@ -28,9 +28,6 @@ void uart_pll_vote_clk_enable(unsigned int clk_dummy)
 		while((readl(PLL_LOCK_DET_STATUS_REG) & BIT(8)) == 0);
 }
 
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 /**
  * usb_pll_vote_clk_enable - enables PLL8
  */
@@ -42,7 +39,6 @@ void usb_pll_vote_clk_enable(unsigned int clk_dummy)
 		while((readl(PLL_LOCK_DET_STATUS_REG) & BIT(0)) == 0);
 }
 
-#endif
 /**
  * uart_set_rate_mnd - configures divider M and D values
  *
@@ -60,9 +56,6 @@ static void uart_set_rate_mnd(unsigned int gsbi_port, unsigned int m,
 	clrbits_le32(GSBIn_UART_APPS_NS_REG(gsbi_port), BIT(7));
 }
 
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 /**
  * usb_set_rate_mnd - configures divider M and D values
  *
@@ -91,7 +84,6 @@ static void usb_set_rate_mnd_utmi(unsigned int usb_port, unsigned int m,
 	clrbits_le32(USB30_MOC_UTMI_CLK_NS, BIT(7));
 }
 
-#endif
 /**
  * uart_branch_clk_enable_reg - enables branch clock
  *
@@ -102,9 +94,6 @@ static void uart_branch_clk_enable_reg(unsigned int gsbi_port)
 	setbits_le32(GSBIn_UART_APPS_NS_REG(gsbi_port), BIT(9));
 }
 
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 /**
  * usb_local_clock_enable - configures N value and enables root clocks
  *
@@ -215,7 +204,6 @@ static void usb_set_utmi_1_clk(unsigned int usb_port)
 	setbits_le32(USB30_MOC_1_UTMI_CLK_CTL, BIT(4));
 }
 
-#endif
 /**
  * uart_local_clock_enable - configures N value and enables root clocks
  *
@@ -263,9 +251,6 @@ static void uart_set_gsbi_clk(unsigned int gsbi_port)
 	setbits_le32(GSBIn_HCLK_CTL_REG(gsbi_port), BIT(4));
 }
 
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 /**
  *
  * USB_clock_config - configures USB3.0 clocks
@@ -291,7 +276,6 @@ void usb_ss_utmi_clock_config(unsigned int usb_port, unsigned int m,
 	usb_set_utmi_1_clk(usb_port);
 }
 
-#endif
 /**
  * uart_clock_config - configures UART clocks
  *

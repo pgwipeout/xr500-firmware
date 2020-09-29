@@ -81,11 +81,7 @@ int cleanup_before_linux(void)
 	 */
 	invalidate_dcache_all();
 
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	clear_l2cache_err();
-#endif
 
 	return 0;
 }

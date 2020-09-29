@@ -17,9 +17,7 @@
 
 /* tftp.c */
 void TftpStart(enum proto_t protocol);	/* Begin TFTP get/put */
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 extern void     TftpServerStart (void);
-#endif
 
 #ifdef CONFIG_CMD_TFTPSRV
 extern void TftpStartServer(void);	/* Wait for incoming TFTP put */

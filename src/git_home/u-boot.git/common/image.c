@@ -57,7 +57,12 @@
 
 static int fit_check_ramdisk(const void *fit, int os_noffset,
 		uint8_t arch, int verify);
-#if defined(CONFIG_DTB_COMPRESSION)
+#if defined(CONFIG_DTB_COMPRESSION) && \
+   (defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL))
 extern int bootm_load_os(image_info_t os, ulong *load_end, int boot_progress);
 #endif
 #endif
@@ -1220,7 +1225,27 @@ static int fit_check_fdt(const void *fit, int fdt_noffset, int verify)
 		return 0;
 	}
 
-#if !defined(CONFIG_DTB_COMPRESSION)
+#if !defined(CONFIG_DTB_COMPRESSION) && \
+    (defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+     defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+     defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL))
+	if (!fit_image_check_comp(fit, fdt_noffset, IH_COMP_NONE)) {
+		fdt_error("FDT image is compressed");
+		return 0;
+	}
+#endif
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+	defined(CONFIG_HW29765285P16P0P256) || \
+	defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
 	if (!fit_image_check_comp(fit, fdt_noffset, IH_COMP_NONE)) {
 		fdt_error("FDT image is compressed");
 		return 0;
@@ -1405,10 +1430,17 @@ int boot_get_fdt(int flag, int argc, char * const argv[],
 	int		fdt_noffset;
 	const void	*data;
 	size_t		size;
-#if defined(CONFIG_DTB_COMPRESSION)
+#if defined(CONFIG_DTB_COMPRESSION) && \
+   (defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL))
 	image_info_t	fdt = {0};
 #endif
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 	uint8_t	comp_type = IH_COMP_NONE;
 #endif
 #endif
@@ -1606,7 +1638,12 @@ int boot_get_fdt(int flag, int argc, char * const argv[],
 					goto error;
 				}
 
-#if defined(CONFIG_DTB_COMPRESSION)
+#if defined(CONFIG_DTB_COMPRESSION) && \
+   (defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL))
 				if (!fit_image_get_comp(fit_hdr, fdt_noffset,
 						&comp_type) &&
 					(comp_type != IH_COMP_NONE)) {
@@ -1625,16 +1662,27 @@ int boot_get_fdt(int flag, int argc, char * const argv[],
 					}
 				}
 #endif
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL) || \
+	defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+	defined(CONFIG_HW29765285P16P0P256) || \
+	defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
 				/* verift that image data is a proper FDT blob */
 				if (fdt_check_header((char *)data) != 0) {
 					fdt_error("Subimage data is not a FTD");
 					goto error;
 				}
 #endif
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 				if (comp_type == IH_COMP_NONE) {
 					/* verify that image data is a proper FDT blob */
 					if (fdt_check_header((char *)data) != 0) {
@@ -1666,7 +1714,12 @@ int boot_get_fdt(int flag, int argc, char * const argv[],
 							(ulong)data,
 							load_start);
 
-#if defined(CONFIG_DTB_COMPRESSION)
+#if defined(CONFIG_DTB_COMPRESSION) && \
+   (defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL))
 					if (comp_type != IH_COMP_NONE) {
 						fdt.image_start = (ulong)data;
 						fdt.image_len = size;
@@ -2822,6 +2875,7 @@ int fit_image_check_hashes(const void *fit, int image_noffset)
 	int		noffset;
 	int		ndepth;
 	char		*err_msg = "";
+	int		check_loop = 0;
 
 	/* Get image data and data length */
 	if (fit_image_get_data(fit, image_noffset, &data, &size)) {
@@ -2833,6 +2887,7 @@ int fit_image_check_hashes(const void *fit, int image_noffset)
 	for (ndepth = 0, noffset = fdt_next_node(fit, image_noffset, &ndepth);
 	     (noffset >= 0) && (ndepth > 0);
 	     noffset = fdt_next_node(fit, noffset, &ndepth)) {
+		check_loop = 1;
 		if (ndepth == 1) {
 			/* Direct child node of the component image node */
 
@@ -2878,7 +2933,7 @@ int fit_image_check_hashes(const void *fit, int image_noffset)
 		}
 	}
 
-	return 1;
+	return check_loop;
 
 error:
 	printf("%s for '%s' hash node in '%s' image node\n",

@@ -137,7 +137,25 @@ static const char *const mtdparts_default = NULL;
 
 /* copies of last seen 'mtdids', 'mtdparts' and 'partition' env variables */
 #define MTDIDS_MAXLEN		128
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #define MTDPARTS_MAXLEN		512
+#endif
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+    defined(CONFIG_HW29765285P16P0P256) || \
+    defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
+#define MTDPARTS_MAXLEN		1024
+#endif
 #define PARTITION_MAXLEN	16
 static char last_ids[MTDIDS_MAXLEN];
 static char last_parts[MTDPARTS_MAXLEN];
@@ -1628,9 +1646,15 @@ static int parse_mtdids(const char *const ids)
 		}
 		p++;
 
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 		/* check if requested device exists */
 		if (mtd_device_validate(type, num, &size) != 0)
 			return 1;
+#endif
 
 		/* locate <mtd-id> */
 		mtd_id = p;
@@ -1644,6 +1668,24 @@ static int parse_mtdids(const char *const ids)
 			printf("mtdids: no <mtd-id> identifier\n");
 			break;
 		}
+
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+	defined(CONFIG_HW29765285P16P0P256) || \
+	defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
+		/* check if requested device exists */
+		if (mtd_device_validate(type, num, &size) != 0) {
+			/* Skip adding invalid mtd to list entry */
+			ret = 0;
+			continue;
+		}
+#endif
 
 		/* check if this id is already on the list */
 		int double_entry = 0;
@@ -1785,9 +1827,7 @@ int mtdparts_init(void)
 
 		if (list_empty(&devices)) {
 			printf("mtdparts_init: no valid partitions\n");
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 			StartTftpServerToRecoveFirmware();
-#endif
 			return 1;
 		}
 

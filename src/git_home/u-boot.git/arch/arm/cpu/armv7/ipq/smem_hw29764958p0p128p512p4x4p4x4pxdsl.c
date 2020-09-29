@@ -55,16 +55,14 @@ typedef enum {
 	SMEM_BOOT_DUALPARTINFO = 427,
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	SMEM_PARTITION_TABLE_OFFSET = 428,
 #endif
 	SMEM_FIRST_VALID_TYPE = SMEM_SPINLOCK_ARRAY,
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-	SMEM_LAST_VALID_TYPE = SMEM_BOOT_DUALPARTINFO,
-	SMEM_MAX_SIZE = SMEM_BOOT_DUALPARTINFO + 1,
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	SMEM_LAST_VALID_TYPE = SMEM_PARTITION_TABLE_OFFSET,
 	SMEM_MAX_SIZE = SMEM_PARTITION_TABLE_OFFSET + 1,
@@ -105,11 +103,9 @@ struct smem {
 };
 
 #define SMEM_PTN_NAME_MAX     16
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-#define SMEM_PTABLE_PARTS_MAX 16
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #define SMEM_PTABLE_PARTS_MAX 32
 #define SMEM_PTABLE_PARTS_DEFAULT 16
@@ -196,6 +192,7 @@ int smem_ptable_init(void)
 				    &smem_ptable, sizeof(smem_ptable));
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 
 	if (ret != 0) {
@@ -252,6 +249,7 @@ unsigned int get_rootfs_active_partition(void)
 
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 unsigned int get_partition_table_offset(void)
 {
@@ -284,6 +282,7 @@ int smem_getpart(char *part_name, uint32_t *start, uint32_t *size)
 	unsigned i;
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	ipq_smem_flash_info_t *sfi = &ipq_smem_flash_info;
 	struct smem_ptn *p;
@@ -297,12 +296,9 @@ int smem_getpart(char *part_name, uint32_t *start, uint32_t *size)
 	if (i == smem_ptable.len)
 		return -ENOENT;
 
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-	*start = smem_ptable.parts[i].start;
-	*size = smem_ptable.parts[i].size;
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	p = &smem_ptable.parts[i];
 
@@ -436,16 +432,9 @@ int do_smeminfo(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	ipq_smem_flash_info_t *sfi = &ipq_smem_flash_info;
 	int i;
 
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-	printf(	"flash_type:		0x%x\n"
-		"flash_index:		0x%x\n"
-		"flash_chip_select:	0x%x\n"
-		"flash_block_size:	0x%x\n",
-			sfi->flash_type, sfi->flash_index,
-			sfi->flash_chip_select, sfi->flash_block_size);
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	printf(	"flash_type:		0x%x\n"
 		"flash_index:		0x%x\n"

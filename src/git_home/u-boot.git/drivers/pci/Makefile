@@ -24,13 +24,11 @@
 include $(TOPDIR)/config.mk
 
 LIB	:= $(obj)libpci.o
+CPPFLAGS += -I$(TOPDIR)/board/$(VENDOR)/$(BOARD) -I$(TOPDIR)/board/qcom/common
+CFLAGS += -I$(TOPDIR)/board/$(VENDOR)/$(BOARD) -I$(TOPDIR)/board/qcom/common
 
 COBJS-$(CONFIG_FSL_PCI_INIT) += fsl_pci_init.o
-ifeq "$(BOARD)" "wndr3700v3"
-COBJS-$(CONFIG_PCI) += pci.o pci_auto.o
-else
 COBJS-$(CONFIG_PCI) += pci.o pci_auto.o pci_indirect.o
-endif
 COBJS-$(CONFIG_FTPCI100) += pci_ftpci100.o
 COBJS-$(CONFIG_IXP_PCI) += pci_ixp.o
 COBJS-$(CONFIG_SH4_PCI) += pci_sh4.o
@@ -39,6 +37,7 @@ COBJS-$(CONFIG_SH7780_PCI) +=pci_sh7780.o
 COBJS-$(CONFIG_TSI108_PCI) += tsi108_pci.o
 COBJS-$(CONFIG_WINBOND_83C553) += w83c553f.o
 COBJS-$(CONFIG_IPQ806X_PCI) += pci_ipq.o
+COBJS-$(CONFIG_IPQ40XX_PCI) += pci_ipq40xx.o
 
 COBJS	:= $(COBJS-y)
 SRCS	:= $(COBJS:.o=.c)

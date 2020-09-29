@@ -769,6 +769,9 @@ int mmc_change_freq(struct mmc *mmc)
 	/* Only version 4 supports high-speed */
 	if (mmc->version < MMC_VERSION_4)
 		return 0;
+#if  defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) ||\
+     defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+     defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
 
 	err = mmc_send_ext_csd(mmc, ext_csd);
 
@@ -776,6 +779,7 @@ int mmc_change_freq(struct mmc *mmc)
 		return err;
 
 	cardtype = ext_csd[EXT_CSD_CARD_TYPE] & 0xf;
+#endif
 
 	err = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_HS_TIMING, 1);
 
@@ -791,6 +795,10 @@ int mmc_change_freq(struct mmc *mmc)
 	/* No high-speed support */
 	if (!ext_csd[EXT_CSD_HS_TIMING])
 		return 0;
+
+#if  defined(HW29765352P0P4096P512P2X2P2X2P4X4)
+	cardtype = ext_csd[EXT_CSD_CARD_TYPE] & 0xf;
+#endif
 
 	/* High Speed is set, there are two types: 52MHz and 26MHz */
 	if (cardtype & MMC_HS_52MHZ)

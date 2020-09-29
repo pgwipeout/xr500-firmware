@@ -78,7 +78,6 @@ extern void dataflash_print_info(void);
 #include <i2c.h>
 #endif
 
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 static int factory_default = 0;
 extern ulong timeStart;
 extern ulong timeDelta;
@@ -91,31 +90,30 @@ void start_tftp_recovery_mode()
     printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
     StartTftpServerToRecoveFirmware ();/*Enter recovery mode when press reset button to upgrade mode*/
 }
-#endif
 
 /************************************************************************
  * Coloured LED functionality
  ************************************************************************
  * May be supplied by boards if desired
  */
-inline void __coloured_LED_init(void) {}
+void __coloured_LED_init(void) {}
 void coloured_LED_init(void)
 	__attribute__((weak, alias("__coloured_LED_init")));
-inline void __red_led_on(void) {}
+void __red_led_on(void) {}
 void red_led_on(void) __attribute__((weak, alias("__red_led_on")));
-inline void __red_led_off(void) {}
+void __red_led_off(void) {}
 void red_led_off(void) __attribute__((weak, alias("__red_led_off")));
-inline void __green_led_on(void) {}
+void __green_led_on(void) {}
 void green_led_on(void) __attribute__((weak, alias("__green_led_on")));
-inline void __green_led_off(void) {}
+void __green_led_off(void) {}
 void green_led_off(void) __attribute__((weak, alias("__green_led_off")));
-inline void __yellow_led_on(void) {}
+void __yellow_led_on(void) {}
 void yellow_led_on(void) __attribute__((weak, alias("__yellow_led_on")));
-inline void __yellow_led_off(void) {}
+void __yellow_led_off(void) {}
 void yellow_led_off(void) __attribute__((weak, alias("__yellow_led_off")));
-inline void __blue_led_on(void) {}
+void __blue_led_on(void) {}
 void blue_led_on(void) __attribute__((weak, alias("__blue_led_on")));
-inline void __blue_led_off(void) {}
+void __blue_led_off(void) {}
 void blue_led_off(void) __attribute__((weak, alias("__blue_led_off")));
 
 /*
@@ -341,7 +339,25 @@ void board_init_f(ulong bootflag)
 	gd->ram_size -= CONFIG_SYS_MEM_TOP_HIDE;
 #endif
 
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+    defined(CONFIG_HW29765285P16P0P256) || \
+    defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4)
+	addr= _TEXT_BASE;
+#endif
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	addr = CONFIG_SYS_SDRAM_BASE + gd->ram_size;
+#endif
 
 #ifdef CONFIG_IPQ_APPSBL_DLOAD
 	/* We reserve 2MB of memory when built with crashdump enabled */
@@ -391,6 +407,11 @@ void board_init_f(ulong bootflag)
 #endif /* CONFIG_FB_ADDR */
 #endif /* CONFIG_LCD */
 
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	/*
 	 * reserve memory for U-Boot code, data & bss
 	 * round down to next 4 kB limit
@@ -399,6 +420,7 @@ void board_init_f(ulong bootflag)
 	addr &= ~(4096 - 1);
 
 	debug("Reserving %ldk for U-Boot at: %08lx\n", gd->mon_len >> 10, addr);
+#endif
 
 #ifndef CONFIG_SPL_BUILD
 	/*
@@ -455,13 +477,53 @@ void board_init_f(ulong bootflag)
 	dram_init_banksize();
 	display_dram_config();	/* and display it */
 
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+    defined(CONFIG_HW29765285P16P0P256) || \
+    defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4)
+	gd->malloc_end = addr;
+	gd->relocaddr = _TEXT_BASE;
+	gd->start_addr_sp = addr_sp;
+	gd->reloc_off = 0;
+#endif
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	gd->relocaddr = addr;
 	gd->start_addr_sp = addr_sp;
 	gd->reloc_off = addr - _TEXT_BASE;
+#endif
+
 	debug("relocation Offset is: %08lx\n", gd->reloc_off);
 	memcpy(id, (void *)gd, sizeof(gd_t));
 
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+    defined(CONFIG_HW29765285P16P0P256) || \
+    defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4)
+	relocate_code(addr_sp, id, _TEXT_BASE);
+#endif
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	relocate_code(addr_sp, id, addr);
+#endif
 
 	/* NOTREACHED - relocate_code() does not return */
 }
@@ -523,7 +585,11 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #endif
 
 	/* The Malloc area is immediately below the monitor copy in DRAM */
+#ifdef CONFIG_IPQ40XX_XIP
+	malloc_start = gd->malloc_end - TOTAL_MALLOC_LEN;
+#else
 	malloc_start = dest_addr - TOTAL_MALLOC_LEN;
+#endif
 	mem_malloc_init (malloc_start, TOTAL_MALLOC_LEN);
 
 #ifdef CONFIG_ARCH_EARLY_INIT_R
@@ -631,8 +697,10 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	bb_miiphy_init();
 #endif
 #if defined(CONFIG_CMD_NET)
+#if !defined(CONFIG_IPQ_ETH_INIT_DEFER)
 	puts("Net:   ");
 	eth_initialize(gd->bd);
+#endif
 #if defined(CONFIG_RESET_PHY_R)
 	debug("Reset Ethernet PHY\n");
 	reset_phy();
@@ -668,7 +736,17 @@ void board_init_r(gd_t *id, ulong dest_addr)
 
 	/* main_loop() can return to retry autoboot, if so just run it again. */
 	for (;;) {
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
+#if defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4)
+		int wireless_nmrp = 0;
+		if(board_reset_button_is_press() && board_wps_button_is_press()) {
+			printf("enable wireless nmrp !\n");
+			wireless_nmrp = 1;
+			board_wireless_nmrp_led(0);
+			while (board_reset_button_is_press() || board_wps_button_is_press())
+				udelay(10000);
+			goto next1;
+		}
+#endif
 		int i,j;
 
 		NetSetTimeout (CONFIG_SYS_HZ/10,board_reset_default_LedSet);
@@ -712,11 +790,12 @@ next:
 			goto Normal;
 
 		board_reset_default();
+#if defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4)
+next1:
+		if (wireless_nmrp)
+			run_command("setenv bootargs ${bootargs} nmrp=1", 0);
+#endif
 Normal:
-#endif
-#if defined(CONFIG_SYS_NMRP) && !defined(CONFIG_CMD_NMRP)
-		StartNmrpClient();
-#endif
 		main_loop();
 	}
 

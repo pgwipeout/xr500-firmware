@@ -26,7 +26,9 @@
 #include <malloc.h>
 #include <stdio_dev.h>
 #include <exports.h>
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 #include <watchdog.h>
 #endif
 
@@ -462,7 +464,9 @@ static int ctrlc_disabled = 0;	/* see disable_ctrl() */
 static int ctrlc_was_pressed = 0;
 int ctrlc(void)
 {
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 	WATCHDOG_RESET();
 #endif
 	if (!ctrlc_disabled && gd->have_console) {

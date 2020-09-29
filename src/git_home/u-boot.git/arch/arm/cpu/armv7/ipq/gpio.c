@@ -60,6 +60,8 @@ void gpio_tlmm_config(unsigned int gpio, unsigned int func,
 
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	/* Output value is only relevant if GPIO has been configured for fixed
 	 * output setting - i.e. func == 0 */
@@ -74,7 +76,9 @@ void gpio_tlmm_config(unsigned int gpio, unsigned int func,
         return;
 }
 
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 int gpio_get_value(unsigned int gpio)
 {
 	unsigned int addr = GPIO_IN_OUT_ADDR(gpio);

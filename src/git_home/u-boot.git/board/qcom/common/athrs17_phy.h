@@ -605,31 +605,30 @@
 #undef HEADER_EN
 #endif
 
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 uint32_t athrs17_reg_read(uint32_t reg_addr);
 void athrs17_reg_write(uint32_t reg_addr, uint32_t reg_val);
 #endif
 
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-void athrs17_reset_switch(void);
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 int athrs17_init_switch(void);
 #endif
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 int athrs17_init_switch(ipq_gmac_board_cfg_t *gmac_cfg);
 #endif
 void athrs17_reg_init(ipq_gmac_board_cfg_t *);
 void athrs17_reg_init_lan(ipq_gmac_board_cfg_t *gmac_cfg);
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 void athrs17_vlan_config(void);
 #endif
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 void athrs17_vlan_config(ipq_gmac_board_cfg_t *gmac_cfg);
 #endif
 #endif

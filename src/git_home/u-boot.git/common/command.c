@@ -420,47 +420,6 @@ int cmd_auto_complete(const char *const prompt, char *buf, int *np, int *colp)
 
 #endif
 
-#if defined(CONFIG_WNDR3700U) || defined(CONFIG_WNDR3700V1H2) || defined(CONFIG_HW29763654P16P128)
-#define MEM_TEMP_ADDR                    0x80060000
-extern flash_info_t flash_info[];
-extern  unsigned char* ag7100_mac_addr_loc(void);
-
-typedef struct{
-    unsigned char eth0_mac[6];
-    unsigned char eth1_mac[6];
-    unsigned char ath1_mac[6];
-    unsigned char wps_pin[9];
-    unsigned char sn[SERIAL_NUMBER_LENGTH +1];
-}dni_info_t;
-void do_dnishow()
-{
-	dni_info_t *dni_info;
-
-	memset(dni_info,0,sizeof(dni_info_t));
-	memcpy(dni_info, (void *)BOARDCAL, 18);
-
-	memcpy(dni_info->wps_pin, (void *)(BOARDCAL + WPSPIN_OFFSET),8);
-	dni_info->wps_pin[9]='\0';
-
-	memcpy(dni_info->sn, (void *)(BOARDCAL + SERIAL_NUMBER_OFFSET),SERIAL_NUMBER_LENGTH);
-	dni_info->sn[SERIAL_NUMBER_LENGTH +1]='\0';
-
-	printf("eth0   mac: %02x:%02x:%02x:%02x:%02x:%02x\n",dni_info->eth0_mac[0],dni_info->eth0_mac[1],dni_info->eth0_mac[2],dni_info->eth0_mac[3],dni_info->eth0_mac[4],dni_info->eth0_mac[5]);
-	printf("eth1   mac: %02x:%02x:%02x:%02x:%02x:%02x\n",dni_info->eth1_mac[0],dni_info->eth1_mac[1],dni_info->eth1_mac[2],dni_info->eth1_mac[3],dni_info->eth1_mac[4],dni_info->eth1_mac[5]);
-	printf("wlan5g mac: %02x:%02x:%02x:%02x:%02x:%02x\n",dni_info->ath1_mac[0],dni_info->ath1_mac[1],dni_info->ath1_mac[2],dni_info->ath1_mac[3],dni_info->ath1_mac[4],dni_info->ath1_mac[5]);
-	printf("wpspin    : %s\n",dni_info->wps_pin);
-	printf("sn	  : %s\n",dni_info->sn);
-}
-
-U_BOOT_CMD(
-               dnishow,CFG_MAXARGS,              1,      do_dnishow,
-               "display dni write info include mac address,wpspin and serial number",
-               "Usage:\n dnishow \n"
-               "for instance:dnishow"
-         );
-
-#endif
-
 #ifdef CMD_DATA_SIZE
 int cmd_get_data_size(char* arg, int default_size)
 {

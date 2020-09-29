@@ -403,14 +403,7 @@ void nand_env_relocate_spec(void)
 {
 #if !defined(ENV_IS_EMBEDDED)
 	int ret;
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-	char buf[CONFIG_ENV_SIZE];
-#endif
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	char buf[CONFIG_ENV_SIZE_MAX];
-#endif
 
 #if defined(CONFIG_ENV_OFFSET_OOB)
 	ret = get_nand_env_oob(&nand_info[nand_env_device],

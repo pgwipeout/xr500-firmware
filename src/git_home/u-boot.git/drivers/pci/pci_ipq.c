@@ -25,6 +25,12 @@
 #if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
 #include "../../board/qcom/hw29764958p0p128p512p4x4p4x4pcascade/hw29764958p0p128p512p4x4p4x4pcascade.h"
 #endif
+#if defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE)
+#include "../../board/qcom/hw29764958p0p256p512p4x4p4x4pcascade/hw29764958p0p256p512p4x4p4x4pcascade.h"
+#endif
+#if defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
+#include "../../board/qcom/hw29765257p0p128p256p3x3p4x4/hw29765257p0p128p256p3x3p4x4.h"
+#endif
 #if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #include "../../board/qcom/hw29764958p0p128p512p4x4p4x4pxDSL/ipq806x_cdp.h"
 #endif

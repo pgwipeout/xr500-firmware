@@ -346,15 +346,10 @@ static void uart_dm_init(void)
 	ipq_configure_gpio(gboard_param->dbg_uart_gpio, NO_OF_DBG_UART_GPIOS);
 
 	/* Configure the uart clock */
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-        uart_clock_config(gboard_param->uart_gsbi,
-		gboard_param->mnd_value.m_value,
-		gboard_param->mnd_value.n_value,
-		gboard_param->mnd_value.d_value,
-		gboard_param->clk_dummy);
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
         uart_clock_config(gboard_param->uart_gsbi,
 		gboard_param->uart_mnd_value.m_value,

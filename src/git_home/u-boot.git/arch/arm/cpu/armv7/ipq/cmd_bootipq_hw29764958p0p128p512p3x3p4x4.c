@@ -19,6 +19,7 @@
 #include <asm/arch-ipq806x/smem.h>
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #include <asm/arch-ipq806x/scm.h>
 #include <linux/mtd/ubi.h>
@@ -28,6 +29,7 @@
 #define img_addr	((void *)CONFIG_SYS_LOAD_ADDR)
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #define CE1_REG_USAGE		(0)
 #define CE1_ADM_USAGE		(1)
@@ -45,6 +47,7 @@ static ipq_mmc *host = &mmc_host;
 
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 typedef struct {
 	unsigned int image_type;
@@ -212,6 +215,7 @@ static int inline do_dumpipq_data()
 
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 static int switch_ce_channel_buf(unsigned int channel_id)
 {
@@ -641,136 +645,11 @@ static int do_bootipq(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 U_BOOT_CMD(bootipq, 2, 0, do_bootipq,
 	   "bootipq from flash device",
 	   "bootipq [debug] - Load image(s) and boots the kernel\n");
-#endif  /* CONFIG_HW29764958P0P128P512P3X3P4X4 || CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE || CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL */
-
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-/**
- * Load the NSS images and Kernel image and transfer control to kernel
- *
- * This function is preserved for R7500 so that kernel in raw NAND flash
- * can be boot through method of "bootipq" in QSDK LN.1.0.1.
- */
-static int do_bootipq2(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
-{
-	char bootargs[IH_NMLEN+32];
-	char runcmd[128];
-	int nandid = 0;
-	int fake_fs_on_nand;
-
-#ifdef CONFIG_IPQ_APPSBL_DLOAD
-	unsigned long * dmagic1 = (unsigned long *) 0x2A03F000;
-	unsigned long * dmagic2 = (unsigned long *) 0x2A03F004;
 #endif
 
-	if (argc == 2 && strncmp(argv[1], "debug", 5) == 0)
-		debug = 1;
-
-#ifdef CONFIG_IPQ_APPSBL_DLOAD
-	/* check if we are in download mode */
-	if (*dmagic1 == 0xE47B337D && *dmagic2 == 0x0501CAB0) {
-		/* clear the magic and run the dump command */
-		*dmagic1 = 0;
-		*dmagic2 = 0;
-		uint64_t etime = get_timer_masked() + (10 * CONFIG_SYS_HZ);
-
-		printf("\nCrashdump magic found."
-			"\nHit any key within 10s to stop dump activity...");
-		while (!tstc()) {       /* while no incoming data */
-			if (get_timer_masked() >= etime) {
-				if (do_dumpipq_data() == CMD_RET_FAILURE)
-					return CMD_RET_FAILURE;
-				break;
-			}
-		}
-
-		/* reset the system, some images might not be loaded
-		 * when crashmagic is found
-		 */
-		run_command("reset", 0);
-	}
-#endif
-
-	set_fs_bootargs(&fake_fs_on_nand);
-
-	/* check the smem info to see which flash used for booting */
-	if (sfi->flash_type == SMEM_BOOT_SPI_FLASH) {
-		nandid = 1;
-		if (debug) {
-			printf("Using nand device 1\n");
-		}
-		run_command("nand device 1", 0);
-	} else if (sfi->flash_type == SMEM_BOOT_NAND_FLASH) {
-		if (debug) {
-			printf("Using nand device 0\n");
-		}
-	} else {
-		printf("Unsupported BOOT flash type\n");
-		return -1;
-	}
-
-#ifdef CONFIG_IPQ_LOAD_NSS_FW
-	/* check the smem info to see whether the partition size is valid.
-	 * refer board/qcom/ipq806x_cdp/ipq806x_cdp.c:ipq_get_part_details
-	 * for more details
-	 */
-	if (sfi->nss[0].size != 0xBAD0FF5E) {
-		sprintf(runcmd, "nand read 0x%x 0x%llx 0x%llx",
-				CONFIG_SYS_LOAD_ADDR,
-				sfi->nss[0].offset, sfi->nss[0].size);
-
-		if (load_nss_img(runcmd, bootargs, sizeof(bootargs), 0)
-				!= CMD_RET_SUCCESS)
-			return CMD_RET_FAILURE;
-
-		if (getenv("nssbootargs0") == NULL)
-			setenv("nssbootargs0", bootargs);
-
-		run_command("setenv bootargs ${bootargs} ${nssbootargs0}", 0);
-	}
-
-	if (sfi->nss[1].size != 0xBAD0FF5E) {
-		sprintf(runcmd, "nand read 0x%x 0x%llx 0x%llx",
-				CONFIG_SYS_LOAD_ADDR,
-				sfi->nss[1].offset, sfi->nss[1].size);
-
-		if (load_nss_img(runcmd, bootargs, sizeof(bootargs), 1)
-				!= CMD_RET_SUCCESS)
-			return CMD_RET_FAILURE;
-
-		if (getenv("nssbootargs1") == NULL)
-			setenv("nssbootargs1", bootargs);
-
-		run_command("setenv bootargs ${bootargs} ${nssbootargs1}", 0);
-	}
-#endif /* CONFIG_IPQ_LOAD_NSS_FW */
-
-	if (debug) {
-		run_command("printenv bootargs", 0);
-		printf("Booting from flash\n");
-	}
-
-	snprintf(runcmd, sizeof(runcmd), "set autostart yes;"
-			"nboot 0x%x %d 0x%x", CONFIG_SYS_LOAD_ADDR, nandid,
-			0x1340000);
-	if (debug)
-		printf(runcmd);
-
-#ifdef CONFIG_IPQ_MMC
-	board_mmc_deinit();
-#endif
-
-	if (run_command(runcmd, 0) != CMD_RET_SUCCESS)
-		return CMD_RET_FAILURE;
-
-	return CMD_RET_SUCCESS;
-}
-
-U_BOOT_CMD(bootipq2, 2, 0, do_bootipq2,
-	   "bootipq from flash device",
-	   "bootipq2 [debug] - Load image(s) and boots the kernel\n");
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 /**
  * Load the NSS images and Kernel image and transfer control to kernel

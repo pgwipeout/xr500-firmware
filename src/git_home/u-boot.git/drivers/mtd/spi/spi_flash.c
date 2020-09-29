@@ -206,6 +206,53 @@ int spi_flash_cmd_wait_ready(struct spi_flash *flash, unsigned long timeout)
 		CMD_READ_STATUS, STATUS_WIP);
 }
 
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+	defined(CONFIG_HW29765285P16P0P256) || \
+	defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
+int spi_nand_flash_cmd_poll_bit(struct spi_flash *flash, unsigned long timeout,
+                           u8 cmd, u8 poll_bit, u8 *status)
+{
+	struct spi_slave *spi = flash->spi;
+	unsigned long timebase;
+	u8 cmd_buf[2];
+
+	cmd_buf[0] = 0x0F;
+	cmd_buf[1] = cmd;
+
+	timebase = get_timer(0);
+	do {
+		WATCHDOG_RESET();
+
+		spi_flash_cmd_read(spi, cmd_buf, 2, status, 1);
+		if ((*status & poll_bit) == 0)
+			break;
+
+	} while (get_timer(timebase) < timeout);
+
+	if ((*status & poll_bit) == 0)
+		return 0;
+
+	/* Timed out */
+	debug("SF: time out!\n");
+	return -1;
+}
+
+int spi_nand_flash_cmd_wait_ready(struct spi_flash *flash, u8 status_bit, u8 *status,
+                                  unsigned long timeout)
+{
+	return spi_nand_flash_cmd_poll_bit(flash, timeout,
+					   0xC0, status_bit, status);
+}
+#endif
+
+
 static int spi_flash_cmd_erase_block_or_sector(struct spi_flash *flash, u8 erase_cmd,
 					u32 erase_size, u32 offset, size_t len)
 {
@@ -346,6 +393,9 @@ static const struct {
 #ifdef CONFIG_SPI_FLASH_WINBOND
 	{ 0, 0xef, spi_flash_probe_winbond, },
 #endif
+#ifdef CONFIG_SPI_FLASH_GIGA
+	{ 0, 0xc8, spi_flash_probe_giga, },
+#endif
 #ifdef CONFIG_SPI_FRAM_RAMTRON
 	{ 6, 0xc2, spi_fram_probe_ramtron, },
 # undef IDCODE_CONT_LEN
@@ -358,8 +408,22 @@ static const struct {
 #ifdef CONFIG_SPI_FRAM_RAMTRON_NON_JEDEC
 	{ 0, 0xff, spi_fram_probe_ramtron, },
 #endif
+#ifdef CONFIG_SPI_NAND_GIGA
+	{ 0, 0xc8, spi_nand_flash_probe, },
+#endif
+#ifdef CONFIG_SPI_NAND_ATO
+	{ 0, 0xff, spi_nand_flash_probe, },
+#endif
+#ifdef CONFIG_SPI_NAND_MACRONIX
+	{ 0, 0x00, spi_nand_flash_probe, },
+#endif
+#ifdef CONFIG_SPI_NAND_WINBOND
+	{ 0, 0x00, spi_nand_flash_probe, },
+#endif
 };
 #define IDCODE_LEN (IDCODE_CONT_LEN + IDCODE_PART_LEN)
+#define MFID_ATO	0x9b
+#define MFID_MACRONIX   0xc2
 
 struct spi_flash *spi_flash_probe(unsigned int bus, unsigned int cs,
 		unsigned int max_hz, unsigned int spi_mode)
@@ -405,6 +469,21 @@ struct spi_flash *spi_flash_probe(unsigned int bus, unsigned int cs,
 			if (flash)
 				break;
 		}
+
+#if defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+	defined(CONFIG_HW29765285P16P0P256) || \
+	defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
+	if (!flash)
+		/* We did not find a match, do generic probe */
+		flash = spi_nor_probe_generic(spi, idp);
+#endif
 
 	if (!flash) {
 		printf("SF: Unsupported manufacturer %02x\n", *idp);

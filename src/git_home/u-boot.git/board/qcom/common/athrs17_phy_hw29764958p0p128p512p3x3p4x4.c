@@ -166,18 +166,6 @@ void athrs17_vlan_config(void)
 * INPUT: NONE
 * OUTPUT: NONE
 *******************************************************************/
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-void athrs17_reset_switch(void)
-{
-	uint32_t data;
-	/* Reset the switch before initialization */
-	athrs17_reg_write(S17_MASK_CTRL_REG, S17_MASK_CTRL_SOFT_RET);
-	do {
-		udelay(10);
-		data = athrs17_reg_read(S17_MASK_CTRL_REG);
-	} while (data & S17_MASK_CTRL_SOFT_RET);
-}
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
@@ -283,18 +271,6 @@ void athrs17_reg_init_lan(ipq_gmac_board_cfg_t *gmac_cfg)
  * OUTPUT: NONE
  *
 **********************************************************************/
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-void ipq_switch_init(ipq_gmac_board_cfg_t *gmac_cfg)
-{
-	if (gmac_cfg != NULL) {
-
-		athrs17_reset_switch();
-		athrs17_reg_init(gmac_cfg);
-		athrs17_reg_init_lan(gmac_cfg);
-		athrs17_vlan_config();
-	}
-}
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)

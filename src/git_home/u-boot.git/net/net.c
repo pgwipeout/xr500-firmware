@@ -97,9 +97,7 @@
 #endif
 #include "link_local.h"
 #include "nfs.h"
-#if defined(CONFIG_SYS_NMRP)
 #include "nmrp.h"
-#endif
 #include "ping.h"
 #include "rarp.h"
 #if defined(CONFIG_CMD_SNTP)
@@ -174,7 +172,6 @@ ushort		NetOurVLAN = 0xFFFF;
 /* ditto */
 ushort		NetOurNativeVLAN = 0xFFFF;
 
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 uchar NetOurTftpIP[4] = { 192, 168, 1, 1 };
 int NetRunTftpServer = 0;
 uchar TftpClientEther[6] = { 0, 0, 0, 0, 0, 0};
@@ -182,6 +179,7 @@ IPaddr_t TftpClientIP = 0;
 #ifdef DNI_NAND
 #include <nand.h>
 #else
+#ifndef CONFIG_SYS_NO_FLASH
 extern flash_info_t flash_info[];
 #endif
 #endif
@@ -333,9 +331,10 @@ int NetLoop(enum proto_t protocol)
 	bootstage_mark_name(BOOTSTAGE_ID_ETH_START, "eth_start");
 	net_init();
 	eth_halt();
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
         setenv("ethact", "eth1");
 #else
@@ -378,27 +377,21 @@ restart:
 		case TFTPPUT:
 #endif
 			/* always use ARP to get server ethernet address */
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 			if(NetRunTftpServer)
 			{
-#ifdef CONFIG_SYS_NMRP
 				if (NmrpState != 0) {
 					NetServerIP = 1;
 					NetCopyIP(&NetOurIP, NetOurTftpIP);
 					NetOurGatewayIP = 0;
 				}
-#endif
 				TftpServerStart();
 			}
 			else
-#endif
 			TftpStart(protocol);
 			break;
-#ifdef CONFIG_SYS_NMRP
 		case NMRP:
 			NmrpStart();
 			break;
-#endif
 
 #ifdef CONFIG_CMD_TFTPSRV
 		case TFTPSRV:
@@ -429,6 +422,12 @@ restart:
 #if defined(CONFIG_CMD_PING)
 		case PING:
 			ping_start();
+			break;
+#endif
+#if defined(SHORT_PING_WORKAROUND)
+       case SHORT_PING:
+			ShortPingStart();
+			protocol = PING;
 			break;
 #endif
 #if defined(CONFIG_CMD_NFS)
@@ -552,10 +551,8 @@ skip_netloop:
 			goto restart;
 
 		case NETLOOP_SUCCESS:
-#ifdef CONFIG_SYS_NMRP
 			if (NmrpState == STATE_CLOSING)
 				goto skip_netloop;
-#endif
 			net_cleanup_loop();
 			if (NetBootFileXferSize > 0) {
 				char buf[20];
@@ -568,9 +565,10 @@ skip_netloop:
 				sprintf(buf, "%lX", (unsigned long)load_addr);
 				setenv("fileaddr", buf);
 			}
-#if !defined(CONFIG_HW29764841P0P128P256P3X3P4X4) && \
-    !defined(CONFIG_HW29764958P0P128P512P3X3P4X4) && \
+#if !defined(CONFIG_HW29764958P0P128P512P3X3P4X4) && \
     !defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) && \
+    !defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) && \
+    !defined(CONFIG_HW29765257P0P128P256P3X3P4X4) && \
     !defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 			eth_halt();
 #endif
@@ -1071,7 +1069,6 @@ NetReceive(uchar *inpkt, int len)
 
 	switch (eth_proto) {
 
-#ifdef CONFIG_SYS_NMRP
 		case PROT_NMRP:
 			if(len <= MIN_ETHER_NMRP_LEN){
 				printf("bad packet len@!\n");
@@ -1080,7 +1077,6 @@ NetReceive(uchar *inpkt, int len)
 			memcpy(NmrpServerEther,et->et_src,6);
 			(*udp_packet_handler)((uchar *)ip, 0, 0, 0, PROT_NMRP);
 			break;
-#endif
 	case PROT_ARP:
 		ArpReceive(et, ip, len);
 		break;
@@ -1088,13 +1084,11 @@ NetReceive(uchar *inpkt, int len)
 #ifdef CONFIG_CMD_RARP
 	case PROT_RARP:
 
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 		if(NetRunTftpServer == 1 )
 		{
 			debug("Got RARP\n");
 			return;
 		}
-#endif
 		rarp_receive(ip, len);
 		break;
 #endif
@@ -1171,10 +1165,8 @@ NetReceive(uchar *inpkt, int len)
 		} else if (ip->ip_p != IPPROTO_UDP) {	/* Only UDP packets */
 			return;
 		}
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 		/* Saved the Client IP address anyway for future use */
 		TftpClientIP = NetReadIP(&ip->ip_src);
-#endif
 
 		debug_cond(DEBUG_DEV_PKT,
 			"received UDP (to=%pI4, from=%pI4, len=%d)\n",
@@ -1526,7 +1518,6 @@ ushort getenv_VLAN(char *var)
 	return string_to_VLAN(getenv(var));
 }
 
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 extern int flash_sect_erase (ulong, ulong);
 
 /* Check if Alive-timer expires? */
@@ -1685,9 +1676,10 @@ void update_firmware(ulong addr, int firmware_size)
 		return;
 	}
 
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	run_command("ipq_nand linux", 0);
 #endif
@@ -1695,10 +1687,133 @@ void update_firmware(ulong addr, int firmware_size)
 	            CONFIG_SYS_IMAGE_LEN +
 		    (size_t)board_image_reserved_length(), 1, 1);
 
-#ifdef CONFIG_SYS_NMRP
+#ifdef CONFIG_SYS_IMAGE_BASE_ADDR_SECOND
+	char runcmd[256];
+	printf ("boot_partition_set 1\n");
+	snprintf(runcmd, sizeof(runcmd), "boot_partition_set 1");
+	run_command(runcmd, 0);
+#endif
+
 	if(NmrpState != 0)
 		return;
+	printf ("Done\nRebooting...\n");
+
+	do_reset(NULL,0,0,NULL);
+}
+
+#ifdef CONFIG_SYS_IMAGE_BASE_ADDR_SECOND
+void update_firmware_second(ulong addr, int firmware_size)
+{
+	if (get_len_incl_bad(&nand_info[0], (loff_t)CONFIG_SYS_IMAGE_BASE_ADDR_SECOND,
+	    (size_t)firmware_size) > ((size_t)CONFIG_SYS_IMAGE_LEN +
+	                              (size_t)board_image_reserved_length()))
+	{
+		printf("** FAIL !! too many bad blocks, no enough space for firmware image.\n");
+		return;
+	}
+
+	update_data(addr, firmware_size, CONFIG_SYS_IMAGE_BASE_ADDR_SECOND,
+	            CONFIG_SYS_IMAGE_LEN +
+		    (size_t)board_image_reserved_length(), 1, 1);
+
+	char runcmd[256];
+	printf ("boot_partition_set 2\n");
+	snprintf(runcmd, sizeof(runcmd), "boot_partition_set 2");
+	run_command(runcmd, 0);
+
+	if(NmrpState != 0)
+		return;
+	printf ("Done\nRebooting...\n");
+
+	do_reset(NULL,0,0,NULL);
+}
 #endif
+#endif
+
+#ifdef CONFIG_FUNC_MMC
+void update_firmware(ulong addr, int firmware_size)
+{
+	if (firmware_size <= 0) {
+		printf("Incorrect firmware size\n");
+		return;
+	}
+	uchar *src_addr;
+	ulong target_addr;
+	ulong target_cnt;
+
+	target_addr = IMAGE_BASE_BLOCK;
+	target_cnt = firmware_size/0x200 + 1;
+
+	char runcmd[256];
+
+	printf ("mmc erase 0x%lx 0x%lx\n",target_addr, target_cnt);
+	snprintf(runcmd, sizeof(runcmd), "mmc erase 0x%lx 0x%lx", target_addr, target_cnt);
+	run_command(runcmd, 0);
+	CheckNmrpAliveTimerExpire(1);
+
+	printf ("Copy image to Flash... ");
+
+	printf ("mmc write 0x%lx 0x%lx 0x%lx\n", addr, target_addr, target_cnt);
+	snprintf(runcmd, sizeof(runcmd), "mmc write 0x%lx 0x%lx 0x%lx", addr, target_addr, target_cnt);
+	run_command(runcmd, 0);
+
+#if defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
+	printf ("boot_partition_set 1\n");
+	snprintf(runcmd, sizeof(runcmd), "boot_partition_set 1");
+	run_command(runcmd, 0);
+#endif
+	CheckNmrpAliveTimerExpire(1);
+	
+	if(NmrpState != 0)
+		return;
+	printf ("Done\nRebooting...\n");
+
+	do_reset(NULL,0,0,NULL);
+}
+#endif
+
+#ifdef CONFIG_FUNC_MMC
+void update_firmware_second(ulong addr, int firmware_size)
+{
+	if (firmware_size <= 0) {
+		printf("Incorrect firmware size\n");
+		return;
+	}
+	uchar *src_addr;
+	ulong target_addr;
+	ulong target_cnt;
+
+	target_addr = IMAGE_BASE_BLOCK_SECOND_FW;
+	target_cnt = firmware_size/0x200 + 1;
+
+	char runcmd[256];
+
+	printf ("mmc erase 0x%lx 0x%lx\n",target_addr, target_cnt);
+	snprintf(runcmd, sizeof(runcmd), "mmc erase 0x%lx 0x%lx", target_addr, target_cnt);
+	run_command(runcmd, 0);
+	CheckNmrpAliveTimerExpire(1);
+
+	printf ("Copy image to Flash... ");
+
+	printf ("mmc write 0x%lx 0x%lx 0x%lx\n", addr, target_addr, target_cnt);
+	snprintf(runcmd, sizeof(runcmd), "mmc write 0x%lx 0x%lx 0x%lx", addr, target_addr, target_cnt);
+	run_command(runcmd, 0);
+
+#if defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
+	printf ("boot_partition_set 2\n");
+	snprintf(runcmd, sizeof(runcmd), "boot_partition_set 2");
+	run_command(runcmd, 0);
+#endif
+	CheckNmrpAliveTimerExpire(1);
+	
+	if(NmrpState != 0)
+		return;
 	printf ("Done\nRebooting...\n");
 
 	do_reset(NULL,0,0,NULL);
@@ -1706,6 +1821,7 @@ void update_firmware(ulong addr, int firmware_size)
 #endif
 
 #ifndef DNI_NAND
+#ifndef CONFIG_FUNC_MMC
 void update_firmware(ulong addr, int firmware_size)
 {
 	if (firmware_size <= 0) {
@@ -1742,14 +1858,13 @@ void update_firmware(ulong addr, int firmware_size)
 		CheckNmrpAliveTimerExpire(1);
 		target_addr += CONFIG_SYS_FLASH_SECTOR_SIZE;
 	}
-#ifdef CONFIG_SYS_NMRP
 	if(NmrpState != 0)
 		return;
-#endif
 	printf ("Done\nRebooting...\n");
 
 	do_reset(NULL,0,0,NULL);
 }
+#endif
 #endif
 
 void StartTftpServerToRecoveFirmware (void)
@@ -1780,13 +1895,12 @@ tftpstart:
 
 	//  copy Image to flash
 
-#ifdef CONFIG_SYS_NMRP
 	if (NmrpState == STATE_CLOSED)
 		return;
 	else if ( NmrpState !=0 )
 		NmrpState = STATE_CLOSING;
-#endif
 	hdr = (image_header_t *)(addr + HEADER_LEN);
+#ifndef CONFIG_FIT
 	if (!board_model_id_match_open_source_id() &&
 	    !image_match_open_source_fw_id(addr) &&
 	    ntohl(hdr->ih_magic) != IH_MAGIC) {
@@ -1794,6 +1908,7 @@ tftpstart:
 		ResetTftpServer();
 		goto tftpstart;
 	}
+#endif
 #ifdef NETGEAR_BOARD_ID_SUPPORT
 	if (!board_match_image_hw_id(addr)) {
 		puts ("Board HW ID mismatch,it is forbidden to be written to flash!!\n");
@@ -1814,13 +1929,11 @@ tftpstart:
 #endif
 
 	update_firmware(addr + HEADER_LEN, file_size - HEADER_LEN);
-#ifdef CONFIG_SYS_NMRP
 	if (NmrpState == STATE_CLOSING)
 	{
 		net_set_udp_handler(NmrpHandler);
 		NmrpSend();
 	}
-#endif
 	/*
 	 *  It indicates that tftp server would leave running state when
 	 *  this function returns.
@@ -1840,7 +1953,97 @@ U_BOOT_CMD(
 	"- start tftp server to recovery dni firmware image."
 );
 
-#if defined(CONFIG_SYS_NMRP) && defined(CONFIG_SYS_SINGLE_FIRMWARE)
+#if defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2) || \
+	defined(CONFIG_SYS_IMAGE_BASE_ADDR_SECOND)
+void StartTftpServerToRecoveFirmware_second (void)
+{
+	NetRunTftpServer = 1;
+	ulong addr;
+	image_header_t *hdr;
+	int file_size;
+	char *s;
+
+	/* pre-set load_addr from CONFIG_SYS_LOAD_ADDR */
+	load_addr = CONFIG_SYS_LOAD_ADDR;
+
+	/* pre-set load_addr from $loadaddr */
+	if ((s = getenv("loadaddr")) != NULL) {
+		load_addr = simple_strtoul(s, NULL, 16);
+	}
+
+tftpstart:
+	addr = load_addr;
+	file_size = NetLoop(TFTPGET);
+	if (file_size < 1)
+	{
+		printf ("\nFirmware recovering from TFTP server is stopped or failed! :( \n");
+		NetRunTftpServer = 0;
+		return;
+	}
+
+	//  copy Image to flash
+
+	if (NmrpState == STATE_CLOSED)
+		return;
+	else if ( NmrpState !=0 )
+		NmrpState = STATE_CLOSING;
+	hdr = (image_header_t *)(addr + HEADER_LEN);
+#ifndef CONFIG_FIT
+	if (!board_model_id_match_open_source_id() &&
+	    !image_match_open_source_fw_id(addr) &&
+	    ntohl(hdr->ih_magic) != IH_MAGIC) {
+		puts ("Bad Magic Number,it is forbidden to be written to flash!!\n");
+		ResetTftpServer();
+		goto tftpstart;
+	}
+#endif
+#ifdef NETGEAR_BOARD_ID_SUPPORT
+	if (!board_match_image_hw_id(addr)) {
+		puts ("Board HW ID mismatch,it is forbidden to be written to flash!!\n");
+		ResetTftpServer();
+		goto tftpstart;
+	}
+	if (!board_model_id_match_open_source_id() &&
+	    (!board_match_image_model_id(addr) &&
+	     !image_match_open_source_fw_id(addr))) {
+		puts ("Board MODEL ID mismatch,it is forbidden to be written to flash!!\n");
+		ResetTftpServer();
+		goto tftpstart;
+	}
+	if (!board_match_image_model_id(addr)) {
+		printf("board model id mismatch with image id, updating board ID\n");
+		board_update_image_model_id(addr);
+	}
+#endif
+
+	update_firmware_second(addr + HEADER_LEN, file_size - HEADER_LEN);
+	if (NmrpState == STATE_CLOSING)
+	{
+		net_set_udp_handler(NmrpHandler);
+		NmrpSend();
+	}
+	/*
+	 *  It indicates that tftp server would leave running state when
+	 *  this function returns.
+	 */
+	NetRunTftpServer = 0;
+}
+
+int do_fw_recovery_second (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
+{
+	StartTftpServerToRecoveFirmware_second();
+	return 0;
+}
+
+U_BOOT_CMD(
+	fw_recovery_second,	1,	0,	do_fw_recovery_second,
+	"start tftp server to recovery dni firmware image.",
+	"- start tftp server to recovery dni firmware image."
+);
+#endif
+
 void UpgradeFirmwareFromNmrpServer(void)
 {
 	NetRunTftpServer = 1;
@@ -1866,11 +2069,9 @@ void UpgradeFirmwareFromNmrpServer(void)
 		return;
 	}
 
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 	NmrpState = STATE_TFTPUPLOADING;
 	net_set_udp_handler(NmrpHandler);
 	NmrpSend();
-#endif
 
 	printf("Ignore Magic number checking when upgrade via NMRP,Magic number is %x!\n", IH_MAGIC);
 	//  copy Image to flash
@@ -1881,12 +2082,15 @@ void UpgradeFirmwareFromNmrpServer(void)
 	}
 	else {
 		puts ("Board HW ID mismatch,it is forbidden to be written to flash!!\n");
+#if defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4)
+		board_nmrp_red_blink();
+#endif
+		NmrpFail = 1;
 	}
 #else
 	update_firmware(addr + HEADER_LEN, file_size - HEADER_LEN);
 #endif
 
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 	/* firmware write to flash done */
 	NmrpFwUPOption = 0;
 	if (NmrpSTUPOption == 1) {
@@ -1894,16 +2098,11 @@ void UpgradeFirmwareFromNmrpServer(void)
 	} else {
 		NmrpState = STATE_CLOSING;
 	}
-#else
-	NmrpState = STATE_CLOSING;
-#endif
 	net_set_udp_handler(NmrpHandler);
 	NmrpSend();
 	NetRunTftpServer = 0;
 }
-#endif
 
-#if defined(CONFIG_SYS_NMRP) && defined(CONFIG_SYS_SINGLE_FIRMWARE)
 void UpgradeStringTableFromNmrpServer(int table_num)
 {
 	NetRunTftpServer = 1;
@@ -1945,6 +2144,7 @@ void UpgradeStringTableFromNmrpServer(int table_num)
 		NmrpSTUPOption = 0;
 	if (NmrpFwUPOption == 0 && NmrpSTUPOption == 0) {
 		workaround_qca8337_gmac_nmrp_hang_action();
+		workaround_ipq40xx_gmac_nmrp_hang_action();
 		printf("Upgrading all done\n");
 		NmrpState = STATE_CLOSING;
 		net_set_udp_handler(NmrpHandler);
@@ -1952,29 +2152,25 @@ void UpgradeStringTableFromNmrpServer(int table_num)
 	} else {
 		printf("More files to be upgrading\n");
 		workaround_qca8337_gmac_nmrp_hang_action();
+		workaround_ipq40xx_gmac_nmrp_hang_action();
 		NmrpState = STATE_CONFIGING;
 		net_set_udp_handler(NmrpHandler);
 		NmrpSend();
 	}
 	NetRunTftpServer = 0;
 }
-#endif
 
 void ResetTftpServer(void)
 {
 	timeHandler = 0;
-#ifdef CONFIG_SYS_NMRP
 	if(NmrpState != 0)
 	{
 		NmrpState = STATE_CONFIGING;
 		NmrpSend();
 	}
 	else
-#endif
 	net_set_state(NETLOOP_RESTART);
 }
-#endif
-#ifdef CONFIG_SYS_NMRP
 void StartNmrpClient(void)
 {
         if( NetLoop(NMRP) < 1)
@@ -1989,7 +2185,6 @@ void ResetBootup_usual(void)
         net_set_state(NETLOOP_SUCCESS);
 }
 
-#if defined(CONFIG_SYS_NMRP) && defined(CONFIG_CMD_NMRP)
 int do_nmrp (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	StartNmrpClient();
@@ -2001,5 +2196,3 @@ U_BOOT_CMD(
 	"start nmrp mechanism to upgrade firmware-image or string-table.",
 	"- start nmrp mechanism to upgrade firmware-image or string-table."
 );
-#endif
-#endif

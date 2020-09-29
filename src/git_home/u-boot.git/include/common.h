@@ -39,11 +39,7 @@ typedef volatile unsigned char	vu_char;
 #include <linux/bitops.h>
 #include <linux/types.h>
 #include <linux/string.h>
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #include <linux/compiler.h>
-#endif
 #include <asm/ptrace.h>
 #include <stdarg.h>
 #if defined(CONFIG_PCI) && (defined(CONFIG_4xx) && !defined(CONFIG_AP1000))
@@ -252,20 +248,6 @@ typedef void (interrupt_handler_t)(void *);
 		(__x < 0) ? -__x : __x;		\
 	})
 
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-#if defined(CONFIG_ENV_IS_EMBEDDED)
-#define TOTAL_MALLOC_LEN	CONFIG_SYS_MALLOC_LEN
-#elif ( ((CONFIG_ENV_ADDR+CONFIG_ENV_SIZE) < CONFIG_SYS_MONITOR_BASE) || \
-	(CONFIG_ENV_ADDR >= (CONFIG_SYS_MONITOR_BASE + CONFIG_SYS_MONITOR_LEN)) ) || \
-      defined(CONFIG_ENV_IS_IN_NVRAM)
-#define	TOTAL_MALLOC_LEN	(CONFIG_SYS_MALLOC_LEN + CONFIG_ENV_SIZE)
-#else
-#define	TOTAL_MALLOC_LEN	CONFIG_SYS_MALLOC_LEN
-#endif
-#endif
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #if defined(CONFIG_ENV_IS_EMBEDDED)
 #define TOTAL_MALLOC_LEN	CONFIG_SYS_MALLOC_LEN
 #elif ( ((CONFIG_ENV_ADDR+CONFIG_ENV_SIZE_MAX) < CONFIG_SYS_MONITOR_BASE) || \
@@ -274,7 +256,6 @@ typedef void (interrupt_handler_t)(void *);
 #define	TOTAL_MALLOC_LEN	(CONFIG_SYS_MALLOC_LEN + CONFIG_ENV_SIZE_MAX)
 #else
 #define	TOTAL_MALLOC_LEN	CONFIG_SYS_MALLOC_LEN
-#endif
 #endif
 
 /**
@@ -360,6 +341,17 @@ int	getenv_f     (const char *name, char *buf, unsigned len);
 ulong getenv_ulong(const char *name, int base, ulong default_val);
 #ifdef CONFIG_IPQ806X_ENV
 extern int	(*saveenv)   (void);
+#elif defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+    defined(CONFIG_HW29765285P16P0P256) || \
+    defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
+extern int	(*saveenv)(void);
 #else
 int	saveenv	     (void);
 #endif
@@ -540,7 +532,6 @@ void	dcache_enable (void);
 void	dcache_disable(void);
 void	mmu_disable(void);
 void	relocate_code (ulong, gd_t *, ulong) __attribute__ ((noreturn));
-void 	ar7240_ddr_tap_init(void);
 ulong	get_endaddr   (void);
 void	trap_init     (ulong);
 #if defined (CONFIG_4xx)	|| \
@@ -759,13 +750,9 @@ void	flush_dcache_range(unsigned long start, unsigned long stop);
 void	invalidate_dcache_range(unsigned long start, unsigned long stop);
 void	invalidate_dcache_all(void);
 void	invalidate_icache_all(void);
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 void	set_l2_indirect_reg(u32 reg_addr, u32 val);
 void	clear_l2cache_err(void);
 u32 	get_l2_indirect_reg(u32 reg_addr);
-#endif
 
 /* arch/$(ARCH)/lib/ticks.S */
 unsigned long long get_ticks(void);

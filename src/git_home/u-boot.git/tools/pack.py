@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 # Copyright (c) 2013-2015 The Linux Foundation. All rights reserved.
 #
@@ -32,7 +31,7 @@ within U-Boot. The procedure to use this script is listed below.
      with address location where the image has been loaded. The script
      expects the variable 'imgaddr' to be set.
 
-     u-boot> imgaddr=0x41000000 source $imgaddr:script
+     u-boot> imgaddr=0x88000000 source $imgaddr:script
 
 Host-side Pre-req
 
@@ -212,7 +211,7 @@ class MIBIB(object):
     TABLE_FMT = "<LLLL"
     TABLE_MAGIC1 = 0x55EE73AA
     TABLE_MAGIC2 = 0xE35EBDDB
-    TABLE_VERSION = 3
+    TABLE_VERSION = 4
 
     Entry = namedtuple("Entry", "name offset length"
                         " attr1 attr2 attr3 which_flash")
@@ -451,9 +450,10 @@ class FlashScript(object):
 class NandScript(FlashScript):
     """Class for creating NAND flash scripts."""
 
-    def __init__(self, flinfo, ipq_nand):
+    def __init__(self, flinfo, ipq_nand, spi_nand):
         FlashScript.__init__(self, flinfo)
         self.ipq_nand = ipq_nand
+        self.spi_nand = spi_nand
 
     def erase(self, offset, size):
         """Generate code, to erase the specified partition."""
@@ -477,11 +477,18 @@ class NandScript(FlashScript):
 
         self.append("ipq_nand %s" % layout)
 
+    def probe(self):
+        if self.spi_nand == "true":
+            self.append("nand device 1")
+        else:
+            self.append("nand device 0")
+
 class NorScript(FlashScript):
     """Class for creating NAND flash scripts."""
 
-    def __init__(self, flinfo):
+    def __init__(self, flinfo, spi_nand):
         FlashScript.__init__(self, flinfo)
+        self.spi_nand = spi_nand
 
     def erase(self, offset, size):
         """Generate code, to erase the specified partition."""
@@ -495,14 +502,22 @@ class NorScript(FlashScript):
         if size > 0:
             self.append("sf write $fileaddr 0x%08x 0x%08x" % (offset, size))
 
-    def nand_write(self, offset, size):
+    def nand_write(self, offset, part_size, img_size):
         """Handle the NOR + NAND case
            All binaries upto HLOS will go to NOR and Root FS will go to NAND
            Assumed all nand page sizes are less than are equal to 8KB
            """
-        self.append("nand device 0 && nand erase 0x%08x 0x%08x" % (offset, size))
-        if size > 0:
-            self.append("nand write $fileaddr 0x%08x 0x%08x" % (offset, size))
+        if self.spi_nand == "true":
+            self.append("nand device 1 && nand erase 0x%08x 0x%08x" % (offset, part_size))
+        else:
+            self.append("nand device 0 && nand erase 0x%08x 0x%08x" % (offset, part_size))
+
+        if img_size > 0:
+            self.append("nand write $fileaddr 0x%08x 0x%08x" % (offset, img_size))
+
+
+    def probe(self):
+        self.append("sf probe")
 
     def switch_layout(self, layout):
         pass
@@ -526,6 +541,9 @@ class EmmcScript(FlashScript):
            self.append("mmc write $fileaddr 0x%08x %x" % (offset, blk_cnt))
 
     def switch_layout(self, layout):
+        pass
+
+    def probe(self):
         pass
 
 its_tmpl = Template("""
@@ -572,6 +590,7 @@ class Pack(object):
         self.flinfo = None
         self.images_dname = None
         self.ipq_nand = None
+        self.spi_nand = "false"
         self.partitions = {}
 
         self.fconf_fname = None
@@ -742,13 +761,18 @@ class Pack(object):
             if part_info == None:
                 if self.flinfo.type == 'norplusnand':
                     offset = count * Pack.norplusnand_rootfs_img_size
-                    img_size = Pack.norplusnand_rootfs_img_size
-                    script.nand_write(offset, img_size)
+                    part_size = Pack.norplusnand_rootfs_img_size
+                    script.nand_write(offset, part_size, img_size)
                     count = count + 1
             else:
-                offset = part_info.offset
-                script.erase(offset, part_info.length)
-                script.write(offset, img_size, yaffs)
+                if part_info.which_flash == 0:
+                    offset = part_info.offset
+                    script.erase(offset, part_info.length)
+                    script.write(offset, img_size, yaffs)
+                else:
+                    offset = part_info.offset
+                    script.nand_write(offset, part_info.length, img_size)
+
             script.finish_activity()
 
             if machid:
@@ -880,11 +904,12 @@ class Pack(object):
 
         self.flinfo = flinfo
         if flinfo.type == "nand":
-            self.ipq_nand = True
-            script = NandScript(flinfo, self.ipq_nand)
-        elif flinfo.type == "nor" or flinfo.type == "norplusnand":
             self.ipq_nand = False
-            script = NorScript(flinfo)
+            script = NandScript(flinfo, self.ipq_nand, self.spi_nand)
+        elif flinfo.type == "nor" or flinfo.type == "norplusnand":
+            self.spi_nand = self.bconf.get(board_section, "spi_nand_available")
+            self.ipq_nand = False
+            script = NorScript(flinfo, self.spi_nand)
         elif flinfo.type == "emmc":
             self.ipq_nand = False
             script = EmmcScript(flinfo)
@@ -892,6 +917,7 @@ class Pack(object):
             error("error, flash type unspecified.")
 
         script.start_if("machid", machid)
+        script.probe()
         self.__gen_script(script_fp, fconf_fp, script, images, flinfo)
         script.end_if()
 
@@ -1179,7 +1205,7 @@ class ArgParser(object):
         self.images_dname = None
         self.ipq_nand = False
         self.bconf = False
-	self.bconf_fname = "boardconfig"
+        self.bconf_fname = "boardconfig"
         self.part_fname = None
         self.fconf_fname = None
 
@@ -1328,7 +1354,7 @@ class ArgParser(object):
         part_fname = None
         fconf_fname = None
         bconf = False
-	bconf_fname = None
+        bconf_fname = None
 
         try:
             opts, args = getopt(argv[1:], "Bib:hp:t:o:c:m:f:F:")
@@ -1376,8 +1402,8 @@ class ArgParser(object):
 
         self.ipq_nand = ipq_nand
         self.bconf = bconf
-	if bconf_fname != None:
-		self.bconf_fname = bconf_fname
+        if bconf_fname != None:
+            self.bconf_fname = bconf_fname
 
     def usage(self, msg):
         """Print error message and command usage information.

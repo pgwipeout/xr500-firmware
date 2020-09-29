@@ -20,14 +20,17 @@
 #include <common.h>
 #include "athrs17_phy.h"
 #include "qca8511.h"
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-#include "../../../drivers/net/ipq/ipq_gmac_hw29764841p0p128p256p3x3p4x4.h"
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4)
 #include "../../../drivers/net/ipq/ipq_gmac_hw29764958p0p128p512p3x3p4x4.h"
 #endif
 #if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
 #include "../../../drivers/net/ipq/ipq_gmac_hw29764958p0p128p512p4x4p4x4pcascade.h"
+#endif
+#if defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE)
+#include "../../../drivers/net/ipq/ipq_gmac_hw29764958p0p256p512p4x4p4x4pcascade.h"
+#endif
+#if defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
+#include "../../../drivers/net/ipq/ipq_gmac_hw29765257p0p128p256p3x3p4x4.h"
 #endif
 #if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #include "../../../drivers/net/ipq/ipq_gmac_hw29764958p0p128p512p4x4p4x4pxDSL.h"

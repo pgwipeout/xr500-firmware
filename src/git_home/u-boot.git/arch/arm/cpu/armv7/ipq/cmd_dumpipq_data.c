@@ -6,7 +6,9 @@
 #include <command.h>
 #include <image.h>
 #include <asm/arch-ipq806x/smem.h>
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 #include <asm/sizes.h>
 #include <asm/arch-ipq806x/scm.h>
 #include <asm/arch-ipq806x/iomap.h>
@@ -40,13 +42,17 @@ struct dumpinfo_t dumpinfo[] = {
 	{ "RPM_WDT.BIN",  0x0006206C, 0x00000004, 0 },
 	{ "CPU0_WDT.BIN", 0x0208A044, 0x00000004, 0 },
 	{ "CPU1_WDT.BIN", 0x0209A044, 0x00000004, 0 },
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 	{ "CPU0_REG.BIN", 0x39013ea8, 0x000000AC, 0 },
 	{ "CPU1_REG.BIN", 0x39013f54, 0x000000AC, 0 },
 #endif
 	{ "WLAN_FW.BIN",  0x41400000, 0x000FFF80, 0 },
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	{ "WLAN_FW_900B.BIN", 0x44000000, 0x00600000, 0 },
 #endif
@@ -54,7 +60,9 @@ struct dumpinfo_t dumpinfo[] = {
 	{ "EBI1CS1.BIN",  0x60000000, 0x20000000, 0 }
 };
 
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 void forever(void) { while (1); }
 /*
  * Set the cold/warm boot address for one of the CPU cores.
@@ -139,7 +147,9 @@ static int do_dumpipq_data(cmd_tbl_t *cmdtp, int flag, int argc,
 		printf("Env 'dumpdir' not set. Using / dir in TFTP server\n");
 	}
 
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 	if (scm_set_boot_addr() == 0) {
 		/* Pull Core-1 out of reset, iff scm call succeeds */
 		krait_release_secondary();

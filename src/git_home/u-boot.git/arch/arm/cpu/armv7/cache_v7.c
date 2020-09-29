@@ -33,9 +33,6 @@
 
 #ifndef CONFIG_SYS_DCACHE_OFF
 
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 void set_l2_indirect_reg(u32 reg_addr, u32 val)
 {
 
@@ -61,7 +58,6 @@ u32 get_l2_indirect_reg(u32 reg_addr)
 
 	return val;
 }
-#endif  /* CONFIG_HW29764958P0P128P512P3X3P4X4 || CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE || CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL */
 
 /*
  * Write the level and type you want to Cache Size Selection Register(CSSELR)
@@ -243,11 +239,7 @@ static void v7_dcache_maint_range(u32 start, u32 stop, u32 range_op)
 {
 	u32 line_len, ccsidr;
 
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	set_csselr(0, ARMV7_CSSELR_IND_DATA_UNIFIED);
-#endif
 
 	ccsidr = get_ccsidr();
 	line_len = ((ccsidr & CCSIDR_LINE_SIZE_MASK) >>

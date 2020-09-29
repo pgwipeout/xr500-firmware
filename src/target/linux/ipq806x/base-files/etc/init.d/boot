@@ -276,6 +276,12 @@ start() {
 		/bin/config set default_ssphrase="0"
 		commit_flag=1
 	fi
+
+	if [ "$(/bin/config get dumaos_signed)" != "1" ] && [ "$(/bin/config get agree_full_TC)" = "1" ]; then
+		/bin/config set dumaos_signed=1
+		commit_flag=1
+	fi
+
 	# need to update Streamboost database after upgrade firmwrare
 	[ -f /tmp/new_firmware ] && /bin/config set new_firmware=1 && commit_flag=1
 	[ "$commit_flag" = "1" ] && /bin/config commit

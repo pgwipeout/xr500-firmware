@@ -602,12 +602,10 @@ static int ipq_check_read_status(struct mtd_info *mtd, uint32_t status)
 
 	debug("Read Status: %08x\n", status);
 
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-	cw_erased = readl(&regs->erased_cw_detect_status);
-	cw_erased &= CODEWORD_ERASED_MASK;
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	/* Hardware handles erased page detection for BCH */
 	if (dev->dev_cfg1 & ENABLE_BCH_ECC(1)) {
@@ -635,6 +633,8 @@ static int ipq_check_read_status(struct mtd_info *mtd, uint32_t status)
 
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 /* On reading an erased page,value 0x54 will appear on the offsets 3
  * and 175 in a page in case of linux layout and value 0x76 will appear
@@ -689,7 +689,7 @@ static int ipq_nand_handle_erased_pg(struct mtd_info *mtd,
 
 	return 0;
 }
-#endif  /* CONFIG_HW29764958P0P128P512P3X3P4X4 || CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE || CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL*/
+#endif
 
 /*
  * Read a codeword into the data and oob buffers, at offsets specified
@@ -709,10 +709,6 @@ static int ipq_read_cw(struct mtd_info *mtd, u_int cwno,
 		return ret;
 
 	ret = ipq_check_read_status(mtd, status);
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-	if (ret < 0)
-		return ret;
-#endif
 
 	if (ops->datbuf != NULL) {
 		hw2memcpy(ops->datbuf, &regs->buffn_acc[cwl->data_offs >> 2],
@@ -720,6 +716,8 @@ static int ipq_read_cw(struct mtd_info *mtd, u_int cwno,
 
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 		ret = ipq_nand_handle_erased_pg(mtd, ops, cwl, ret);
 		if (ret < 0)
@@ -733,6 +731,8 @@ static int ipq_read_cw(struct mtd_info *mtd, u_int cwno,
 	if (ops->oobbuf != NULL) {
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 		if (ret < 0)
 			return ret;

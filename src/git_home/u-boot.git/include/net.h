@@ -416,18 +416,14 @@ extern ushort		NetOurNativeVLAN;	/* Our Native VLAN */
 
 extern int		NetRestartWrap;		/* Tried all network devices */
 
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 extern uchar NetOurTftpIP[4];
 extern int NetRunTftpServer;
 extern uchar TftpClientEther[6];    /* TFTP Client enet address      */
 extern IPaddr_t TftpClientIP;       /* Client IP addr (0 = unknown)  */
 extern void StartTftpServerToRecoveFirmware(void);
-#if defined(CONFIG_SYS_NMRP) && defined(CONFIG_SYS_SINGLE_FIRMWARE)
 extern void UpgradeFirmwareFromNmrpServer(void);
 extern void CheckNmrpAliveTimerExpire(int send_nmrp_alive);
-#endif
 extern void ResetTftpServer(void);
-#endif
 
 #define IP_ADDR_LEN 4
 typedef struct{
@@ -452,7 +448,7 @@ extern uchar NmrpServerEther[6];
 
 enum proto_t {
 	BOOTP, RARP, ARP, TFTPGET, DHCP, PING, DNS, NFS, CDP, NETCONS, SNTP,
-	TFTPSRV, TFTPPUT, LINKLOCAL, NMRP
+	TFTPSRV, TFTPPUT, LINKLOCAL, NMRP, SHORT_PING
 };
 
 /* from net/net.c */

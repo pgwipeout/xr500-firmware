@@ -21,6 +21,10 @@
  */
 void ping_start(void);
 
+#if defined(SHORT_PING_WORKAROUND)
+void ShortPingStart(void);
+#endif
+
 /*
  * Deal with the receipt of a ping packet
  *

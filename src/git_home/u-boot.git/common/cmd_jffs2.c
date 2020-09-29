@@ -532,9 +532,7 @@ int do_jffs2_fsload(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 			setenv("filesize", buf);
 		} else {
 			printf("### %s LOAD ERROR<%x> for %s!\n", fsname, size, filename);
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 			StartTftpServerToRecoveFirmware();
-#endif
 		}
 
 		return !(size > 0);

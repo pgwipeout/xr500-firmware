@@ -79,4 +79,14 @@ static inline int board_image_reserved_length(void)
 } while (0)
 #endif
 
+#if defined(WORKAROUND_IPQ40XX_GMAC_NMRP_HANG)
+#define workaround_ipq40xx_gmac_nmrp_hang_action()  do {  \
+	DECLARE_GLOBAL_DATA_PTR;  \
+	eth_halt();  \
+	eth_init(gd->bd);  \
+} while (0)
+#else
+#define workaround_ipq40xx_gmac_nmrp_hang_action()  do {} while (0)
+#endif
+
 #endif	/* __DNI_COMMON_H_ */

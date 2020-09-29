@@ -7,7 +7,6 @@ extern void NmrpConfig(void);
 extern void NmrpHandler(uchar * pkt, unsigned dest, IPaddr_t src_ip,
                         unsigned src, unsigned type);
 extern int NmrpState;
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 extern int NmrpFwUPOption;
 extern int NmrpSTUPOption;
 extern int NmrpStringTableUpdateCount;
@@ -15,8 +14,8 @@ extern int NmrpStringTableUpdateIndex;
 extern ulong NmrpAliveTimerStart;
 extern ulong NmrpAliveTimerBase;
 extern int NmrpAliveTimerTimeout;
-#endif
 extern ulong Nmrp_active_start;
+extern int NmrpFail;
 /* NMRP codes */
 enum _nmrp_codes_ {
 	NMRP_CODE_ADVERTISE = 0x01,
@@ -102,10 +101,8 @@ typedef struct {
 			uchar addr[IP_LEN];
 			uchar mask[IP_LEN];
 		}ip;
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 		u16 region;
 		u32 string_table_bitmask;
-#endif
 	} value;
 }__attribute__ ((packed)) NMRP_PARSED_OPT;
 

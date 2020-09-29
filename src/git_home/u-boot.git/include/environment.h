@@ -140,12 +140,8 @@ extern char *env_name_spec;
 
 #define ENV_SIZE (CONFIG_ENV_SIZE - ENV_HEADER_SIZE)
 
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #ifndef CONFIG_ENV_SIZE_MAX
 #define CONFIG_ENV_SIZE_MAX CONFIG_ENV_SIZE
-#endif
 #endif
 
 typedef struct environment_s {
@@ -153,14 +149,7 @@ typedef struct environment_s {
 #ifdef CONFIG_SYS_REDUNDAND_ENVIRONMENT
 	unsigned char	flags;		/* active/obsolete flags	*/
 #endif
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-	unsigned char	data[ENV_SIZE]; /* Environment data		*/
-#endif
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	unsigned char	data[CONFIG_ENV_SIZE_MAX - ENV_HEADER_SIZE]; /* Environment data		*/
-#endif
 } env_t;
 
 #ifdef ENV_IS_EMBEDDED

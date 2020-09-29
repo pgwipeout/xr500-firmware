@@ -55,8 +55,14 @@ int smem_get_boot_flash(uint32_t *flash_type,
 int smem_getpart(char *name, uint32_t *start, uint32_t *size);
 unsigned int smem_get_board_machtype(void);
 int smem_ram_ptable_init(struct smem_ram_ptable *smem_ram_ptable);
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 int ipq_smem_get_socinfo_cpu_type(uint32_t *cpu_type);
 int ipq_smem_get_socinfo_version(uint32_t *version);
+#endif
 
 typedef struct {
 	loff_t offset;
@@ -68,7 +74,13 @@ typedef struct {
 	uint32_t		flash_index;
 	uint32_t		flash_chip_select;
 	uint32_t		flash_block_size;
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	uint32_t		flash_secondary_type;
+#endif
 	ipq_part_entry_t	hlos;
 #ifdef CONFIG_IPQ_LOAD_NSS_FW
 	ipq_part_entry_t	nss[2];
@@ -103,6 +115,11 @@ typedef struct
 	struct per_part_info per_part_entry[NUM_ALT_PARTITION];
 } ipq_smem_bootconfig_info_t;
 
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 /* version 2 */
 #define SMEM_DUAL_BOOTINFO_MAGIC_START 0xA3A2A1A0
 #define SMEM_DUAL_BOOTINFO_MAGIC_END 0xB3B2B1B0
@@ -116,18 +133,23 @@ typedef struct
 	struct per_part_info per_part_entry[NUM_ALT_PARTITION];
 	uint32_t magic_end;
 } ipq_smem_bootconfig_v2_info_t;
+#endif
 
 extern ipq_smem_bootconfig_info_t ipq_smem_bootconfig_info;
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 extern ipq_smem_bootconfig_v2_info_t ipq_smem_bootconfig_v2_info;
+#endif
 
 int smem_bootconfig_info(void);
 unsigned int get_rootfs_active_partition(void);
-#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 unsigned int get_mibib_active_partition(void);
-#endif
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 char *ipq_smem_part_to_mtdparts(char *mtdid);
 #endif
 

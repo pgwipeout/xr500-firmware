@@ -185,6 +185,11 @@ stack_setup:
 	adr	r0, _start
 	cmp	r0, r6
 	moveq	r9, #0		/* no relocation. relocation offset(r9) = 0 */
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	beq	clear_bss		/* skip relocation */
 	mov	r1, r6			/* r1 <- scratch for copy_loop */
 	ldr	r3, _image_copy_end_ofs
@@ -196,6 +201,7 @@ copy_loop:
 	cmp	r0, r2			/* until source end address [r2]    */
 	blo	copy_loop
 
+#endif
 #ifndef CONFIG_SPL_BUILD
 	/*
 	 * fix .rel.dyn relocations

@@ -43,14 +43,14 @@
 #include <linux/ctype.h>
 #include <menu.h>
 
-#if defined(CONFIG_SILENT_CONSOLE) || defined(CONFIG_POST) || defined(CONFIG_CMDLINE_EDITING)
+#if defined(CONFIG_SILENT_CONSOLE) || defined(CONFIG_POST) || defined(CONFIG_CMDLINE_EDITING) || defined(CONFIG_IPQ_ETH_INIT_DEFER)
 DECLARE_GLOBAL_DATA_PTR;
 #endif
 
 /*
  * Board-specific Platform code can reimplement show_boot_progress () if needed
  */
-void inline __show_boot_progress (int val) {}
+void __show_boot_progress (int val) {}
 void show_boot_progress (int val) __attribute__((weak, alias("__show_boot_progress")));
 
 #if defined(CONFIG_UPDATE_TFTP)
@@ -254,12 +254,21 @@ int abortboot(int bootdelay)
 
 		printf("\b\b\b%2d ", bootdelay);
 	}
+#ifdef CONFIG_IPQ_ETH_INIT_DEFER
+       if (abort) {
+               puts("\nNet:   ");
+               eth_initialize(gd->bd);
+       }
+#endif
 
 	putc('\n');
 
 #ifdef CONFIG_SILENT_CONSOLE
 	if (abort)
 		gd->flags &= ~GD_FLG_SILENT;
+#endif
+#if defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4)
+	run_command("reset_i2c_to_blink", 0);
 #endif
 
 	return abort;

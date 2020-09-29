@@ -41,6 +41,8 @@ ulong NmrpAliveTimerBase = 0;
 int NmrpAliveTimerTimeout = NMRP_TIMEOUT_ACTIVE;
 int NmrpAliveWaitACK = 0;
 
+int NmrpFail = 0 ;
+
 static void Nmrp_Listen_Timeout(void);
 void NmrpSend(void);
 
@@ -49,6 +51,10 @@ void NmrpStart(void);
 void NmrpSetTimeout(unchar, ulong, nmrp_thand_f *);
 
 void Nmrp_Led_Flashing_Timeout();
+
+#ifdef ORBI_DESKTOP_LED_DEF_V1_14
+void board_nmrp_led(int);
+#endif
 
 static int MyNetSetEther(volatile uchar * xet, uchar * addr, uint prot)
 {
@@ -97,9 +103,10 @@ void Nmrp_Closing_Timeout()
 		Nmrp_Closing_TimeoutCount = 0;
 		board_reset_default();
 
-		puts("\npress ctrl+C to continue.....\n");
+		puts("\nNMRP is complete. Please switch OFF power.\n");
 
 		Nmrp_Led_Flashing_Timeout();
+		/* Unreachable */
 
 		ctrlc();
 		console_assign(stdout, "nulldev");
@@ -119,19 +126,25 @@ void Nmrp_Led_Flashing_Timeout()
 {
 	static int NmrpLedCount = 0;
 	while (1) {
-
-		if (ctrlc())
-			break;
-
 		NmrpLedCount++;
 		if ((NmrpLedCount % 2) == 1) {
+#ifdef ORBI_DESKTOP_LED_DEF_V1_14
+			board_nmrp_led(0);
+#else
 			board_test_led(0);
+#endif
 			udelay(500000);
 		} else {
+#ifdef ORBI_DESKTOP_LED_DEF_V1_14
+			board_nmrp_led(1);
+#else
 			board_test_led(1);
+#endif
 			udelay(500000);
 		}
 	}
+	/* Unreachable */
+
 	/*press ctl+c, turn on test led,then normally boot*/
 	board_test_led(0);
 }
@@ -174,7 +187,6 @@ extern void NmrpSend(void)
 		pkt++;
 		*((u8 *) pkt) = 0;
 		pkt++;
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 		/* Recv ST-UP option, upgrade string table.
 		 * add FILE-NAME option to TFTP-UL-REQ
 		 * value of FILE-NAME would like "string table 01"*/
@@ -228,32 +240,23 @@ extern void NmrpSend(void)
 				pkt++;
 			}
 		}
-#else
-		*((u16 *) pkt) = htons(6);
-		pkt += 2;
-#endif
 		len = pkt - xp;
 		(void)NetSendPacket((u8 *) NetTxPacket, eth_len + len);
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 		int update_table_num = NmrpStringTableUpdateList[NmrpStringTableUpdateIndex];
 		if (NmrpSTUPOption == 1)
 			UpgradeStringTableFromNmrpServer(update_table_num);
 		else
 			UpgradeFirmwareFromNmrpServer();
-#else
-		StartTftpServerToRecoveFirmware();
-#endif
 		break;
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 	case STATE_TFTPUPLOADING:
 		printf("TFTP upload done\n");
 		NmrpAliveTimerStart = get_timer(0);
 		NmrpAliveTimerBase = NMRP_TIMEOUT_ACTIVE / 4;
 		NmrpState = STATE_KEEP_ALIVE;
 		break;
-#endif
 	case STATE_KEEP_ALIVE:
 		printf("NMRP Send Keep alive REQ\n");
+		workaround_ipq40xx_gmac_nmrp_hang_action();
 		xp = pkt;
 		*((u16 *) pkt) = 0;
 		pkt += 2;
@@ -265,13 +268,12 @@ extern void NmrpSend(void)
 		pkt += 2;
 		len = pkt - xp;
 		(void)NetSendPacket((u8 *) NetTxPacket, eth_len + len);
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 		NmrpAliveWaitACK = 1;
-#endif
 		break;
 	case STATE_CLOSING:
 		printf("NMRP Send Closing REQ\n");
 		workaround_qca8337_gmac_nmrp_hang_action();
+		workaround_ipq40xx_gmac_nmrp_hang_action();
 		xp = pkt;
 		*((u16 *) pkt) = 0;
 		pkt += 2;
@@ -289,10 +291,23 @@ extern void NmrpSend(void)
 
 	case STATE_CLOSED:
 		board_reset_default();
+#if defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
+		char runcmd[256];
+		printf ("boot_partition_set 1\n");
+		snprintf(runcmd, sizeof(runcmd), "boot_partition_set 1");
+		run_command(runcmd, 0);
+#endif
 		NmrptimeHandler=NULL;
-		puts("\npress ctrl+C to continue.....\n");
+		puts("\nNMRP is complete. Please switch OFF power.\n");
 
 		Nmrp_Led_Flashing_Timeout();
+		/* Unreachable */
 
 		ctrlc();
 		console_assign(stdout, "nulldev");
@@ -370,7 +385,6 @@ static int Nmrp_Parse_Opts(uchar *pkt, NMRP_PARSED_MSG *nmrp_parsed)
 	return remain_len;
 }
 
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 void string_table_bitmask_check()
 {
 	int update_bit;
@@ -384,7 +398,6 @@ void string_table_bitmask_check()
 		}
 	}
 }
-#endif
 
 void NmrpHandler(uchar * pkt, unsigned dest, IPaddr_t src_ip, unsigned src,
                  unsigned type)
@@ -448,7 +461,11 @@ void NmrpHandler(uchar * pkt, unsigned dest, IPaddr_t src_ip, unsigned src,
 				int opt_hdr_len = sizeof(opt->type) + sizeof(opt->len);
 				if (memcmp(opt->value.magicno, MAGICNO, ntohs(opt->len) - opt_hdr_len) == 0){
 					NmrpState = STATE_LISTENING;
+#ifdef ORBI_DESKTOP_LED_DEF_V1_14
+					board_nmrp_led(0);
+#else
 					board_test_led(0);
+#endif
 					printf("\nNMRP CONFIGING");
 					NmrpSend();
 				}
@@ -475,7 +492,6 @@ void NmrpHandler(uchar * pkt, unsigned dest, IPaddr_t src_ip, unsigned src,
 				   DEV-IP and MAGIC-NO.
 				 */
 
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 #if defined(REGION_NUMBER_OFFSET) && defined(REGION_NUMBER_LENGTH)
 				/*When NMRP Client get CONF-ACK with DEV-REGION option*/
 				if ((opt = Nmrp_Parse(&nmrp_parsed, NMRP_OPT_DEV_REGION)) != NULL) {
@@ -524,16 +540,10 @@ void NmrpHandler(uchar * pkt, unsigned dest, IPaddr_t src_ip, unsigned src,
 					printf("\nNMRP WAITING FOR UPLOAD FIRMWARE or STRING TABLES!\n");
 					NmrpSend();
 				}
-#else
-				NmrpState = STATE_CONFIGING;
-				printf("\nNMRP WAITING FOR UPLOAD FIRMWARE!\n");
-				NmrpSend();
-#endif
 			}else
 				break;
 		}
 		break;
-#if defined(CONFIG_SYS_SINGLE_FIRMWARE)
 	case NMRP_CODE_KEEP_ALIVE_ACK:
 		if (NmrpState == STATE_KEEP_ALIVE) {
 			if (NmrpAliveWaitACK == 1) {
@@ -542,7 +552,6 @@ void NmrpHandler(uchar * pkt, unsigned dest, IPaddr_t src_ip, unsigned src,
 			}
 		}
 		break;
-#endif
 	case NMRP_CODE_CLOSE_ACK:
 		if (NmrpState == STATE_CLOSING) {
 			NmrpState = STATE_CLOSED;

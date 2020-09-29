@@ -386,6 +386,14 @@ int nand_unlock(struct mtd_info *mtd, ulong start, ulong length)
 }
 #endif
 
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL) || \
+    defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+    defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2)
 /**
  * get_len_incl_bad
  *
@@ -418,6 +426,7 @@ size_t get_len_incl_bad (nand_info_t *nand, loff_t offset,
 
 	return len_incl_bad;
 }
+#endif
 
 /**
  * check_skip_len

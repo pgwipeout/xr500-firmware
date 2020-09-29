@@ -160,7 +160,13 @@
 #define EXT_CSD_SEC_CNT			212	/* RO, 4 bytes */
 #define EXT_CSD_HC_ERASE_GRP_SIZE	224	/* RO */
 #define EXT_CSD_SEC_FEATURE_SUPPORT     231     /* RO */
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #define EXT_CSD_TRIM_MULT		232     /* RO */
+#endif
 
 #define EXT_CSD_SEC_ER_EN       (1 << 0)
 #define EXT_CSD_SEC_GB_CL_EN    (1 << 4)
@@ -269,7 +275,13 @@ struct mmc {
 	int (*getcd)(struct mmc *mmc);
 	uint b_max;
 	uchar sec_feature_support;
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 	unsigned int trim_timeout; /* In milliseconds */
+#endif
 };
 
 int mmc_register(struct mmc *mmc);

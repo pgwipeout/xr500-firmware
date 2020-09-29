@@ -300,6 +300,35 @@ U_BOOT_CMD(
 );
 #endif
 
+#if defined(SHORT_PING_WORKAROUND)
+int do_short_ping(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
+{
+       if (argc < 2)
+               return -1;
+
+       NetPingIP = string_to_ip(argv[1]);
+       if (NetPingIP == 0) {
+               printf ("Usage:\n%s\n", cmdtp->usage);
+               return -1;
+       }
+
+       if (NetLoop(SHORT_PING) < 0) {
+               printf("short_ping failed; host %s is not alive\n", argv[1]);
+               return 1;
+       }
+
+       printf("host %s is alive\n", argv[1]);
+
+       return 0;
+}
+
+U_BOOT_CMD(
+       short_ping,     2,      1,      do_short_ping,
+       "short_ping - ping with lower timeout.\n",
+       "- ping with lower timeout.\n"
+);
+#endif  /* SHORT_PING_WORKAROUND */
+
 #if defined(CONFIG_CMD_CDP)
 
 static void cdp_update_env(void)

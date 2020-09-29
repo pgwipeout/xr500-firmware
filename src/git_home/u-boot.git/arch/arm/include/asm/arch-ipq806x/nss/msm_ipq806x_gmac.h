@@ -139,6 +139,8 @@
 #define GMAC3_RX_CLK_HALT                       (1 << 14)
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+	defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #define NSS_QSGMII_CLK_CTL_CLR_MSK		0
 #endif
@@ -182,6 +184,8 @@
 #define QSGMII_PHY_MODE_CTL                     0x128
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 #define QSGMII_PHY_QSGMII_CTL			0x134
 #endif
@@ -203,6 +207,8 @@
 
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 /* Bit definitions for QSGMII_PHY_QSGMII_CTL */
 #define QSGMII_TX_SLC_CTL(x)			(x << 26)
@@ -253,11 +259,10 @@ extern uchar ipq_def_enetaddr[];
 void ipq_gmac_common_init(ipq_gmac_board_cfg_t *cfg);
 int ipq_gmac_init(ipq_gmac_board_cfg_t *cfg);
 int get_eth_mac_address(uchar *enetaddr, uint no_of_macs);
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4)
-void ipq_switch_init(ipq_gmac_board_cfg_t *cfg);
-#endif
 #if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4) || \
     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
 int ipq_qca8511_init(ipq_gmac_board_cfg_t *gmac_cfg);
 int ipq_athrs17_init(ipq_gmac_board_cfg_t *gmac_cfg);

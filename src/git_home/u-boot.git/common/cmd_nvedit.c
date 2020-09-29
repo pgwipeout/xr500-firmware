@@ -165,6 +165,49 @@ int do_env_print (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	return rcode;
 }
 
+static int do_env_inc(cmd_tbl_t *cmdtp, int flag, int argc,
+               char * const argv[])
+{
+	unsigned long val;
+	unsigned long inc_val;
+	char *init_val;
+	char val_str[10];
+	char *argv_new[] = { argv[0], argv[1], val_str };
+
+	if (argc != 3)
+		return CMD_RET_USAGE;
+
+	init_val = getenv(argv[1]);
+	if (!init_val)
+		return -1;
+
+	val = simple_strtoul(init_val, NULL, 16);
+	inc_val = simple_strtoul(argv[2], NULL, 16);
+
+	sprintf(val_str, "%08x", (unsigned int)(val + inc_val));
+
+	return _do_env_set(flag, argc, argv_new);
+}
+
+static int do_env_set_from_mem(
+    cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	unsigned long addr;
+	uint32_t val;
+	char val_str[10];
+	char *argv_new[] = { argv[0], argv[1], val_str };
+
+	if (argc != 3)
+		return CMD_RET_USAGE;
+
+	addr = simple_strtoul(argv[2], NULL, 16);
+	val = ntohl(*(volatile uint32_t *)addr);
+	sprintf(val_str, "%08x", val);
+
+	return _do_env_set(flag, argc, argv_new);
+}
+
+
 #ifdef CONFIG_CMD_GREPENV
 static int do_env_grep(cmd_tbl_t *cmdtp, int flag,
 		       int argc, char * const argv[])
@@ -512,10 +555,7 @@ char *getenv(const char *name)
 
 		return ep ? ep->data : NULL;
 	} else {
-#if defined(CONFIG_ENV_SIZE_MAX) && \
-    (defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
-     defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL))
+#if defined(CONFIG_ENV_SIZE_MAX)
 		/* for first time set maximum */
 		CONFIG_ENV_SIZE = CONFIG_ENV_SIZE_MAX;
 #endif
@@ -924,6 +964,8 @@ static cmd_tbl_t cmd_env_sub[] = {
 	U_BOOT_CMD_MKENT(save, 1, 0, do_env_save, "", ""),
 #endif
 	U_BOOT_CMD_MKENT(set, CONFIG_SYS_MAXARGS, 0, do_env_set, "", ""),
+	U_BOOT_CMD_MKENT(inc, CONFIG_SYS_MAXARGS, 0, do_env_inc, "", ""),
+	U_BOOT_CMD_MKENT(setmem, CONFIG_SYS_MAXARGS, 0, do_env_set_from_mem, "", ""),
 };
 
 #if defined(CONFIG_NEEDS_MANUAL_RELOC)
@@ -1046,3 +1088,18 @@ U_BOOT_CMD_COMPLETE(
 	var_complete
 );
 #endif
+
+U_BOOT_CMD_COMPLETE(
+	incenv, 3, 0,   do_env_inc,
+	"increment environment variable",
+	"name <inc val (hex)>\n",
+	var_complete
+);
+
+U_BOOT_CMD_COMPLETE(
+	dnisetenvmem, CONFIG_SYS_MAXARGS, 0, do_env_set_from_mem,
+	"set environment variable from memory",
+	"setenv name <address>\n",
+	var_complete
+);
+

@@ -91,6 +91,7 @@ SUBSYSTEM == button, BUTTON == reset, BUTTONACTION == default {
 	break_if_failed
 	exec /sbin/save_reset
 	exec /bin/config default
+	exec /dumaos/config-change.sh
 	exec /bin/rm -f /usr/lib/sbsaved/sb.redis
 	exec /sbin/reboot
 }

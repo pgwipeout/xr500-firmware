@@ -74,6 +74,8 @@
 #define CONFIG_SERVERIP 192.168.1.10
 #define CONFIG_LOADADDR 0x42000000
 
+#define CONFIG_QCA_SINGLE_IMG
+
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_NO_FLASH
 #define CONFIG_SYS_CACHELINE_SIZE   64
@@ -425,6 +427,8 @@ typedef struct {
 #define BOARDCAL			0x1200000
 #define BOARDCAL_LEN			0x140000
 
+#define CONFIG_TRIPLE_MAC_ADDRESS 1
+
 #define LAN_MAC_OFFSET			0x00
 #define WAN_MAC_OFFSET			0x06
 #define WLAN_MAC_OFFSET			0x0c
@@ -440,9 +444,9 @@ typedef struct {
 #define REGION_NUMBER_LENGTH		2
 
 /*
- * R7500 hardware's PCB number is 29764841, 0MiB NOR Flash, 128MiB NAND Flash,
- * 256MiB RAM, 3Tx 3Rx 2.4GHz radio, 4Tx 4Rx 5GHz radio.
- * It's HW_ID would be "29764841+0+128+256+3x3+4x4".
+ * D7800 hardware's PCB number is 29764958, 0MiB NOR Flash, 128MiB NAND Flash,
+ * 512MiB RAM, 4Tx 4Rx 2.4GHz radio, 4Tx 4Rx 5GHz radio, with xDSL interface.
+ * It's HW_ID would be "29764958+0+128+512+4x4+4x4".
  * "(8 MSB of PCB number)+(NOR flash size)+(NAND flash size)+(SDRAM size)+
  *  (2.4GHz radio)+(5GHz radio)", length should be 26
  */
@@ -450,7 +454,7 @@ typedef struct {
 #define BOARD_HW_ID_LENGTH          26
 
 /*
- * Model ID: "R7500"
+ * Model ID: "D7800"
  */
 #define BOARD_MODEL_ID_OFFSET       (BOARD_HW_ID_OFFSET + BOARD_HW_ID_LENGTH)
 #define BOARD_MODEL_ID_LENGTH       16

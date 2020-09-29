@@ -25,16 +25,9 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(CPU).o
 
-ifeq ($(BOARD), wndr3700v3)
-START	= wndr3700v3/start.o
-
-SOBJS-y	= wndr3700v3/cache.o
-COBJS-y	= wndr3700v3/cpu.o wndr3700v3/interrupts.o time.o
-else
 START	= start.o
 SOBJS-y	= cache.o
 COBJS-y	= cpu.o interrupts.o time.o
-endif
 
 SRCS	:= $(START:.o=.S) $(SOBJS-y:.o=.S) $(COBJS-y:.o=.c)
 OBJS	:= $(addprefix $(obj),$(SOBJS-y) $(COBJS-y))

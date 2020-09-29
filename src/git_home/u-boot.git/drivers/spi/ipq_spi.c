@@ -722,7 +722,9 @@ static int gsbi_spi_read(struct ipq_spi_slave *ds, u8 *data_buffer,
 					SPI_INPUT_BLOCK_SIZE : read_bytes);
 
 			for (i = 0; i < fifo_count; i++) {
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 				if (ctrlc()) {
 					putc ('\n');
 					return 1;
@@ -746,7 +748,9 @@ static int gsbi_spi_read(struct ipq_spi_slave *ds, u8 *data_buffer,
 					SPI_OUTPUT_BLOCK_SIZE : read_bytes);
 
 			for (i = 0; i < fifo_count; i++) {
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 				if (ctrlc()) {
 					putc ('\n');
 					return 1;
@@ -841,7 +845,9 @@ static int gsbi_spi_write(struct ipq_spi_slave *ds, const u8 *cmd_buffer,
 
 			for (i = 0; i < fifo_count; i++) {
 				/* Write actual data to output FIFO */
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 				if (ctrlc()) {
 					putc ('\n');
 					return 1;
@@ -866,7 +872,9 @@ static int gsbi_spi_write(struct ipq_spi_slave *ds, const u8 *cmd_buffer,
 				fifo_count = read_len;
 
 			for (i = 0; i < fifo_count; i++) {
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 				if (ctrlc()) {
 					putc ('\n');
 					return 1;

@@ -207,6 +207,15 @@ static int bootm_start(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 	os_hdr = boot_get_kernel(cmdtp, flag, argc, argv,
 			&images, &images.os.image_start, &images.os.image_len);
 	if (images.os.image_len == 0) {
+#if defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
+		board_firmware_corrupted_LedSet();
+#endif
 		puts("ERROR: can't get kernel image!\n");
 		return 1;
 	}
@@ -330,23 +339,12 @@ int bootm_load_os(image_info_t os, ulong *load_end, int boot_progress)
 #endif /* defined(CONFIG_LZMA) || defined(CONFIG_LZO) */
 
 	const char *type_name = genimg_get_type_name(os.type);
-#if defined(CONFIG_DTB_COMPRESSION)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+	defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 	if(os.type == IH_TYPE_FLATDT) {
 		unc_len = CONFIG_DTB_LOAD_MAXLEN;
 	}
-#endif
-
-#if defined(CONFIG_AR7240)
-    /*
-     * Flush everything, restore caches for linux
-     */
-    mips_cache_flush();
-#if defined(CONFIG_WASP)
-    mips_icache_flush_ix();
-#endif
-
-    /* XXX - this causes problems when booting from flash */
-    /* dcache_disable(); */
 #endif
 
 	switch (comp) {
@@ -444,13 +442,24 @@ int bootm_load_os(image_info_t os, ulong *load_end, int boot_progress)
 	flush_cache(load, (*load_end - load) * sizeof(ulong));
 #endif
 	puts("OK\n");
-#if defined(CONFIG_HW29764841P0P128P256P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
-    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL)
+#if defined(CONFIG_HW29764958P0P128P512P3X3P4X4) || \
+    defined(CONFIG_HW29764958P0P128P512P4X4P4X4PXDSL) || \
+	defined(CONFIG_HW29765265P16P0P256P2X2P2X2) || \
+	defined(CONFIG_HW29765285P16P0P256) || \
+	defined(CONFIG_HW29765285P16P0P128) || \
+	defined(CONFIG_HW29765352P32P4000P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765619P0P256P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765641P0P256P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765641P0P128P512P2X2P2X2P2X2) || \
+	defined(CONFIG_HW29765352P0P4096P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765352P32P0P512P2X2P2X2P4X4) || \
+	defined(CONFIG_HW29765515P0P4096P512P2X2P2X2P2X2)
 	debug("   kernel loaded at 0x%08lx, end = 0x%08lx\n", load, *load_end);
 	bootstage_mark(BOOTSTAGE_ID_KERNEL_LOADED);
 #endif
-#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE)
+#if defined(CONFIG_HW29764958P0P128P512P4X4P4X4PCASCADE) || \
+    defined(CONFIG_HW29764958P0P256P512P4X4P4X4PCASCADE) || \
+	defined(CONFIG_HW29765257P0P128P256P3X3P4X4)
 	debug("   %s loaded at 0x%08lx, end = 0x%08lx\n", type_name, load, *load_end);
 	if(os.type == IH_TYPE_KERNEL) {
 		bootstage_mark(BOOTSTAGE_ID_KERNEL_LOADED);
@@ -768,9 +777,7 @@ static image_header_t *image_get_kernel(ulong img_addr, int verify)
 	    !image_check_magic(hdr)) {
 		puts("Bad Magic Number\n");
 		bootstage_error(BOOTSTAGE_ID_CHECK_MAGIC);
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 		StartTftpServerToRecoveFirmware();
-#endif
 		return NULL;
 	}
 	bootstage_mark(BOOTSTAGE_ID_CHECK_HEADER);
@@ -778,9 +785,7 @@ static image_header_t *image_get_kernel(ulong img_addr, int verify)
 	if (!image_check_hcrc(hdr)) {
 		puts("Bad Header Checksum\n");
 		bootstage_error(BOOTSTAGE_ID_CHECK_HEADER);
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 		StartTftpServerToRecoveFirmware();
-#endif
 		return NULL;
 	}
 
@@ -792,9 +797,7 @@ static image_header_t *image_get_kernel(ulong img_addr, int verify)
 		if (!image_check_dcrc(hdr)) {
 			printf("Bad Data CRC\n");
 			bootstage_error(BOOTSTAGE_ID_CHECK_CHECKSUM);
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 			StartTftpServerToRecoveFirmware();
-#endif
 			return NULL;
 		}
 		puts("OK\n");
@@ -1037,9 +1040,7 @@ static void *boot_get_kernel(cmd_tbl_t *cmdtp, int flag, int argc,
 #endif
 	default:
 		printf("Wrong Image Format for %s command\n", cmdtp->name);
-#ifdef FIRMWARE_RECOVER_FROM_TFTP_SERVER
 		StartTftpServerToRecoveFirmware();
-#endif
 		bootstage_error(BOOTSTAGE_ID_FIT_KERNEL_INFO);
 		return NULL;
 	}
