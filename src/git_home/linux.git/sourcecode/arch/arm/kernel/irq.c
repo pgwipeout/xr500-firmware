@@ -34,11 +34,17 @@
 #include <linux/list.h>
 #include <linux/kallsyms.h>
 #include <linux/proc_fs.h>
+#ifdef CONFIG_STOPWATCH_HARD_IRQ
+#define __STOPWATCH_USE__
+#endif
+#include <linux/stopwatch.h>
 
 #include <asm/exception.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/irq.h>
 #include <asm/mach/time.h>
+
+DEFINE_STOPWATCH_ARRAY(hardirq, NR_IRQS+1);
 
 /*
  * No architecture-specific irq_finish function defined in arm/arch/irqs.h.
@@ -61,6 +67,47 @@ int arch_show_interrupts(struct seq_file *p, int prec)
 	return 0;
 }
 
+#ifdef __STOPWATCH_USE__
+int stopwatch_hardirq_show(struct seq_file *f, void *v)
+{
+	struct irqaction *ap;
+	int irq = *((loff_t *) v);
+	struct irq_desc *desc = irq_to_desc(irq);
+	int cpu;
+
+	if (irq == 0)
+		seq_printf(f, "%20s\tCPU\tmin(us)\tavg(us)\tmax(us)\n\n", "");
+
+	if (irq == NR_IRQS)
+		seq_printf(f, "%-20s", "softirq");
+	else {
+		ap = desc->action;
+		if (!ap || (desc->handle_irq == handle_bad_irq))
+			return 0;
+		else
+			seq_printf(f, "%3d:%-17s", irq, ap->name);
+	}
+
+	for_each_cpu(cpu, cpu_online_mask) {
+		if (!cpu)
+			seq_printf(f, "\t%d", cpu);
+		else
+			seq_printf(f, "%20s\t%d", "", cpu);
+		stopwatch_show(&STOPWATCH_INSTANCE_CPU(hardirq[irq], cpu), f, STOPWATCH_MICRO);
+		seq_printf(f, "\n");
+	}
+	seq_printf(f, "\n");
+	return 0;
+}
+
+static int __init hardirq_stopwatch_init(void)
+{
+	INIT_STOPWATCH_ARRAY(hardirq, NR_IRQS+1);
+	return stopwatch_register("hardirq", NR_IRQS+1, stopwatch_hardirq_show);
+}
+module_init(hardirq_stopwatch_init)
+#endif
+
 /*
  * handle_IRQ handles all hardware IRQ's.  Decoded IRQs should
  * not come via this function.  Instead, they should provide their
@@ -82,13 +129,17 @@ void handle_IRQ(unsigned int irq, struct pt_regs *regs)
 			printk(KERN_WARNING "Bad IRQ%u\n", irq);
 		ack_bad_irq(irq);
 	} else {
+		STOPWATCH_START(hardirq[irq]);
 		generic_handle_irq(irq);
+		STOPWATCH_STOP(hardirq[irq]);
 	}
 
 	/* AT91 specific workaround */
 	irq_finish(irq);
 
+	STOPWATCH_START(hardirq[NR_IRQS]);
 	irq_exit();
+	STOPWATCH_STOP(hardirq[NR_IRQS]);
 	set_irq_regs(old_regs);
 }
 

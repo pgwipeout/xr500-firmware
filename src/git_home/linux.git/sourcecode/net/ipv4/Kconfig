@@ -222,6 +222,12 @@ config IP_MROUTE
 	  <file:Documentation/networking/multicast.txt>. If you haven't heard
 	  about it, you don't need it.
 
+config	BT_IGMP 
+	bool "IP: multicast routing"
+	depends on IP_MULTICAST
+	help
+	  This is used when BT IGMP enable. It will record the IGMP group IP.
+
 config IP_MROUTE_MULTIPLE_TABLES
 	bool "IP: multicast policy routing"
 	depends on IP_MROUTE && IP_ADVANCED_ROUTER

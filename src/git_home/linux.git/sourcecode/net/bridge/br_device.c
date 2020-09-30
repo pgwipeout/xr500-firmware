@@ -22,6 +22,25 @@
 #include <asm/uaccess.h>
 #include "br_private.h"
 
+#define MAX_DEVICE 128
+
+struct mac_traffic mac_updownload[MAX_DEVICE];
+EXPORT_SYMBOL(mac_updownload);
+
+static int check_authorized_mac(unsigned char *dev_mac)
+{
+    int i;
+
+    for (i = 0; i < MAX_DEVICE; i++) {
+        if (mac_updownload[i].flag == 0)
+            continue;
+        if (compare_ether_addr(mac_updownload[i].mac, dev_mac) == 0)
+            return i;
+    }
+
+    return -1;
+}
+
 /* net device transmit always called with BH disabled */
 netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
 {
@@ -30,6 +49,10 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
 	struct net_bridge_fdb_entry *dst;
 	struct net_bridge_mdb_entry *mdst;
 	struct br_cpu_netstats *brstats = this_cpu_ptr(br->stats);
+	struct net_bridge_port *pdst;
+	br_get_dst_hook_t *get_dst_hook;
+	unsigned char *dev_mac;
+	int ret;
 
 #ifdef CONFIG_BRIDGE_NETFILTER
 	if (skb->nf_bridge && (skb->nf_bridge->mask & BRNF_BRIDGED_DNAT)) {
@@ -38,20 +61,38 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 #endif
 
-	u64_stats_update_begin(&brstats->syncp);
-	brstats->tx_packets++;
-	brstats->tx_bytes += skb->len;
-	u64_stats_update_end(&brstats->syncp);
-
 	BR_INPUT_SKB_CB(skb)->brdev = dev;
 
 	skb_reset_mac_header(skb);
 	skb_pull(skb, ETH_HLEN);
 
+	u64_stats_update_begin(&brstats->syncp);
+	brstats->tx_packets++;
+	/* Exclude ETH_HLEN from byte stats for consistency with Rx chain */
+	brstats->tx_bytes += skb->len;
+	u64_stats_update_end(&brstats->syncp);
+
+    if (dev->name != NULL && dev->name[0] == 'b' &&
+        dev->name[1] == 'r' && dev->name[2] == '0') {
+         dev_mac = eth_hdr(skb)->h_dest;
+         if (NULL != dev_mac) {
+           ret = check_authorized_mac(dev_mac);
+           if (ret >= 0) {
+               mac_updownload[ret].download += skb->len;
+               //printk("download package len = %d\n", mac_updownload[ret].download);
+           }
+         }
+    }
+
 	rcu_read_lock();
+	get_dst_hook = rcu_dereference(br_get_dst_hook);
 	if (is_broadcast_ether_addr(dest))
 		br_flood_deliver(br, skb);
 	else if (is_multicast_ether_addr(dest)) {
+		br_multicast_handle_hook_t *multicast_handle_hook = rcu_dereference(br_multicast_handle_hook);
+		if (!__br_get(multicast_handle_hook, true, NULL, skb))
+			goto out;
+
 		if (unlikely(netpoll_tx_running(dev))) {
 			br_flood_deliver(br, skb);
 			goto out;
@@ -66,6 +107,10 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
 			br_multicast_deliver(mdst, skb);
 		else
 			br_flood_deliver(br, skb);
+	} else if ((pdst = __br_get(get_dst_hook, NULL, NULL, &skb))) {
+		if (!skb)
+			goto out;
+		br_deliver(pdst, skb);
 	} else if ((dst = __br_fdb_get(br, dest)) != NULL)
 		br_deliver(dst->dst, skb);
 	else
@@ -374,4 +419,10 @@ void br_dev_setup(struct net_device *dev)
 	br_netfilter_rtable_init(br);
 	br_stp_timer_init(br);
 	br_multicast_init(br);
+#ifdef CONFIG_BRIDGE_NETGEAR_ACL
+        br->acl_enabled = 0;
+        br->acl_type = 1;
+        br->acl_debug = 0;
+        spin_lock_init(&br->acl_hash_lock);
+#endif
 }

@@ -29,6 +29,7 @@ presentation_url=http://www.routerlogin.net
 notify_interval=900
 serial=12345678
 model_number=1
+model_name=$5
 EOF
 }
  
@@ -422,7 +423,7 @@ dlna_start() {
 	[ -f $MINIDLNA_CONF ] && rm -f $MINIDLNA_CONF
 	[ ! -d /tmp/etc ] && mkdir /tmp/etc
 
-	print_dlna_conf "$($config get lan_ipaddr)" "$($config get lan_netmask)" "$name" "$($config get upnp_enable_tivo)" > $MINIDLNA_CONF
+	print_dlna_conf "$($config get lan_ipaddr)" "$($config get lan_netmask)" "$name" "$($config get upnp_enable_tivo)" "$($config get minidlna_modelname)" > $MINIDLNA_CONF
 
 	scan_disk_entries
 

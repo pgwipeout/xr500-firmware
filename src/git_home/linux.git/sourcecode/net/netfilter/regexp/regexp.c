@@ -234,6 +234,7 @@ regcomp(char *exp,int *patternsize)
 	register int len;
 	int flags;
 	struct match_globals g;
+	char *scantmp;
 	
 	/* commented out by ethan
 	   extern char *malloc();
@@ -266,8 +267,10 @@ regcomp(char *exp,int *patternsize)
 	g.regnpar = 1;
 	g.regcode = r->program;
 	regc(&g, MAGIC);
-	if (reg(&g, 0, &flags) == NULL)
+	if (reg(&g, 0, &flags) == NULL) {
+		kfree(r);
 		return(NULL);
+	}
 
 	/* Dig out information for optimizations. */
 	r->regstart = '\0';	/* Worst-case defaults. */
@@ -275,7 +278,10 @@ regcomp(char *exp,int *patternsize)
 	r->regmust = NULL;
 	r->regmlen = 0;
 	scan = r->program+1;			/* First BRANCH. */
-	if (OP(regnext(&g, scan)) == END) {		/* Only one top-level choice. */
+	scantmp = regnext(&g, scan);
+	if (unlikely(!scantmp))
+		BUG();
+	if (OP(scantmp) == END) {		/* Only one top-level choice. */
 		scan = OPERAND(scan);
 
 		/* Starting-point info. */
@@ -934,6 +940,9 @@ regmatch(struct match_globals *g, char *prog)
 		case BRANCH: {
 				register char *save;
 
+				if (unlikely(!next))
+					BUG();
+
 				if (OP(next) != BRANCH)		/* No choice. */
 					next = OPERAND(scan);	/* Avoid recursion. */
 				else {
@@ -961,6 +970,10 @@ regmatch(struct match_globals *g, char *prog)
 				 * when we know what character comes next.
 				 */
 				nextch = '\0';
+
+				if (unlikely(!next))
+					BUG();
+
 				if (OP(next) == EXACTLY)
 					nextch = *OPERAND(next);
 				min = (OP(scan) == STAR) ? 0 : 1;

@@ -1537,6 +1537,8 @@ enable_qcawifi() {
 		# only if vht_11ng is set or not
 		config_get_bool vht_11ng "$vif" vht_11ng
 		[ -n "$vht_11ng" ] && {
+			# disable 2.4G 256QAM on XR450
+			[ "$(cat /module_name)" = "XR450" ] && vht_11ng=0
 			iwpriv "$ifname" vht_11ng "$vht_11ng"
 			iwpriv "$ifname" 11ngvhtintop "$vht_11ng"
 		}

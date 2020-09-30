@@ -4,7 +4,7 @@ XR500
 
 2) List the version number of the firmware/software that correlates with the open source code archive.
 
-XR500-V2.3.0.8
+XR500-V2.3.2.18
 
 7) List the main HW platform utilized such as CPU, main chipset, RF chipset, DSP, Switch IC¡­etc.
 
@@ -21,6 +21,7 @@ u-boot, 2009.08, GPL, Yes
 10) List the name, version, license, and modification status of the toolchain for the product
 
 gcc, 4.6, GPL, No
+e2fsprogs, 1.42.4, GPL, No
 
 11) List the name, version, license, and modification status of the tools for the product
 
@@ -292,3 +293,4 @@ NetUSB, 1, KCodes, No
 
 ufsd, 1, paragon, No
 
+funsjq, 1, iexcloud, No

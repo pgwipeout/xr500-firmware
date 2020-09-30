@@ -48,6 +48,9 @@ var wan_pppoe_demand = "<% cfg_get("wan_pppoe_demand") %>";
 var wan_pptp_demand = "<% cfg_get("wan_pptp_demand") %>";
 var wan_l2tp_demand = "<% cfg_get("wan_l2tp_demand") %>";
 var wan_mulpppoe_demand = "<% cfg_get("wan_mulpppoe_demand") %>";
+var on_updating = "<% cat_file("/tmp/vpn_on_updating") %>";
+var isMd5 = "<% cat_file("/tmp/md5vpn") %>";
+on_updating = (isMd5.trim() === '1')? '0': on_updating;
 
 function loadvalue()
 {
@@ -81,7 +84,8 @@ function loadvalue()
 		alert("$warn_config_differ");
 	if(vpn_enable == "1"&&old_endis_ddns != "1"&& old_wan_assign == "1" && ip_or_hostname != old_wan_ip && ip_or_hostname != "" && select_basic == "1")
 		alert("$warn_config_differ");
-	
+
+	handle_on_updating();	
 }
 </script>
 <input type="hidden" name="hidden_enable_vpn">
@@ -166,8 +170,12 @@ $bluebar
 </TR>
 $bluebar
 </TABLE>
+<div id="updating_tip" style="margin-top:30px; font-size:1.3em; text-align:center;display:none;">
+       <span>Private CA is current generating. Please wait for couple minutes.</span>
+</div>
 </div>
 <% help_box("0","_openvpn") %>
 </FORM>
+<iframe name="hidden_checking" src="vpn_check_updating.html" allowtransparency="true" scrolling="no" frameborder="0" style="display:none;">
 </BODY>
 </HTML>

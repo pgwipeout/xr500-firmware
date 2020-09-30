@@ -2,6 +2,7 @@
  *	IP multicast routing support for mrouted 3.6/3.8
  *
  *		(c) 1995 Alan Cox, <alan@lxorguk.ukuu.org.uk>
+ *              Copyright (c) 2013 The Linux Foundation. All rights reserved.
  *	  Linux Consultancy and Custom Driver Development
  *
  *	This program is free software; you can redistribute it and/or
@@ -124,6 +125,8 @@ static DEFINE_SPINLOCK(mfc_unres_lock);
 static struct kmem_cache *mrt_cachep __read_mostly;
 
 static struct mr_table *ipmr_new_table(struct net *net, u32 id);
+static void ipmr_free_table(struct mr_table *mrt);
+
 static int ip_mr_forward(struct net *net, struct mr_table *mrt,
 			 struct sk_buff *skb, struct mfc_cache *cache,
 			 int local);
@@ -131,7 +134,11 @@ static int ipmr_cache_report(struct mr_table *mrt,
 			     struct sk_buff *pkt, vifi_t vifi, int assert);
 static int __ipmr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
 			      struct mfc_cache *c, struct rtmsg *rtm);
+static void mroute_clean_tables(struct mr_table *mrt);
 static void ipmr_expire_process(unsigned long arg);
+static struct mfc_cache *ipmr_cache_find(struct mr_table *mrt, __be32 origin,
+					 __be32 mcastgrp);
+static ipmr_mfc_event_offload_callback_t __rcu ipmr_mfc_event_offload_callback;
 
 #ifdef CONFIG_IP_MROUTE_MULTIPLE_TABLES
 #define ipmr_for_each_table(mrt, net) \
@@ -151,9 +158,12 @@ static struct mr_table *ipmr_get_table(struct net *net, u32 id)
 static int ipmr_fib_lookup(struct net *net, struct flowi4 *flp4,
 			   struct mr_table **mrt)
 {
-	struct ipmr_result res;
-	struct fib_lookup_arg arg = { .result = &res, };
 	int err;
+	struct ipmr_result res;
+	struct fib_lookup_arg arg = {
+		.result = &res,
+		.flags = FIB_LOOKUP_NOREF,
+	};
 
 	err = fib_rules_lookup(net->ipv4.mr_rules_ops,
 			       flowi4_to_flowi(flp4), 0, &arg);
@@ -175,6 +185,7 @@ static int ipmr_rule_action(struct fib_rule *rule, struct flowi *flp,
 	case FR_ACT_UNREACHABLE:
 		return -ENETUNREACH;
 	case FR_ACT_PROHIBIT:
+	case FR_ACT_FAILED_POLICY:
 		return -EACCES;
 	case FR_ACT_BLACKHOLE:
 	default:
@@ -218,6 +229,75 @@ static int ipmr_rule_fill(struct fib_rule *rule, struct sk_buff *skb,
 	return 0;
 }
 
+/*
+ * ipmr_sync_entry_update()
+ * Call the registered offload callback to report an update to a multicast
+ * route entry. The callback receives the list of destination interfaces and
+ * the interface count
+ */
+static void ipmr_sync_entry_update(struct mr_table *mrt, struct mfc_cache *cache)
+{
+	int vifi, dest_if_count = 0;
+	uint32_t dest_dev[MAXVIFS];
+	__be32  origin;
+	__be32  group;
+	ipmr_mfc_event_offload_callback_t offload_update_cb_f;
+
+	memset(dest_dev, 0, sizeof(dest_dev));
+
+	origin = cache->mfc_origin;
+	group = cache->mfc_mcastgrp;
+
+	read_lock(&mrt_lock);
+	for (vifi = 0; vifi < cache->mfc_un.res.maxvif; vifi++) {
+		if (!((cache->mfc_un.res.ttls[vifi] > 0) &&
+					(cache->mfc_un.res.ttls[vifi] < 255))) {
+			continue;
+		}
+		if (dest_if_count == MAXVIFS) {
+			read_unlock(&mrt_lock);
+			return;
+		}
+
+		if (!VIF_EXISTS(mrt, vifi)) {
+			read_unlock(&mrt_lock);
+			return;
+		}
+		dest_dev[dest_if_count] = mrt->vif_table[vifi].dev->ifindex;
+		dest_if_count++;
+	}
+	read_unlock(&mrt_lock);
+
+	rcu_read_lock();
+	offload_update_cb_f = rcu_dereference(ipmr_mfc_event_offload_callback);
+	rcu_read_unlock();
+
+	if (!offload_update_cb_f)
+		return;
+
+	offload_update_cb_f(group, origin, dest_if_count, dest_dev,
+				IPMR_MFC_EVENT_UPDATE);
+}
+
+/*
+ * ipmr_sync_entry_delete()
+ * Call the registered offload callback to inform of a multicast route entry
+ * delete event
+ */
+static void ipmr_sync_entry_delete(uint32_t origin, uint32_t group)
+{
+	ipmr_mfc_event_offload_callback_t offload_update_cb_f;
+
+	rcu_read_lock();
+	offload_update_cb_f = rcu_dereference(ipmr_mfc_event_offload_callback);
+	rcu_read_unlock();
+
+	if (!offload_update_cb_f)
+		return;
+
+	offload_update_cb_f(group, origin, 0, NULL, IPMR_MFC_EVENT_DELETE);
+}
+
 static const struct fib_rules_ops __net_initdata ipmr_rules_ops_template = {
 	.family		= RTNL_FAMILY_IPMR,
 	.rule_size	= sizeof(struct ipmr_rule),
@@ -232,6 +312,148 @@ static const struct fib_rules_ops __net_initdata ipmr_rules_ops_template = {
 	.policy		= ipmr_rule_policy,
 	.owner		= THIS_MODULE,
 };
+
+/*
+ * ipmr_register_mfc_event_offload_callback()
+ * Register the IPv4 Multicast update offload callback with IPMR
+ */
+bool ipmr_register_mfc_event_offload_callback(ipmr_mfc_event_offload_callback_t mfc_offload_cb)
+{
+	ipmr_mfc_event_offload_callback_t offload_update_cb_f;
+
+	rcu_read_lock();
+	offload_update_cb_f = rcu_dereference(ipmr_mfc_event_offload_callback);
+	rcu_read_unlock();
+
+	if (offload_update_cb_f)
+		return false;
+
+	rcu_assign_pointer(ipmr_mfc_event_offload_callback, mfc_offload_cb);
+	return true;
+}
+EXPORT_SYMBOL(ipmr_register_mfc_event_offload_callback);
+
+/*
+ * ipmr_unregister_mfc_event_offload_callback()
+ * De-register the IPv4 Multicast update offload callback with IPMR
+ */
+void ipmr_unregister_mfc_event_offload_callback(void)
+{
+	rcu_assign_pointer(ipmr_mfc_event_offload_callback, NULL);
+}
+EXPORT_SYMBOL(ipmr_unregister_mfc_event_offload_callback);
+
+/*
+ * ipmr_find_mfc_entry()
+ * Returns destination interface list for a particular multicast flow, and
+ * the number of interfaces in the list
+ */
+int ipmr_find_mfc_entry(struct net *net, __be32 origin, __be32 group,
+			uint32_t max_dest_cnt, uint32_t dest_dev[])
+{
+	int vifi, dest_if_count = 0;
+	struct mr_table *mrt;
+	struct mfc_cache *cache;
+
+	mrt = ipmr_get_table(net, RT_TABLE_DEFAULT);
+	if (mrt == NULL)
+		return -ENOENT;
+
+	rcu_read_lock();
+	cache = ipmr_cache_find(mrt, origin, group);
+	if (cache == NULL) {
+		rcu_read_unlock();
+		return -ENOENT;
+	}
+
+	read_lock(&mrt_lock);
+	for (vifi = 0; vifi < cache->mfc_un.res.maxvif; vifi++) {
+		if (!((cache->mfc_un.res.ttls[vifi] > 0) &&
+					(cache->mfc_un.res.ttls[vifi] < 255))) {
+			continue;
+		}
+
+		/*
+		 * We have another valid destination interface entry. Check if
+		 * the number of the destination interfaces for the route is
+		 * exceeding the size of the array given to us
+		 */
+		if (dest_if_count == max_dest_cnt) {
+			read_unlock(&mrt_lock);
+			rcu_read_unlock();
+			return -EINVAL;
+		}
+
+		if (!VIF_EXISTS(mrt, vifi)) {
+			read_unlock(&mrt_lock);
+			rcu_read_unlock();
+			return -EINVAL;
+		}
+
+		dest_dev[dest_if_count] = mrt->vif_table[vifi].dev->ifindex;
+		dest_if_count++;
+	}
+	read_unlock(&mrt_lock);
+	rcu_read_unlock();
+
+	return dest_if_count;
+}
+EXPORT_SYMBOL(ipmr_find_mfc_entry);
+
+/*
+ * ipmr_mfc_stats_update()
+ * Update the MFC/VIF statistics for offloaded flows
+ */
+int ipmr_mfc_stats_update(struct net *net, __be32 origin, __be32 group,
+			  uint64_t pkts_in, uint64_t bytes_in,
+			  uint64_t pkts_out, uint64_t bytes_out)
+{
+	int vif, vifi;
+	struct mr_table *mrt;
+	struct mfc_cache *cache;
+
+	mrt = ipmr_get_table(net, RT_TABLE_DEFAULT);
+	if (mrt == NULL)
+		return -ENOENT;
+
+	rcu_read_lock();
+	cache = ipmr_cache_find(mrt, origin, group);
+	if (cache == NULL) {
+		rcu_read_unlock();
+		return -ENOENT;
+	}
+
+	vif = cache->mfc_parent;
+
+	read_lock(&mrt_lock);
+	if (!VIF_EXISTS(mrt, vif)) {
+		read_unlock(&mrt_lock);
+		rcu_read_unlock();
+		return -EINVAL;
+	}
+
+	mrt->vif_table[vif].pkt_in += pkts_in;
+	mrt->vif_table[vif].bytes_in += bytes_in;
+	cache->mfc_un.res.pkt  += pkts_out;
+	cache->mfc_un.res.bytes += bytes_out;
+
+	for (vifi = cache->mfc_un.res.minvif; vifi < cache->mfc_un.res.maxvif; vifi++) {
+		if ((cache->mfc_un.res.ttls[vifi] > 0) && (cache->mfc_un.res.ttls[vifi] < 255)) {
+			if (!VIF_EXISTS(mrt, vifi)) {
+				read_unlock(&mrt_lock);
+				rcu_read_unlock();
+				return -EINVAL;
+			}
+			mrt->vif_table[vifi].pkt_out += pkts_out;
+			mrt->vif_table[vifi].bytes_out += bytes_out;
+		}
+	}
+	read_unlock(&mrt_lock);
+	rcu_read_unlock();
+
+	return 0;
+}
+EXPORT_SYMBOL(ipmr_mfc_stats_update);
 
 static int __net_init ipmr_rules_init(struct net *net)
 {
@@ -271,7 +493,7 @@ static void __net_exit ipmr_rules_exit(struct net *net)
 
 	list_for_each_entry_safe(mrt, next, &net->ipv4.mr_tables, list) {
 		list_del(&mrt->list);
-		kfree(mrt);
+		ipmr_free_table(mrt);
 	}
 	fib_rules_unregister(net->ipv4.mr_rules_ops);
 }
@@ -299,7 +521,7 @@ static int __net_init ipmr_rules_init(struct net *net)
 
 static void __net_exit ipmr_rules_exit(struct net *net)
 {
-	kfree(net->ipv4.mrt);
+	ipmr_free_table(net->ipv4.mrt);
 }
 #endif
 
@@ -334,6 +556,13 @@ static struct mr_table *ipmr_new_table(struct net *net, u32 id)
 	list_add_tail_rcu(&mrt->list, &net->ipv4.mr_tables);
 #endif
 	return mrt;
+}
+
+static void ipmr_free_table(struct mr_table *mrt)
+{
+	del_timer_sync(&mrt->ipmr_expire_timer);
+	mroute_clean_tables(mrt);
+	kfree(mrt);
 }
 
 /* Service routines creating virtual interfaces: DVMRP tunnels and PIMREG */
@@ -981,7 +1210,7 @@ ipmr_cache_unresolved(struct mr_table *mrt, vifi_t vifi, struct sk_buff *skb)
 	if (!found) {
 		/* Create a new entry if allowable */
 
-		if (atomic_read(&mrt->cache_resolve_queue_len) >= 10 ||
+		if (atomic_read(&mrt->cache_resolve_queue_len) >= sysctl_igmp_max_memberships ||
 		    (c = ipmr_cache_alloc_unres()) == NULL) {
 			spin_unlock_bh(&mfc_unres_lock);
 
@@ -1044,6 +1273,10 @@ static int ipmr_mfc_delete(struct mr_table *mrt, struct mfcctl *mfc)
 	list_for_each_entry_safe(c, next, &mrt->mfc_cache_array[line], list) {
 		if (c->mfc_origin == mfc->mfcc_origin.s_addr &&
 		    c->mfc_mcastgrp == mfc->mfcc_mcastgrp.s_addr) {
+			/*
+			 * Inform offload modules of the delete event
+			 */
+			ipmr_sync_entry_delete(c->mfc_origin, c->mfc_mcastgrp);
 			list_del_rcu(&c->list);
 
 			ipmr_cache_free(c);
@@ -1080,6 +1313,11 @@ static int ipmr_mfc_add(struct net *net, struct mr_table *mrt,
 		if (!mrtsock)
 			c->mfc_flags |= MFC_STATIC;
 		write_unlock_bh(&mrt_lock);
+
+		/*
+		 * Inform offload modules of the update event
+		 */
+		ipmr_sync_entry_update(mrt, c);
 		return 0;
 	}
 
@@ -1563,7 +1801,7 @@ static void ip_encap(struct sk_buff *skb, __be32 saddr, __be32 daddr)
 	iph->protocol	=	IPPROTO_IPIP;
 	iph->ihl	=	5;
 	iph->tot_len	=	htons(skb->len);
-	ip_select_ident(iph, skb_dst(skb), NULL);
+	ip_select_ident(skb, NULL);
 	ip_send_check(iph);
 
 	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));

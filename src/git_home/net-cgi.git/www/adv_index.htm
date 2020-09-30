@@ -131,12 +131,16 @@ if( wds_support_wpa == 1 && gui_region == "Chinese" && (netgear_region == "" || 
 
 function loadvalue()
 {
-	if(lang_select == "Auto" && browser_lang != gui_region && master == "admin" &&
+	if(document.location.search.indexOf('vpn_on_updating=1') !== -1) {
+               goto_formframe('vpn_upgrade_process.htm');
+               return;
+       }
+	/*if(lang_select == "Auto" && browser_lang != gui_region && master == "admin" &&
 		!(bgn_pr_wds_support_wpa == 1 || an_pr_wds_support_wpa == 1 || dis_lang_crl == "0" ))
 	{
 		goto_formframe("lang_auto_change.html");
-	}
-	else if(enable_ap_flag == "1")
+	}*/
+	if(enable_ap_flag == "1")
 		click_adv_action("wireless");
 	else if(show_rae_page == "1")
 		click_adv_action("rae");

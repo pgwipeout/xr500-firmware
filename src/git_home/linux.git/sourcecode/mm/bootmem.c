@@ -15,6 +15,7 @@
 #include <linux/export.h>
 #include <linux/kmemleak.h>
 #include <linux/range.h>
+#include <linux/crashlog.h>
 #include <linux/memblock.h>
 
 #include <asm/bug.h>
@@ -177,6 +178,7 @@ static unsigned long __init free_all_bootmem_core(bootmem_data_t *bdata)
 	if (!bdata->node_bootmem_map)
 		return 0;
 
+	crashlog_init_bootmem(bdata);
 	start = bdata->node_min_pfn;
 	end = bdata->node_low_pfn;
 
@@ -766,13 +768,17 @@ void * __init alloc_bootmem_section(unsigned long size,
 				    unsigned long section_nr)
 {
 	bootmem_data_t *bdata;
-	unsigned long pfn, goal;
+	unsigned long pfn, goal, limit;
 
 	pfn = section_nr_to_pfn(section_nr);
 	goal = pfn << PAGE_SHIFT;
+	limit = section_nr_to_pfn(section_nr + 1) << PAGE_SHIFT;
 	bdata = &bootmem_node_data[early_pfn_to_nid(pfn)];
 
-	return alloc_bootmem_core(bdata, size, SMP_CACHE_BYTES, goal, 0);
+	if (goal + size > limit)
+		limit = 0;
+
+	return alloc_bootmem_core(bdata, size, SMP_CACHE_BYTES, goal, limit);
 }
 #endif
 

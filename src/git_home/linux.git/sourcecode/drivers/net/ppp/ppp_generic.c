@@ -2,6 +2,7 @@
  * Generic PPP layer for Linux.
  *
  * Copyright 1999-2002 Paul Mackerras.
+ * Copyright (c) 2013-2015 The Linux Foundation. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -59,6 +60,13 @@
 #include <net/net_namespace.h>
 #include <net/netns/generic.h>
 
+#define PPP_TM_ACCURATE_CONTROL
+#ifdef PPP_TM_ACCURATE_CONTROL
+#include <net/sock.h>
+#include <linux/netlink.h>
+#define PPP_NETLINK_TM 22
+#endif
+
 #define PPP_VERSION	"2.4.2"
 
 #if 0
@@ -80,6 +88,30 @@
 
 #define MPHDRLEN	6	/* multilink protocol header length */
 #define MPHDRLEN_SSN	4	/* ditto with short sequence numbers */
+
+#ifdef PPP_TM_ACCURATE_CONTROL
+#define TM_PPP_ONE_DIRECTION 0
+#define TM_PPP_BOTH_DIRECTION 1
+#define TM_PPP_CONTROL_ABOLISH 2
+#define TM_PPP_DROP_PACKET 3
+#define TM_PPP_MAX_LIMIT 0xffffffffffffffff
+
+unsigned long long ppp_tm_limit = TM_PPP_MAX_LIMIT;
+int ppp_tm_dir;
+unsigned long long ppp_counter_rx = 0;
+unsigned long long ppp_counter_tx = 0;
+struct sock *ppp_nl_sk = NULL;
+int ppp_send = 0;
+int need_drop = 0;
+unsigned long long tmp_counter;
+struct ppp_msg_data{
+	int backpid;
+	unsigned long long leftdata;
+	int tm_dir; /* 1--both,0--only download,
+		     * 2--abolish,3--drop packet */
+
+};
+#endif
 
 /*
  * An instance of /dev/ppp can be associated with either a ppp
@@ -196,6 +228,7 @@ static atomic_t ppp_unit_count = ATOMIC_INIT(0);
 static atomic_t channel_count = ATOMIC_INIT(0);
 
 int dod_skip_control_packet = 0;
+int dial_on_demand_dns= 0;
 #ifdef CONFIG_SYSCTL
 static struct ctl_table_header *dni_sysctl_header;
 #endif
@@ -918,6 +951,13 @@ static ctl_table dni_table[] = {
 		.mode           = 0644,
 		.proc_handler   = &proc_dointvec,
 	},
+	{
+		.procname       = "dial_on_demand_dns",
+		.data           = &dial_on_demand_dns,
+		.maxlen         = sizeof(int),
+		.mode           = 0666,
+		.proc_handler   = &proc_dointvec,
+	},
 	{0}
 };
 
@@ -936,11 +976,57 @@ static struct ctl_path nf_ct_path[] = {
 };
 #endif
 
+#ifdef PPP_TM_ACCURATE_CONTROL
+void ppp_test_netlink(struct sk_buff *__skb)
+{
+	struct sk_buff * skb = NULL;
+	struct sk_buff *skb_send = NULL;
+	struct nlmsghdr * nlh = NULL;
+	struct ppp_msg_data *msgdata;
+
+	skb = skb_get(__skb);
+	if (skb == NULL || skb->len < NLMSG_LENGTH(0)){
+		printk("PPP Driver recive message ERROR ...\n");
+		return;
+	}
+
+	nlh = nlmsg_hdr(skb);
+	msgdata = (struct msg_data *)NLMSG_DATA(nlh);
+
+	if (msgdata->tm_dir == TM_PPP_CONTROL_ABOLISH || msgdata->tm_dir == TM_PPP_DROP_PACKET)
+		ppp_tm_limit = TM_PPP_MAX_LIMIT;
+	else
+		ppp_tm_limit = msgdata->leftdata;
+
+	ppp_tm_dir = msgdata->tm_dir;
+	ppp_send = 1;
+	if (msgdata->tm_dir == TM_PPP_DROP_PACKET)
+		need_drop = 1;
+	else
+		need_drop = 0;
+
+	kfree_skb(skb);
+	printk("PPP Driver recive message, dir is %d ...\n",ppp_tm_dir);
+
+	ppp_counter_rx = 0;
+	ppp_counter_tx = 0;
+
+}
+#endif
+
 /* Called at boot time if ppp is compiled into the kernel,
    or at module load time (from init_module) if compiled as a module. */
+
 static int __init ppp_init(void)
 {
 	int err;
+#ifdef PPP_TM_ACCURATE_CONTROL
+	ppp_nl_sk = netlink_kernel_create(&init_net, PPP_NETLINK_TM, 1, ppp_test_netlink, NULL, THIS_MODULE);
+	
+	if (ppp_nl_sk < 0) {
+		printk("Netlink for ppp driver create error ...\n");
+	}
+#endif
 
 	pr_info("PPP generic driver version " PPP_VERSION "\n");
 
@@ -1213,6 +1299,10 @@ static int session_actived_frame(unsigned char *data)
 			DOD_DEBUG("Sending a time-*.netgear.com DNS query.\n");
 			return 0;
 		}
+		if (strncmp(dns, "updates", 7) == 0) {
+			DOD_DEBUG("Sending a updates1.etgear.com DNS query.\n");
+			return 0;
+		}
 	}
 
 	return 1;
@@ -1234,7 +1324,13 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
 	int actived = 1;
 
 	if (proto == PPP_IP && (dod_skip_control_packet != 0))
-		actived = session_actived_frame(skb->data);
+	{
+		//actived = session_actived_frame(skb->data);
+		if(dial_on_demand_dns == 1)
+			actived = 1;
+		else if(skb->mark == 0x2015)
+			actived = 0;
+	}
 
 	if (proto < 0x8000) {
 #ifdef CONFIG_PPP_FILTER
@@ -1263,8 +1359,18 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
 #endif /* CONFIG_PPP_FILTER */
 	}
 
+#ifdef PPP_TM_ACCURATE_CONTROL
+	if (need_drop == 1)
+		goto drop;
+#endif
+
 	++ppp->dev->stats.tx_packets;
 	ppp->dev->stats.tx_bytes += skb->len - 2;
+
+#ifdef PPP_TM_ACCURATE_CONTROL
+	if (ppp_tm_limit != TM_PPP_MAX_LIMIT)
+		ppp_counter_tx += skb->len - 2;
+#endif
 
 	switch (proto) {
 	case PPP_IP:
@@ -1782,6 +1888,13 @@ ppp_receive_nonmp_frame(struct ppp *ppp, struct sk_buff *skb)
 	struct sk_buff *ns;
 	int proto, len, npi;
 
+#ifdef PPP_TM_ACCURATE_CONTROL
+	struct sk_buff *skb_send = NULL;
+	struct nlmsghdr * nlh = NULL;
+	struct ppp_msg_data sendata;
+	int ppp_ret;
+#endif
+
 	/*
 	 * Decompress the frame, if compressed.
 	 * Note that some decompressors need to see uncompressed frames
@@ -1853,8 +1966,61 @@ ppp_receive_nonmp_frame(struct ppp *ppp, struct sk_buff *skb)
 		break;
 	}
 
+#ifdef PPP_TM_ACCURATE_CONTROL
+	if (need_drop == 1)
+		goto err;
+#endif
+
 	++ppp->dev->stats.rx_packets;
 	ppp->dev->stats.rx_bytes += skb->len - 2;
+
+#ifdef PPP_TM_ACCURATE_CONTROL
+	if (ppp_tm_limit != TM_PPP_MAX_LIMIT) {
+		ppp_counter_rx += skb->len - 2;
+
+		if (ppp_tm_dir == TM_PPP_BOTH_DIRECTION)
+			tmp_counter = ppp_counter_rx + ppp_counter_tx;
+		else 
+			tmp_counter = ppp_counter_rx;
+
+		if (tmp_counter >= ppp_tm_limit && ppp_send == 1 ) {
+			sendata.backpid = 0;
+			sendata.leftdata = 0;
+			ppp_send =0 ;
+
+			skb_send = alloc_skb(NLMSG_SPACE(1024), GFP_KERNEL);
+			if (skb_send == NULL) {
+				printk("alloc skb failed\n");
+				return;
+			}
+
+			NETLINK_CB(skb_send).pid = 0;
+			NETLINK_CB(skb_send).dst_group = 1;
+
+			nlh = NLMSG_PUT(skb_send, 0, 0, 0, 1024);
+			memcpy(NLMSG_DATA(nlh),&sendata,sizeof(sendata));
+			
+			if (ppp_tm_dir != TM_PPP_CONTROL_ABOLISH ) {
+				ppp_ret = netlink_broadcast(ppp_nl_sk, skb_send, 0, 1, GFP_KERNEL);
+				need_drop = 1;
+				printk("Need drop packet ...\n");
+
+				if (ppp_ret < 0)
+					printk("PPP Driver send failed %d ... \n",ppp_ret);
+			}
+			ppp_counter_tx = 0;
+			ppp_counter_rx = 0;
+			tmp_counter = 0;
+			ppp_tm_limit = TM_PPP_MAX_LIMIT;
+
+nlmsg_failure:
+			ppp_counter_rx = 0;
+			ppp_counter_tx = 0;
+			tmp_counter = 0;
+			ppp_tm_limit = TM_PPP_MAX_LIMIT;
+		}
+	}
+#endif
 
 	npi = proto_to_npindex(proto);
 	if (npi < 0) {
@@ -2351,6 +2517,22 @@ char *ppp_dev_name(struct ppp_channel *chan)
 	return name;
 }
 
+/*
+ * Return the PPP net device index.
+ */
+int ppp_dev_index(struct ppp_channel *chan)
+{
+	struct channel *pch = chan->ppp;
+	int ifindex = 0;
+
+	if (pch) {
+		read_lock_bh(&pch->upl);
+		if (pch->ppp && pch->ppp->dev)
+			ifindex = pch->ppp->dev->ifindex;
+		read_unlock_bh(&pch->upl);
+	}
+	return ifindex;
+}
 
 /*
  * Disconnect a channel from the generic layer.
@@ -3000,8 +3182,24 @@ static void ppp_destroy_channel(struct channel *pch)
 	kfree(pch);
 }
 
+#ifdef PPP_TM_ACCURATE_CONTROL
+void tm_sk_release_kernel(struct sock *sk)
+{
+	if (sk == NULL || sk->sk_socket == NULL)
+		return;
+
+	sock_hold(sk);
+	sock_release(sk->sk_socket);
+	sock_put(sk);
+}
+#endif
+
 static void __exit ppp_cleanup(void)
 {
+#ifdef PPP_TM_ACCURATE_CONTROL
+	tm_sk_release_kernel(ppp_nl_sk);
+#endif
+
 	/* should never happen */
 	if (atomic_read(&ppp_unit_count) || atomic_read(&channel_count))
 		pr_err("PPP: removing module but units remain!\n");
@@ -3073,6 +3271,316 @@ static void *unit_find(struct idr *p, int n)
 	return idr_find(p, n);
 }
 
+/*
+ * Updates the PPP interface statistics.
+ */
+void ppp_update_stats(struct net_device *dev, unsigned long rx_packets,
+		unsigned long rx_bytes, unsigned long tx_packets, unsigned long tx_bytes)
+{
+	struct ppp *ppp;
+
+	if (!dev)
+		return;
+
+	if (dev->type != ARPHRD_PPP)
+		return;
+
+	ppp = netdev_priv(dev);
+
+	ppp_lock(ppp);
+	dev->stats.tx_packets += tx_packets;
+	dev->stats.tx_bytes += tx_bytes;
+	dev->stats.rx_packets += rx_packets;
+	dev->stats.rx_bytes += rx_bytes;
+	ppp_unlock(ppp);
+}
+
+/*
+ * Registers a destroy method to the channel. When a PPP interface goes down,
+ * this destroy method is called if it is registered.
+ */
+bool ppp_register_destroy_method(struct net_device *dev, ppp_channel_destroy_method_t method, void *arg)
+{
+	struct channel *pch;
+	struct ppp *ppp;
+	struct ppp_net *pn;
+
+	if (!dev) {
+		printk(KERN_NOTICE "net device is null\n");
+		return false;
+	}
+
+	if (dev->type != ARPHRD_PPP) {
+		printk(KERN_NOTICE "net device type is not PPP\n");
+		return false;
+	}
+
+	ppp = netdev_priv(dev);
+	pn = ppp_pernet(ppp->ppp_net);
+
+	spin_lock_bh(&pn->all_channels_lock);
+	list_for_each_entry(pch, &ppp->channels, clist) {
+		if (pch->chan && pch->chan->ops->reg_destroy_method) {
+			if (!pch->chan->ops->reg_destroy_method(pch->chan, method, arg)) {
+				/*
+				 * One of the channels has failed to register the destroy method.
+				 */
+				spin_unlock_bh(&pn->all_channels_lock);
+				printk(KERN_NOTICE "PPP channel %p failed to register destroy method\n", pch->chan);
+				return false;
+			}
+		}
+	}
+	spin_unlock_bh(&pn->all_channels_lock);
+
+	return true;
+}
+
+/*
+ * Unregisters the destroy method from the channel.
+ */
+bool ppp_unregister_destroy_method(struct net_device *dev)
+{
+	struct channel *pch;
+	struct ppp *ppp;
+	struct ppp_net *pn;
+
+	if (!dev) {
+		printk(KERN_NOTICE "net device is null\n");
+		return false;
+	}
+
+	if (dev->type != ARPHRD_PPP) {
+		printk(KERN_NOTICE "net device type is not PPP\n");
+		return false;
+	}
+
+	ppp = netdev_priv(dev);
+
+	pn = ppp_pernet(ppp->ppp_net);
+
+	spin_lock_bh(&pn->all_channels_lock);
+	list_for_each_entry(pch, &ppp->channels, clist) {
+		if (pch->chan && pch->chan->ops->unreg_destroy_method) {
+			/*
+			 * unregister function just sets the fields to NULL, so there is not any failure case.
+			 */
+			pch->chan->ops->unreg_destroy_method(pch->chan);
+		}
+	}
+	spin_unlock_bh(&pn->all_channels_lock);
+
+	return true;
+}
+
+/*
+ * ppp_is_multilink()
+ *	Returns >0 if the device is a multilink PPP netdevice, 0 if not or < 0 if the device is not PPP
+ */
+int ppp_is_multilink(struct net_device *dev)
+{
+	struct ppp *ppp;
+	unsigned int flags;
+
+	if (!dev) {
+		return -1;
+	}
+	if (dev->type != ARPHRD_PPP) {
+		return -1;
+	}
+
+	ppp = netdev_priv(dev);
+	ppp_lock(ppp);
+	flags = ppp->flags;
+	ppp_unlock(ppp);
+	if (flags & SC_MULTILINK) {
+		return 1;
+	}
+	return 0;
+}
+
+/*
+ * ppp_channel_get_protocol()
+ *	Call this to obtain the underlying protocol of the PPP channel, e.g. PX_PROTO_OE
+ *
+ * NOTE: Some channels do not use PX sockets so the protocol value may be very different for them.
+ * NOTE: -1 indicates failure.
+ * NOTE: Once you know the channel protocol you may then either cast 'chan' to its sub-class or
+ * use the channel protocol specific API's as provided by that channel sub type.
+ */
+int ppp_channel_get_protocol(struct ppp_channel *chan)
+{
+	if (!chan->ops->get_channel_protocol) {
+		return -1;
+	}
+	return chan->ops->get_channel_protocol(chan);
+}
+
+/*
+ * ppp_channel_hold()
+ *	Call this to hold a channel.
+ *
+ * Returns true on success or false if the hold could not happen.
+ *
+ * NOTE: chan must be protected against destruction during this call -
+ * either by correct locking etc. or because you already have an implicit
+ * or explicit hold to the channel already and this is an additional hold.
+ */
+bool ppp_channel_hold(struct ppp_channel *chan)
+{
+	if (!chan->ops->hold) {
+		return false;
+	}
+	chan->ops->hold(chan);
+	return true;
+}
+
+/*
+ * ppp_channel_release()
+ *	Call this to release a hold you have upon a channel
+ */
+void ppp_channel_release(struct ppp_channel *chan)
+{
+	chan->ops->release(chan);
+}
+
+/*
+ * ppp_hold_channels()
+ *	Returns the PPP channels of the PPP device, storing each one into channels[].
+ *
+ * channels[] has chan_sz elements.
+ * This function returns the number of channels stored, up to chan_sz.
+ * It will return < 0 if the device is not PPP.
+ *
+ * You MUST release the channels using ppp_release_channels().
+ */
+int ppp_hold_channels(struct net_device *dev, struct ppp_channel *channels[], unsigned int chan_sz)
+{
+	struct ppp *ppp;
+	int c;
+	struct channel *pch;
+
+	if (!dev) {
+		return -1;
+	}
+	if (dev->type != ARPHRD_PPP) {
+		return -1;
+	}
+
+	ppp = netdev_priv(dev);
+
+	c = 0;
+	ppp_lock(ppp);
+	list_for_each_entry(pch, &ppp->channels, clist) {
+		struct ppp_channel *chan;
+
+		if (!pch->chan) {
+			/*
+			 * Channel is going / gone away
+			 */
+			continue;
+		}
+		if (c == chan_sz) {
+			/*
+			 * No space to record channel
+			 */
+			ppp_unlock(ppp);
+			return c;
+		}
+
+		/*
+		 * Hold the channel, if supported
+		 */
+		chan = pch->chan;
+		if (!chan->ops->hold) {
+			continue;
+		}
+		chan->ops->hold(chan);
+
+		/*
+		 * Record the channel
+		 */
+		channels[c++] = chan;
+	}
+	ppp_unlock(ppp);
+	return c;
+}
+
+/*
+ * __ppp_hold_channels()
+ *	Returns the PPP channels of the PPP device, storing each
+ *	one into channels[].
+ *
+ * channels[] has chan_sz elements.
+ * This function returns the number of channels stored, up to chan_sz.
+ * It will return < 0 if the device is not PPP.
+ *
+ * You MUST acquire ppp_lock & release the channels using
+ * ppp_release_channels().
+ */
+int __ppp_hold_channels(struct net_device *dev, struct ppp_channel *channels[],
+			unsigned int chan_sz)
+{
+	struct ppp *ppp;
+	int c;
+	struct channel *pch;
+
+	if (!dev)
+		return -1;
+
+	if (dev->type != ARPHRD_PPP)
+		return -1;
+
+	ppp = netdev_priv(dev);
+
+	c = 0;
+	list_for_each_entry(pch, &ppp->channels, clist) {
+		struct ppp_channel *chan;
+
+		if (!pch->chan) {
+			/*
+			 * Channel is going / gone away
+			 */
+			continue;
+		}
+		if (c == chan_sz) {
+			/*
+			 * No space to record channel
+			 */
+			return c;
+		}
+
+		/*
+		 * Hold the channel, if supported
+		 */
+		chan = pch->chan;
+		if (!chan->ops->hold) {
+			continue;
+		}
+		chan->ops->hold(chan);
+
+		/*
+		 * Record the channel
+		 */
+		channels[c++] = chan;
+	}
+	return c;
+}
+
+/*
+ * ppp_release_channels()
+ *	Releases channels
+ */
+void ppp_release_channels(struct ppp_channel *channels[], unsigned int chan_sz)
+{
+	unsigned int c;
+	for (c = 0; c < chan_sz; ++c) {
+		struct ppp_channel *chan;
+		chan = channels[c];
+		chan->ops->release(chan);
+	}
+}
+
 /* Module/initialization stuff */
 
 module_init(ppp_init);
@@ -3084,11 +3592,23 @@ EXPORT_SYMBOL(ppp_unregister_channel);
 EXPORT_SYMBOL(ppp_channel_index);
 EXPORT_SYMBOL(ppp_unit_number);
 EXPORT_SYMBOL(ppp_dev_name);
+EXPORT_SYMBOL(ppp_dev_index);
 EXPORT_SYMBOL(ppp_input);
 EXPORT_SYMBOL(ppp_input_error);
 EXPORT_SYMBOL(ppp_output_wakeup);
 EXPORT_SYMBOL(ppp_register_compressor);
 EXPORT_SYMBOL(ppp_unregister_compressor);
+EXPORT_SYMBOL(ppp_update_stats);
+EXPORT_SYMBOL(ppp_register_destroy_method);
+EXPORT_SYMBOL(ppp_unregister_destroy_method);
+EXPORT_SYMBOL(ppp_is_multilink);
+EXPORT_SYMBOL(ppp_hold_channels);
+EXPORT_SYMBOL(__ppp_hold_channels);
+EXPORT_SYMBOL(ppp_release_channels);
+EXPORT_SYMBOL(ppp_channel_get_protocol);
+EXPORT_SYMBOL(ppp_channel_hold);
+EXPORT_SYMBOL(ppp_channel_release);
+
 MODULE_LICENSE("GPL");
 MODULE_ALIAS_CHARDEV(PPP_MAJOR, 0);
 MODULE_ALIAS("devname:ppp");

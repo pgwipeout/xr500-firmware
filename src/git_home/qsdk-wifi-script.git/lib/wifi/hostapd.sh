@@ -281,11 +281,12 @@ hostapd_set_bss_options() {
 	CONFIG_wla_serial_number=`dd if=/dev/mtd3 bs=1c count=6 2>/dev/null | hexdump -v -e '1/1 "%02x"'`
 
 	[ -n "$wps_possible" -a -n "$config_methods" ] && {
+		name=$(cat /module_name)
 		config_get device_type "$vif" wps_device_type "6-0050F204-1"
-		config_get device_name "$vif" wps_device_name "XR500"
+		config_get device_name "$vif" wps_device_name "$name"
 		config_get manufacturer "$vif" wps_manufacturer "NTGR"
-		config_get model_name "$vif" model_name "XR500"
-		config_get model_number "$vif" model_number "XR500"
+		config_get model_name "$vif" model_name "$name"
+		config_get model_number "$vif" model_number "$name"
 		config_get serial_number "$vif" serial_number "12345"
 		config_get wps_pin "$vif" wps_pin "12345670"
 		config_get wps_state "$vif" wps_state $wps_configured_state

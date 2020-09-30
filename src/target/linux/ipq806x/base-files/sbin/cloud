@@ -1,7 +1,9 @@
 #!/bin/sh
 
 version=`cat /cloud_version`
-BINARY_REPO="https://http.fw.updates1.netgear.com/sw-apps/ready-genie-cloud/xr500"
+modelname=`cat /module_name`
+modelname_lc="$(echo $modelname |awk '{print tolower($0)}')"
+BINARY_REPO="https://http.fw.updates1.netgear.com/sw-apps/ready-genie-cloud/${modelname_lc}"
 sleep_time_1=60
 sleep_time_2=300
 sleep_time_3=600
@@ -81,7 +83,7 @@ update() {
 	#	echo "cannot access ${BINARY_REPO}/ or don't find readygeniecloud tarball with version $version"
 	#	dynamic_sleep
 	#done
-	fullversion=geniereadycloud-XR500-20171220-01.tar.gz
+	fullversion=geniereadycloud-${modelname}-20171220-01.tar.gz
 
 	if [ -f /opt/version -a "x$(cat /opt/version)" = "x$fullversion" ]; then
 		touch /tmp/.cloud_updated

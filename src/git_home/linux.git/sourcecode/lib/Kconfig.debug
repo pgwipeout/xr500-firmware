@@ -676,8 +676,9 @@ config DEBUG_LOCKING_API_SELFTESTS
 	  mutexes and rwsems.
 
 config STACKTRACE
-	bool
+	bool "Stacktrace"
 	depends on STACKTRACE_SUPPORT
+	default y
 
 config DEBUG_STACK_USAGE
 	bool "Stack utilization instrumentation"
@@ -1297,3 +1298,27 @@ source "lib/Kconfig.kmemcheck"
 
 config TEST_KSTRTOX
 	tristate "Test kstrto*() family of functions at runtime"
+
+config STOPWATCH
+	bool
+	prompt "API to measure time elapsed between two events"
+	default n
+	help
+	  This feature provides APIs to measure time elaspsed between any two
+	  events with nanosecond precision. Multiple samples can be collected
+	  by calling the STOPWATCH_(START/STOP) APIs.  The min, avg and max
+	  values of all the samples can be viewed at /proc/stopwatch/<event>.
+	  The counters are reset everytime the file is viewed.
+
+	  If in doubt, say N here.
+
+config STOPWATCH_SOFT_IRQ
+	bool
+	depends on STOPWATCH
+	prompt "Measure soft IRQ processing time using stopwatch"
+	default n
+	help
+	  Measure the time taken to process each soft IRQ.
+	  The values can be viewed at /proc/stopwatch/softirq
+
+	  If in doubt, say N here.

@@ -397,11 +397,6 @@ struct fb_cursor {
 	struct fb_image	image;	/* Cursor image */
 };
 
-#ifdef CONFIG_FB_BACKLIGHT
-/* Settings for the generic backlight code */
-#define FB_BACKLIGHT_LEVELS	128
-#define FB_BACKLIGHT_MAX	0xFF
-#endif
 
 #ifdef __KERNEL__
 
@@ -852,16 +847,6 @@ struct fb_info {
 	struct list_head modelist;      /* mode list */
 	struct fb_videomode *mode;	/* current mode */
 
-#ifdef CONFIG_FB_BACKLIGHT
-	/* assigned backlight device */
-	/* set before framebuffer registration, 
-	   remove after unregister */
-	struct backlight_device *bl_dev;
-
-	/* Backlight level curve */
-	struct mutex bl_curve_mutex;	
-	u8 bl_curve[FB_BACKLIGHT_LEVELS];
-#endif
 #ifdef CONFIG_FB_DEFERRED_IO
 	struct delayed_work deferred_work;
 	struct fb_deferred_io *fbdefio;

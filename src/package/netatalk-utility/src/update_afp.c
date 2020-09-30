@@ -54,7 +54,7 @@ static const char daapd_conf[] =
 "	itunes_overrides = false\n"
 "}\n"
 "audio {\n"
-"	nickname = \"XR500\"\n"
+"	nickname = \"%s\"\n"
 "}";
 
 struct disk_partition_info
@@ -80,6 +80,8 @@ struct share_info
 #define USB_APPLE_VOLUMES_DEFAULT_CONF	"/etc/netatalk/AppleVolumes.default"
 #define AVAHI_SERVICE_ADISK	"/etc/avahi/services/adisk.service"
 #define TMP_AFP_LOCK  "/tmp/tmp_afp_lock"
+#define MODULE_FILE	"/module_name"
+#define MODELNAME_SIZE	16
 #define SHARE_FILE_INFO "shared_usb_folder"
 #define APPROVED_DISK	"USB_approved_device"
 
@@ -950,6 +952,7 @@ int main(int argc, char**argv)
 	FILE *fp, *filp;
 	char *diskname = NULL;
 	char *device_name;
+	char model_name[MODELNAME_SIZE]={0};
 	struct timeval currenttime, newtime;
 
 	signal(SIGINT, cleanup);
@@ -991,12 +994,21 @@ int main(int argc, char**argv)
 	reload_services();
 
 	system("/etc/init.d/forked-daapd stop");
+
+	fp = fopen(MODULE_FILE, "r");
+	if(fp == NULL) {
+		perror("error when read module_name!\n");
+		return 1;
+	}
+	fscanf(fp, "%s", model_name);
+	fclose(fp);
+
 	if (config_match("endis_itunes", "1") && itunes_share_floders[0] != 0 && (fp = fopen("/etc/forked-daapd.conf", "w")) != NULL) {
 		device_name  = config_get("upnp_serverName");
 		if (*device_name != '\0')
-			fprintf(fp, daapd_conf, itunes_db_folder, itunes_db_folder, config_get("upnp_serverName"), itunes_share_floders);
+			fprintf(fp, daapd_conf, itunes_db_folder, itunes_db_folder, config_get("upnp_serverName"), itunes_share_floders, model_name);
 		else
-			fprintf(fp, daapd_conf, itunes_db_folder, itunes_db_folder, config_get("Device_name"), itunes_share_floders);
+			fprintf(fp, daapd_conf, itunes_db_folder, itunes_db_folder, config_get("Device_name"), itunes_share_floders, model_name);
 		fclose(fp);
 		char filename[256];
 		

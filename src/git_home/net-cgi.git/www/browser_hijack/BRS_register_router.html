@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html style="height:100%">
+
+<head>
+<% new_hijack_flow_head() %>
+<% hijack_language() %>
+<style>
+form{
+	height:100%;
+}
+iframe{
+	position: absolute;
+    margin-top:20px;
+    left: 50%;
+    transform: translate(-50%);
+	
+}
+#apply{
+	margin-left:3%;
+	top:91%;
+	position:absolute;
+	margin:0 auto;
+	text-align:center;
+	width:100%;
+}
+</style>
+<script>
+function register_router(){
+	var cf=document.forms[0];
+	cf.submit();
+}
+</script>
+</head>
+<body style="height:100%">
+<% form_submit("apply", "to_internet_no_auth.htm", "hijack_register_succ")%>
+<div id="container" style="height:100%,position: relative;">
+<script>
+<% hijack_get_sn() %>
+document.write('<iframe name="netgear_success" id="netgear_succ" height="85%" width="92%" src="http://www.netgear.com/success/XR500.aspx?sn='+sn+'">');
+document.write('</iframe>');
+</script>
+<div class="buttons" id="apply">
+				<button id="next_btn" class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="register_router()">
+					<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
+			  </button>
+		  </div>
+
+</div>
+<script>
+</script>
+</form>
+</body>
+</html>
+

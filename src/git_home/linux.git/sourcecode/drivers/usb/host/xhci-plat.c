@@ -12,19 +12,44 @@
  */
 
 #include <linux/platform_device.h>
+#include <linux/pm_runtime.h>
 #include <linux/module.h>
 #include <linux/slab.h>
+#include <linux/usb/otg.h>
 
 #include "xhci.h"
 
+#define SYNOPSIS_DWC3_VENDOR	0x5533
+
+static struct usb_phy *phy;
+
 static void xhci_plat_quirks(struct device *dev, struct xhci_hcd *xhci)
 {
+	struct xhci_plat_data *pdata = dev->platform_data;
+
 	/*
 	 * As of now platform drivers don't provide MSI support so we ensure
 	 * here that the generic code does not try to make a pci_dev from our
 	 * dev struct in order to setup MSI
 	 */
-	xhci->quirks |= XHCI_BROKEN_MSI;
+	xhci->quirks |= XHCI_PLAT;
+
+	if (!pdata)
+		return;
+	else if (pdata->vendor == SYNOPSIS_DWC3_VENDOR &&
+			pdata->revision < 0x230A)
+		xhci->quirks |= XHCI_PORTSC_DELAY;
+	else if (pdata->vendor == SYNOPSIS_DWC3_VENDOR &&
+			pdata->revision == 0x230A) {
+		/*
+		 * There is a known issue in this controller that has
+		 * enumeration  issues with some devices and could end up
+		 * aborting HC. When this happens, we don't want other processes
+		 * to get affected due to increased CPU utilization by the
+		 * abort process.
+		 */
+		xhci->quirks |= XHCI_RELAXED_ABORT;
+	}
 }
 
 /* called during probe() after chip reset completes */
@@ -118,7 +143,7 @@ static int xhci_plat_probe(struct platform_device *pdev)
 		goto put_hcd;
 	}
 
-	hcd->regs = ioremap(hcd->rsrc_start, hcd->rsrc_len);
+	hcd->regs = ioremap_nocache(hcd->rsrc_start, hcd->rsrc_len);
 	if (!hcd->regs) {
 		dev_dbg(&pdev->dev, "error mapping memory\n");
 		ret = -EFAULT;
@@ -148,6 +173,24 @@ static int xhci_plat_probe(struct platform_device *pdev)
 	ret = usb_add_hcd(xhci->shared_hcd, irq, IRQF_SHARED);
 	if (ret)
 		goto put_usb3_hcd;
+
+	phy = usb_get_transceiver();
+	if (phy && phy->otg) {
+		dev_dbg(&pdev->dev, "%s otg support available\n", __func__);
+		hcd->driver->stop(hcd);
+		ret = otg_set_host(phy->otg, &hcd->self);
+		if (ret) {
+			dev_err(&pdev->dev, "%s otg_set_host failed\n",
+				__func__);
+			usb_put_transceiver(phy);
+			goto put_usb3_hcd;
+		}
+	} else {
+		pm_runtime_no_callbacks(&pdev->dev);
+		pm_runtime_set_active(&pdev->dev);
+		pm_runtime_enable(&pdev->dev);
+		pm_runtime_get(&pdev->dev);
+	}
 
 	return 0;
 
@@ -179,8 +222,17 @@ static int xhci_plat_remove(struct platform_device *dev)
 
 	usb_remove_hcd(hcd);
 	iounmap(hcd->regs);
+	release_mem_region(hcd->rsrc_start, hcd->rsrc_len);
 	usb_put_hcd(hcd);
 	kfree(xhci);
+
+	if (phy && phy->otg) {
+		otg_set_host(phy->otg, NULL);
+		usb_put_transceiver(phy);
+	} else {
+		pm_runtime_put(&dev->dev);
+		pm_runtime_disable(&dev->dev);
+	}
 
 	return 0;
 }

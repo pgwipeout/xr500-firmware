@@ -7,21 +7,10 @@
  */
 #ifndef _ASM_MUTEX_H
 #define _ASM_MUTEX_H
-
-#if __LINUX_ARM_ARCH__ < 6
-/* On pre-ARMv6 hardware the swp based implementation is the most efficient. */
-# include <asm-generic/mutex-xchg.h>
-#else
-
 /*
- * Attempting to lock a mutex on ARMv6+ can be done with a bastardized
- * atomic decrement (it is not a reliable atomic decrement but it satisfies
- * the defined semantics for our purpose, while being smaller and faster
- * than a real atomic decrement or atomic swap.  The idea is to attempt
- * decrementing the lock value only once.  If once decremented it isn't zero,
- * or if its store-back fails due to a dispute on the exclusive store, we
- * simply bail out immediately through the slow path where the lock will be
- * reattempted until it succeeds.
+ * On pre-ARMv6 hardware this results in a swp-based implementation,
+ * which is the most efficient. For ARMv6+, we emit a pair of exclusive
+ * accesses instead.
  */
 static inline void
 __mutex_fastpath_lock(atomic_t *count, void (*fail_fn)(atomic_t *))
@@ -41,6 +30,8 @@ __mutex_fastpath_lock(atomic_t *count, void (*fail_fn)(atomic_t *))
 	__res |= __ex_flag;
 	if (unlikely(__res != 0))
 		fail_fn(count);
+	else
+		smp_rmb();
 }
 
 static inline int
@@ -61,6 +52,9 @@ __mutex_fastpath_lock_retval(atomic_t *count, int (*fail_fn)(atomic_t *))
 	__res |= __ex_flag;
 	if (unlikely(__res != 0))
 		__res = fail_fn(count);
+	else
+		smp_rmb();
+
 	return __res;
 }
 
@@ -74,6 +68,7 @@ __mutex_fastpath_unlock(atomic_t *count, void (*fail_fn)(atomic_t *))
 {
 	int __ex_flag, __res, __orig;
 
+	smp_wmb();
 	__asm__ (
 
 		"ldrex	%0, [%3]	\n\t"
@@ -119,9 +114,10 @@ __mutex_fastpath_trylock(atomic_t *count, int (*fail_fn)(atomic_t *))
 		: "=&r" (__orig), "=&r" (__res), "=&r" (__ex_flag)
 		: "r" (&count->counter)
 		: "cc", "memory" );
+	if (__orig)
+		smp_rmb();
 
 	return __orig;
 }
 
-#endif
 #endif

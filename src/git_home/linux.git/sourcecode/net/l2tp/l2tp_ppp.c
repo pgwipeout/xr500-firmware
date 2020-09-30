@@ -134,9 +134,17 @@ struct pppol2tp_session {
 };
 
 static int pppol2tp_xmit(struct ppp_channel *chan, struct sk_buff *skb);
+static struct net_device *pppol2tp_get_netdev(struct ppp_channel *chan);
+static int pppol2tp_get_channel_protocol(struct ppp_channel *);
+static void pppol2tp_hold_chan(struct ppp_channel *);
+static void pppol2tp_release_chan(struct ppp_channel *);
 
 static const struct ppp_channel_ops pppol2tp_chan_ops = {
 	.start_xmit =  pppol2tp_xmit,
+	.get_netdev = pppol2tp_get_netdev,
+	.get_channel_protocol = pppol2tp_get_channel_protocol,
+	.hold = pppol2tp_hold_chan,
+	.release = pppol2tp_release_chan,
 };
 
 static const struct proto_ops pppol2tp_ops;
@@ -200,8 +208,6 @@ static int pppol2tp_recvmsg(struct kiocb *iocb, struct socket *sock,
 	if (sk->sk_state & PPPOX_BOUND)
 		goto end;
 
-	msg->msg_namelen = 0;
-
 	err = 0;
 	skb = skb_recv_datagram(sk, flags & ~MSG_DONTWAIT,
 				flags & MSG_DONTWAIT, &err);
@@ -257,6 +263,7 @@ static void pppol2tp_recv(struct l2tp_session *session, struct sk_buff *skb, int
 		nf_reset(skb);
 
 		po = pppox_sk(sk);
+		skb->skb_iif = ppp_dev_index(&po->chan);
 		ppp_input(&po->chan, skb);
 	} else {
 		PRINTK(session->debug, PPPOL2TP_MSG_DATA, KERN_INFO,
@@ -350,18 +357,21 @@ static int pppol2tp_sendmsg(struct kiocb *iocb, struct socket *sock, struct msgh
 	skb_put(skb, 2);
 
 	/* Copy user data into skb */
-	error = memcpy_fromiovec(skb->data, m->msg_iov, total_len);
+	error = memcpy_fromiovec(skb_put(skb, total_len), m->msg_iov,
+				 total_len);
 	if (error < 0) {
 		kfree_skb(skb);
 		goto error_put_sess_tun;
 	}
-	skb_put(skb, total_len);
 
+	local_bh_disable();
 	l2tp_xmit_skb(session, skb, session->hdr_len);
+	local_bh_enable();
 
 	sock_put(ps->tunnel_sock);
+	sock_put(sk);
 
-	return error;
+	return total_len;
 
 error_put_sess_tun:
 	sock_put(ps->tunnel_sock);
@@ -369,6 +379,33 @@ error_put_sess:
 	sock_put(sk);
 error:
 	return error;
+}
+
+/*
+ * pppol2tp_hold_chan()
+ */
+static void pppol2tp_hold_chan(struct ppp_channel *chan)
+{
+	struct sock *sk = (struct sock *)chan->private;
+	sock_hold(sk);
+}
+
+/*
+ * pppol2tp_release_chan()
+ */
+static void pppol2tp_release_chan(struct ppp_channel *chan)
+{
+	struct sock *sk = (struct sock *)chan->private;
+	sock_put(sk);
+}
+
+/*
+ * pppol2tp_get_channel_protocol()
+ * Return the protocol type of the L2TP over PPP protocol
+ */
+static int pppol2tp_get_channel_protocol(struct ppp_channel *chan)
+{
+	return PX_PROTO_OL2TP;
 }
 
 /* Transmit function called by generic PPP driver.  Sends PPP frame
@@ -431,7 +468,13 @@ static int pppol2tp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
 	skb->data[0] = ppph[0];
 	skb->data[1] = ppph[1];
 
+	/* set incoming interface as the ppp interface */
+	if (skb->skb_iif)
+		skb->skb_iif = ppp_dev_index(chan);
+
+	local_bh_disable();
 	l2tp_xmit_skb(session, skb, session->hdr_len);
+	local_bh_enable();
 
 	sock_put(sk_tun);
 	sock_put(sk);
@@ -445,6 +488,38 @@ abort:
 	/* Free the original skb */
 	kfree_skb(skb);
 	return 1;
+}
+
+static struct net_device *pppol2tp_get_netdev(struct ppp_channel *chan)
+{
+	struct sock *sk = (struct sock *)chan->private;
+	struct inet_sock *isk = NULL;
+	struct l2tp_session *session = NULL;
+	struct pppol2tp_session *ps = NULL;
+	struct net_device *dev = NULL;
+	struct rtable *rt = NULL;
+	struct dst_entry *dst = NULL;
+
+	session = pppol2tp_sock_to_session(sk);
+	if (session == NULL) {
+		return NULL;
+	}
+
+	ps = l2tp_session_priv(session);
+	isk = inet_sk(ps->tunnel_sock);
+
+	rt = ip_route_output(&init_net, isk->inet_daddr, 0, 0, 0);
+	if (IS_ERR(rt)) {
+		return NULL;
+	}
+
+	dst = (struct dst_entry *)rt;
+	dev = dst->dev;
+	dst_release(dst);
+
+	sock_put(sk);
+
+	return dev;
 }
 
 /*****************************************************************************
@@ -769,9 +844,9 @@ static int pppol2tp_connect(struct socket *sock, struct sockaddr *uservaddr,
 	session->deref = pppol2tp_session_sock_put;
 
 	/* If PMTU discovery was enabled, use the MTU that was discovered */
-	dst = sk_dst_get(sk);
+	dst = sk_dst_get(tunnel->sock);
 	if (dst != NULL) {
-		u32 pmtu = dst_mtu(__sk_dst_get(sk));
+		u32 pmtu = dst_mtu(__sk_dst_get(tunnel->sock));
 		if (pmtu != 0)
 			session->mtu = session->mru = pmtu -
 				PPPOL2TP_HEADER_OVERHEAD;
@@ -1348,7 +1423,7 @@ static int pppol2tp_setsockopt(struct socket *sock, int level, int optname,
 	int err;
 
 	if (level != SOL_PPPOL2TP)
-		return udp_prot.setsockopt(sk, level, optname, optval, optlen);
+		return -EINVAL;
 
 	if (optlen < sizeof(int))
 		return -EINVAL;
@@ -1474,7 +1549,7 @@ static int pppol2tp_getsockopt(struct socket *sock, int level,
 	struct pppol2tp_session *ps;
 
 	if (level != SOL_PPPOL2TP)
-		return udp_prot.getsockopt(sk, level, optname, optval, optlen);
+		return -EINVAL;
 
 	if (get_user(len, (int __user *) optlen))
 		return -EFAULT;
@@ -1777,7 +1852,8 @@ static const struct proto_ops pppol2tp_ops = {
 
 static const struct pppox_proto pppol2tp_proto = {
 	.create		= pppol2tp_create,
-	.ioctl		= pppol2tp_ioctl
+	.ioctl		= pppol2tp_ioctl,
+	.owner		= THIS_MODULE,
 };
 
 #ifdef CONFIG_L2TP_V3

@@ -36,6 +36,9 @@
 #include <linux/module.h>
 #include <linux/magic.h>
 #include <linux/xattr.h>
+#include <linux/root_dev.h>
+#include <linux/syscalls.h>
+#include <linux/mtd/mtd.h>
 
 #include "squashfs_fs.h"
 #include "squashfs_fs_sb.h"
@@ -394,10 +397,36 @@ static void squashfs_put_super(struct super_block *sb)
 	}
 }
 
+/* copy from init/do_mounts.h */
+static inline int create_dev(char *name, dev_t dev)
+{
+	sys_unlink(name);
+	return sys_mknod(name, S_IFBLK|0600, new_encode_dev(dev));
+}
+
 
 static struct dentry *squashfs_mount(struct file_system_type *fs_type,
 				int flags, const char *dev_name, void *data)
 {
+	char dev[32];
+
+	if (!strncmp(dev_name, "mtd:", 4) || !strncmp(dev_name, "ubi:", 4)) {
+		struct mtd_info *mtd = get_mtd_device_nm(dev_name + 4);
+
+		if (!IS_ERR(mtd)) {
+			void *bdev;
+
+			sprintf(dev, "/dev/mtdblock%d", mtd->index);
+			bdev = blkdev_get_by_path(dev, FMODE_READ, fs_type);
+			if (!IS_ERR(bdev)) {
+				dev_name = dev;
+			} else if (PTR_ERR(bdev) == -ENOENT) {
+				create_dev(dev,
+					MKDEV(MTD_BLOCK_MAJOR, mtd->index));
+				dev_name = dev;
+			}
+		}
+	}
 	return mount_bdev(fs_type, flags, dev_name, data, squashfs_fill_super);
 }
 

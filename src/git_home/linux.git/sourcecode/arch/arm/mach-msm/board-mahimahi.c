@@ -31,19 +31,17 @@
 #include <mach/board.h>
 #include <mach/hardware.h>
 #include <mach/system.h>
+#include <mach/proc_comm.h>
 
 #include "board-mahimahi.h"
 #include "devices.h"
-#include "proc_comm.h"
 
 static uint debug_uart;
 
 module_param_named(debug_uart, debug_uart, uint, 0);
 
 static struct platform_device *devices[] __initdata = {
-#if !defined(CONFIG_MSM_SERIAL_DEBUGGER)
 	&msm_device_uart1,
-#endif
 	&msm_device_uart_dm1,
 	&msm_device_nand,
 };

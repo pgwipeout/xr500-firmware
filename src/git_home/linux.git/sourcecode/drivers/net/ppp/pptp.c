@@ -180,7 +180,6 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
 	unsigned char *data;
 	__u32 seq_recv;
 
-
 	struct rtable *rt;
 	struct net_device *tdev;
 	struct iphdr  *iph;
@@ -189,7 +188,7 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
 	if (sk_pppox(po)->sk_state & PPPOX_DEAD)
 		goto tx_error;
 
-	rt = ip_route_output_ports(&init_net, &fl4, NULL,
+	rt = ip_route_output_ports(sock_net(sk), &fl4, NULL,
 				   opt->dst_addr.sin_addr.s_addr,
 				   opt->src_addr.sin_addr.s_addr,
 				   0, 0, IPPROTO_GRE,
@@ -281,8 +280,12 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
 	nf_reset(skb);
 
 	skb->ip_summed = CHECKSUM_NONE;
-	ip_select_ident(iph, &rt->dst, NULL);
+	ip_select_ident(skb, NULL);
 	ip_send_check(iph);
+
+	/* set incoming interface as the ppp interface */
+	if (skb->skb_iif)
+		skb->skb_iif = ppp_dev_index(chan);
 
 	ip_local_out(skb);
 	return 1;
@@ -290,6 +293,28 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
 tx_error:
 	kfree_skb(skb);
 	return 1;
+}
+
+static struct net_device *pptp_get_netdev(struct ppp_channel *chan)
+{
+	struct sock *sk = (struct sock *)chan->private;
+	struct rtable *rt = NULL;
+	struct dst_entry *dst = NULL;
+	struct pppox_sock *po = NULL;
+	struct net_device *dev = NULL;
+
+	po = pppox_sk(sk);
+
+	rt = ip_route_output(&init_net, po->proto.pptp.dst_addr.sin_addr.s_addr, 0, 0, 0);
+	if (IS_ERR(rt)) {
+		return NULL;
+	}
+
+	dst = (struct dst_entry *)rt;
+	dev = dst->dev;
+	dst_release(dst);
+
+	return dev;
 }
 
 static int pptp_rcv_core(struct sock *sk, struct sk_buff *skb)
@@ -404,6 +429,7 @@ static int pptp_rcv(struct sk_buff *skb)
 	if (po) {
 		skb_dst_drop(skb);
 		nf_reset(skb);
+		skb->skb_iif = ppp_dev_index(&po->chan);
 		return sk_receive_skb(sk_pppox(po), skb, 0);
 	}
 drop:
@@ -468,7 +494,7 @@ static int pptp_connect(struct socket *sock, struct sockaddr *uservaddr,
 	po->chan.private = sk;
 	po->chan.ops = &pptp_chan_ops;
 
-	rt = ip_route_output_ports(&init_net, &fl4, sk,
+	rt = ip_route_output_ports(sock_net(sk), &fl4, sk,
 				   opt->dst_addr.sin_addr.s_addr,
 				   opt->src_addr.sin_addr.s_addr,
 				   0, 0,
@@ -624,9 +650,40 @@ static int pptp_ppp_ioctl(struct ppp_channel *chan, unsigned int cmd,
 	return err;
 }
 
+/*
+ * pptp_hold_chan()
+ */
+static void pptp_hold_chan(struct ppp_channel *chan)
+{
+       struct sock *sk = (struct sock *)chan->private;
+       sock_hold(sk);
+}
+
+/*
+ * pptp_release_chan()
+ */
+static void pptp_release_chan(struct ppp_channel *chan)
+{
+       struct sock *sk = (struct sock *)chan->private;
+       sock_put(sk);
+}
+
+/*
+ * pptp_get_channel_protocol()
+ *     Return the protocol type of the PPTP over PPP protocol
+ */
+static int pptp_get_channel_protocol(struct ppp_channel *chan)
+{
+       return PX_PROTO_PPTP;
+}
+
 static const struct ppp_channel_ops pptp_chan_ops = {
 	.start_xmit = pptp_xmit,
 	.ioctl      = pptp_ppp_ioctl,
+	.get_netdev = pptp_get_netdev,
+	.get_channel_protocol = pptp_get_channel_protocol,
+	.hold = pptp_hold_chan,
+	.release = pptp_release_chan,
 };
 
 static struct proto pptp_sk_proto __read_mostly = {

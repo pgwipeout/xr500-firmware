@@ -15,14 +15,19 @@ bitrate_down=1000000
 notify_interval=$3
 time_to_live=$4
 friendly_name=$5
-listening_net=$6
+modelname=$6
+modelnumber=$7
+modelurl=$8
+pnpx_hwid=$9
+devupc=${10}
+listening_net=${11}
 allow 1024-65535 192.168.0.0/24 1024-65535
 allow 1024-65535 192.168.1.0/24 1024-65535
 allow 0-65535 0.0.0.0/0 0-65535
-appsystem_location=http://updates1.netgear.com/xr500/ww/xr500.ddf
+appsystem_location=http://updates1.netgear.com/${12}/ww/${12}.ddf
 appsystem_os=Linux/3.4
-appsystem_product=xr500
-non_igd=${7:-0}
+appsystem_product=${12}
+non_igd=${13:-0}
 EOF
 }
 
@@ -53,7 +58,10 @@ upnp_start() {
 
 	[ -f $MINIUPNPD_CONF ] && rm -f $MINIUPNPD_CONF
 	[ ! -d /tmp/etc ] && mkdir /tmp/etc
-	print_upnp_conf "$wan_ifname" "$listenip" "$($config get upnp_AdverTime)" "$($config get upnp_TimeToLive)" "$name" "$($config get lan_netmask)" "$non_igd" > $MINIUPNPD_CONF
+	print_upnp_conf "$wan_ifname" "$listenip" "$($config get upnp_AdverTime)" "$($config get upnp_TimeToLive)" "$name" \
+		"$($config get miniupnp_modelname)" "$($config get miniupnp_modelnumber)" "$($config get miniupnp_modelurl)" \
+		"$($config get miniupnp_pnpx_hwid)" "$($config get miniupnp_devupc)" "$($config get lan_netmask)" \
+		"$(awk '{print tolower($0)}' /module_name)" "$non_igd" > $MINIUPNPD_CONF
 
 	# wait a moment ...
 	sleep 2

@@ -1,6 +1,13 @@
 #
 # USB Core configuration
 #
+config DNI_3G_DONGLE_SUPPORT
+        bool "Dni 3g dongle support"
+        default n
+        ---help---
+          This option adds 3g dongle support
+          You also need to enable serial driver to fully support 3G dongle
+
 config USB_DEBUG
 	bool "USB verbose debug messages"
 	depends on USB

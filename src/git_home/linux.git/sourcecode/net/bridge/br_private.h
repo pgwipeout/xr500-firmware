@@ -18,6 +18,7 @@
 #include <linux/netpoll.h>
 #include <linux/u64_stats_sync.h>
 #include <net/route.h>
+#include <linux/export.h>
 
 #define BR_HASH_BITS 8
 #define BR_HASH_SIZE (1 << BR_HASH_BITS)
@@ -37,6 +38,7 @@
 /* Path to usermode spanning tree program */
 #define BR_STP_PROG	"/sbin/bridge-stp"
 
+#define BR_ACL_HASH_SIZE 64
 typedef struct bridge_id bridge_id;
 typedef struct mac_addr mac_addr;
 typedef __u16 port_id;
@@ -135,6 +137,7 @@ struct net_bridge_port
 
 	unsigned long 			flags;
 #define BR_HAIRPIN_MODE		0x00000001
+#define BR_ISOLATE_MODE		0x00000002
 
 #ifdef CONFIG_BRIDGE_IGMP_SNOOPING
 	u32				multicast_startup_queries_sent;
@@ -158,8 +161,7 @@ struct net_bridge_port
 
 static inline struct net_bridge_port *br_port_get_rcu(const struct net_device *dev)
 {
-	struct net_bridge_port *port = rcu_dereference(dev->rx_handler_data);
-	return br_port_exists(dev) ? port : NULL;
+	return rcu_dereference(dev->rx_handler_data);
 }
 
 static inline struct net_bridge_port *br_port_get_rtnl(struct net_device *dev)
@@ -253,6 +255,18 @@ struct net_bridge
 	struct timer_list		topology_change_timer;
 	struct timer_list		gc_timer;
 	struct kobject			*ifobj;
+#ifdef CONFIG_BRIDGE_NETGEAR_ACL
+        unsigned char                   acl_enabled; /* 1 if enable, 0 if disable */
+        /*
+         * acl_type
+         * 1 if new device allowed by default (means only block the device in acl_hash),
+         * 0 if new device blocked by default (means only allow the device in acl_hash)
+         */
+        unsigned char                   acl_type;
+        unsigned char                   acl_debug;
+        struct hlist_head               acl_hash[BR_ACL_HASH_SIZE]; /* mac address of the devices that are blocked/allowed*/
+        spinlock_t                      acl_hash_lock;
+#endif
 };
 
 struct br_input_skb_cb {
@@ -336,6 +350,18 @@ static inline int br_netpoll_enable(struct net_bridge_port *p)
 static inline void br_netpoll_disable(struct net_bridge_port *p)
 {
 }
+#endif
+
+#ifdef CONFIG_BRIDGE_NETGEAR_ACL
+/* br_acl.c */
+#define ACL_CHECK_SRC  0x01
+#define ACL_CHECK_DST  0x02
+extern void br_acl_init(void);
+extern void br_acl_fini(void);
+extern void br_acl_cleanup(struct net_bridge *br);
+extern int br_acl_insert(struct net_bridge *br, const unsigned char *addr);
+extern int br_acl_should_pass(struct net_bridge *br, struct sk_buff *skb, int type);
+extern void br_acl_debug_onoff(struct net_bridge *br, int onoff);
 #endif
 
 /* br_fdb.c */
@@ -501,6 +527,7 @@ extern struct net_bridge_port *br_get_port(struct net_bridge *br,
 extern void br_init_port(struct net_bridge_port *p);
 extern void br_become_designated_port(struct net_bridge_port *p);
 
+extern void __br_set_forward_delay(struct net_bridge *br, unsigned long t);
 extern int br_set_forward_delay(struct net_bridge *br, unsigned long x);
 extern int br_set_hello_time(struct net_bridge *br, unsigned long x);
 extern int br_set_max_age(struct net_bridge *br, unsigned long x);
@@ -538,6 +565,7 @@ extern int (*br_fdb_test_addr_hook)(struct net_device *dev, unsigned char *addr)
 #endif
 
 /* br_netlink.c */
+extern struct rtnl_link_ops br_link_ops;
 extern int br_netlink_init(void);
 extern void br_netlink_fini(void);
 extern void br_ifinfo_notify(int event, struct net_bridge_port *port);
@@ -559,5 +587,84 @@ extern void br_sysfs_delbr(struct net_device *dev);
 #define br_sysfs_addbr(dev)	(0)
 #define br_sysfs_delbr(dev)	do { } while(0)
 #endif /* CONFIG_SYSFS */
+
+#ifdef CONFIG_DNI_MCAST_TO_UNICAST
+#define MCAST_ENTRY_SIZE 10
+#define MAX_CLEAN_COUNT 4
+#define MAX_SOURCE_SIZE 8
+#define BR_PROC_MCAST_NAME "mcast"
+#define BR_IGMP_SNOOP_NAME "igmpsnoop"
+#define BR_MCAST_SET_NAME "mcast_set"
+#define MULTICAST_MAC(mac)       ((mac[0]==0x01)&&(mac[1]==0x00)&&(mac[2]==0x5e))
+#define INSERT_TO_TAIL(X, Y, Z)  do{ \
+      Z=X; \
+      while (Z->next)  \
+              Z = Z->next; \
+      Z->next = Y; \
+      } while(0)
+
+struct __mac_cache
+{
+      unsigned char valid;
+      unsigned char count;
+      unsigned char mac[6];
+      unsigned long sip;
+      struct net_device *dev;
+};
+
+struct source_set
+{
+      unsigned short num;
+      unsigned short mode;
+      unsigned long sip[MAX_SOURCE_SIZE];
+};
+
+struct __mgroup_mbr_list
+{
+      unsigned char mac[6];
+      char noused[2]; // just for aligned
+      unsigned long sip;
+      struct source_set set;
+      struct net_device *dev;
+      struct __mgroup_mbr_list *next;
+};
+
+struct __mgroup_list
+{
+      unsigned long gip;
+      struct __mgroup_mbr_list *member;
+      struct __mgroup_list *next;
+};
+extern struct __mac_cache mac_cache[MCAST_ENTRY_SIZE];
+extern int igmp_snoop_enable;
+extern struct __mgroup_list *mhead;
+
+void iptv_port_update_mgroup(const struct sk_buff *skb);
+void proc_mcast_entry(char cmd, unsigned long ip ,unsigned long gip);
+int mcast_set_read( char *page, char **start, off_t off,
+                                int count, int *eof, void *data );
+ssize_t mcast_set_write( struct file *filp, const char __user *buff,
+                                         unsigned long len, void *data );
+unsigned long a2n(char *addr);
+#endif
+
+#define __br_get( __hook, __default, __args ... ) \
+		(__hook ? (__hook( __args )) : (__default))
+
+static inline void __br_notify(int group, int type, const void *data)
+{
+	br_notify_hook_t *notify_hook = rcu_dereference(br_notify_hook);
+
+	if (notify_hook)
+		notify_hook(group, type, data);
+}
+
+
+struct mac_traffic {
+    unsigned char mac[6];
+    unsigned char flag;
+    unsigned long upload;
+    unsigned long download;
+};
 
 #endif

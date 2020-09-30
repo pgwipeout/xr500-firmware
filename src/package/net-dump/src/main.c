@@ -150,6 +150,8 @@ static void usage(void)
 int main(int argc, char **argv)
 {
 	FILE *dumpfp;
+	FILE *modelfp;
+	char modelbuf[MODELBUF_SIZE]={0};
 	int cap_sock, i, socketfd;
 	char *ifname, *filename, *serverip;
 	void *param;
@@ -179,15 +181,23 @@ int main(int argc, char **argv)
 
 	/* TFTP first */
 	if (serverip != 0) {
+		modelfp = fopen(MODULE_FILE, "r");
+		if (!modelfp) {
+			printf("Can't read model name.\n");
+			return -1;
+		}
+		fscanf(modelfp, "%s", modelbuf);
+		fclose(modelfp);
+
 		socketfd = socket(AF_INET, SOCK_DGRAM, 0);
 		if (socketfd < 0) {
 			printf("Can't open the socket for TFTP.\n");
 			return -1;
-		}	
+		}
 
 		tparam.port = htons(TFTP_PORT);
 		tparam.serverip = inet_addr(serverip);
-		tparam.filename = filename ? : DFT_FILENAME;
+		tparam.filename = filename ? : strcat(modelbuf, DFT_FILESUFFIX);
 		tparam.socketfd = socketfd;
 		
 		param = &tparam;

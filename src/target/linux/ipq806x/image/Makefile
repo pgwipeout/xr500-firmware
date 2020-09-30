@@ -5,13 +5,15 @@ include $(INCLUDE_DIR)/image.mk
 
 MODULE_NAME=XR500
 HW_VERSION=XR500
-FW_VERSION=V2.3.0.8
+FW_VERSION=V2.3.2.18
 LG_VERSION=V1.0.0.327
 CLOUD_VERSION=20171220
 HW_ID="29764958+0+256+512+4x4+4x4+cascade"
 ifndef FW_REGION
 	FW_REGION=""
 endif
+
+MODULE_LIST ?= XR500 XR450
 
 # * page size = 2KB, block size = 128KB.
 # * kernel + rootfs + (reserved for bad blocks) = 50MB = 400 blocks
@@ -28,8 +30,8 @@ UBINIZE_OPTS = -m 2048 -p 128KiB
 E2SIZE=$(shell echo $$(($(CONFIG_TARGET_ROOTFS_PARTSIZE)*1024)))
 
 define Image/Prepare
-	echo "$(MODULE_NAME)" > $(TARGET_DIR)/module_name
-	echo "$(HW_VERSION)" > $(TARGET_DIR)/hardware_version
+	ln -sf /tmp/module_name $(TARGET_DIR)/module_name
+	ln -sf /tmp/hardware_version $(TARGET_DIR)/hardware_version
 	echo "$(FW_VERSION)" > $(TARGET_DIR)/firmware_version
 	echo "$(CLOUD_VERSION)" > $(TARGET_DIR)/cloud_version
 	echo "$(FW_REGION)" > $(TARGET_DIR)/firmware_region
@@ -43,6 +45,14 @@ define MkImageLzma
 	mkimage -A arm -O linux -C lzma -T kernel -a 0x40908000 \
 		-e 0x40908000 -n 'Linux-$(LINUX_VERSION)' \
 		-d $(1) $(2)
+endef
+
+define Image/Build/Firmware
+	# FIXME:removing this line will cause strange behaviour in the foreach loop below
+	$(STAGING_DIR_HOST)/bin/mkdniimg \
+		-B $(1) -v $(FW_VERSION) -r $(FW_REGION) -H $(HW_ID) \
+		-i $(BIN_DIR)/$(IMG_PREFIX)-sysupgrade.bin \
+		-o $(BIN_DIR)/$(1)-$(FW_VERSION)$(FW_REGION).img
 endef
 
 define Image/Build/XR500
@@ -65,10 +75,7 @@ define Image/Build/XR500
 		dd if=$(KDIR)/root.$(1).final bs=64k; \
 	) > $(BIN_DIR)/$(IMG_PREFIX)-sysupgrade.bin
 	$(STAGING_DIR_HOST)/../../tools/checksize $(BIN_DIR)/$(IMG_PREFIX)-sysupgrade.bin $(MAX_IMAGE_SIZE)
-	$(STAGING_DIR_HOST)/bin/mkdniimg \
-		-B $(MODULE_NAME) -v $(FW_VERSION) -r $(FW_REGION) -H $(HW_ID) \
-		-i $(BIN_DIR)/$(IMG_PREFIX)-sysupgrade.bin \
-		-o $(BIN_DIR)/$(MODULE_NAME)-$(FW_VERSION)$(FW_REGION).img
+	$(foreach SZ,$(MODULE_LIST),$(call Image/Build/Firmware,$(SZ)))
 endef
 
 define Image/BuildKernel

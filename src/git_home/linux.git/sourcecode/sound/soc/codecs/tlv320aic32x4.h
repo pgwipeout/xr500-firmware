@@ -1,6 +1,8 @@
 /*
  * tlv320aic32x4.h
  *
+ * Copyright (c) 2013 The Linux Foundation. All rights reserved.
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
@@ -85,7 +87,9 @@
 #define AIC32X4_LMICPGAVOL	(AIC32X4_PAGE1 + 59)
 #define AIC32X4_RMICPGAVOL	(AIC32X4_PAGE1 + 60)
 
+#define AIC32X4_FREQ_11289600 11289600
 #define AIC32X4_FREQ_12000000 12000000
+#define AIC32X4_FREQ_12288000 12288000
 #define AIC32X4_FREQ_24000000 24000000
 #define AIC32X4_FREQ_25000000 25000000
 

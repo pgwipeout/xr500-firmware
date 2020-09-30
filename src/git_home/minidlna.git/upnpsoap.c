@@ -1791,20 +1791,66 @@ SamsungSetBookmark(struct upnphttp * h, const char * action)
 	    " xmlns:u=\"urn:schemas-upnp-org:service:ContentDirectory:1\">"
 	    "</u:X_SetBookmarkResponse>";
 
+	static const char sql[] =
+		"INSERT OR REPLACE into BOOKMARKS"
+		   " VALUES "
+		   "((select DETAIL_ID from OBJECTS where OBJECT_ID = '?'), ?)";
+
 	struct NameValueParserData data;
 	char *ObjectID, *PosSecond;
 
 	ParseNameValue(h->req_buf + h->req_contentoff, h->req_contentlen, &data, 0);
 	ObjectID = GetValueFromNameValueList(&data, "ObjectID");
 	PosSecond = GetValueFromNameValueList(&data, "PosSecond");
-	if( ObjectID && PosSecond )
-	{
-		int ret;
-		ret = sql_exec(db, "INSERT OR REPLACE into BOOKMARKS"
-		                   " VALUES "
-		                   "((select DETAIL_ID from OBJECTS where OBJECT_ID = '%q'), %q)", ObjectID, PosSecond);
-		if( ret != SQLITE_OK )
-			DPRINTF(E_WARN, L_METADATA, "Error setting bookmark %s on ObjectID='%s'\n", PosSecond, ObjectID);
+
+	if( ObjectID && PosSecond ) // move the logic
+	{ // fix PSV-2017-3056, could wrap up, just put to reuse.
+		sqlite3_stmt    *stmt;
+		int				counter;
+		int				result;
+
+		if (db == NULL) // db is a global var
+		{
+			DPRINTF(E_WARN, L_DB_SQL, "db is NULL\n");
+			return NULL;
+		}
+
+		switch (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL))
+		{
+			case SQLITE_OK:
+				if (SQLITE_OK != sqlite3_bind_text(stmt, 1, ObjectID, -1, NULL) ||
+					SQLITE_OK != sqlite3_bind_text(stmt, 2, PosSecond, -1, NULL)) {
+					DPRINTF(E_ERROR, L_DB_SQL, "prepare failed: %s\n%s\n", sqlite3_errmsg(db), sql);
+				}
+				break;
+			default:
+				DPRINTF(E_ERROR, L_DB_SQL, "prepare failed: %s\n%s\n", sqlite3_errmsg(db), sql);
+				return NULL;
+		}
+
+		// wait to be available
+		for (counter = 0; 
+			 ((result = sqlite3_step(stmt)) == SQLITE_BUSY || result == SQLITE_LOCKED) && counter < 2;
+			 counter++)
+		{
+			/* While SQLITE_BUSY has a built in timeout,
+			 * SQLITE_LOCKED does not, so sleep */
+			if (result == SQLITE_LOCKED)
+				sleep(1);
+		}
+
+		switch (result)
+		{
+			case SQLITE_DONE:
+				break;
+
+			default:
+				DPRINTF(E_WARN, L_METADATA, "Error setting bookmark %s on ObjectID='%s'\n", PosSecond, ObjectID);
+				break;
+		}
+
+		sqlite3_finalize(stmt); // done the prepared statement
+
 		BuildSendAndCloseSoapResp(h, resp, sizeof(resp)-1);
 	}
 	else

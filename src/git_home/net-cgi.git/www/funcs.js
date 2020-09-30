@@ -2965,7 +2965,7 @@ function goTestApply()
 		if( in_hijack == true)// to fix bug 32600
 			window.open("BRS_check_manulConfig.html", null, winoptions);
 		else
-			window.open("$success_href",null,winoptions);
+			window.open("http://www.netgear.com/success/"+getTop(window).host_name.toLowerCase()+".aspx",null,winoptions);
 
 	}
 }

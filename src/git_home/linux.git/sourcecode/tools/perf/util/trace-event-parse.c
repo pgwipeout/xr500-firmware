@@ -150,7 +150,7 @@ void parse_proc_kallsyms(char *file, unsigned int size __unused)
 	char *line;
 	char *next = NULL;
 	char *addr_str;
-	char ch;
+	char *fmt;
 	int ret __used;
 	int i;
 
@@ -158,13 +158,12 @@ void parse_proc_kallsyms(char *file, unsigned int size __unused)
 	while (line) {
 		item = malloc_or_die(sizeof(*item));
 		item->mod = NULL;
-		ret = sscanf(line, "%as %c %as\t[%as",
-			     (float *)(void *)&addr_str, /* workaround gcc warning */
-			     &ch,
-			     (float *)(void *)&item->func,
-			     (float *)(void *)&item->mod);
+		addr_str = strtok_r(line, " ", &fmt);
 		item->addr = strtoull(addr_str, NULL, 16);
-		free(addr_str);
+		/* skip character */
+		strtok_r(NULL, " ", &fmt);
+		item->func = strtok_r(NULL, "\t", &fmt);
+		item->mod = strtok_r(NULL, "]", &fmt);
 
 		/* truncate the extra ']' */
 		if (item->mod)
@@ -1590,6 +1589,8 @@ process_symbols(struct event *event, struct print_arg *arg, char **tok)
 	field = malloc_or_die(sizeof(*field));
 
 	type = process_arg(event, field, &token);
+	while (type == EVENT_OP)
+		type = process_op(event, field, &token);
 	if (test_type_token(type, token, EVENT_DELIM, ","))
 		goto out_free;
 

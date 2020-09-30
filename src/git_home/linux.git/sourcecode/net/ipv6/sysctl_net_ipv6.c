@@ -16,6 +16,8 @@
 #include <net/addrconf.h>
 #include <net/inet_frag.h>
 
+extern int sysctl_ipv6_6to4_force_ip4fragoff_zero;
+
 static struct ctl_table empty[1];
 
 static ctl_table ipv6_static_skeleton[] = {
@@ -58,6 +60,13 @@ static ctl_table ipv6_rotable[] = {
 		.maxlen		= sizeof(int),
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec
+	},
+	{
+		.procname       = "ipv6_6to4_force_ip4fragoff_zero",
+		.data           = &sysctl_ipv6_6to4_force_ip4fragoff_zero,
+		.maxlen         = sizeof(int),
+		.mode           = 0644,
+		.proc_handler   = proc_dointvec 
 	},
 	{ }
 };

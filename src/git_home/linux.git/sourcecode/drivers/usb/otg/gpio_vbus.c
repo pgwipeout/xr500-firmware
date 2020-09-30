@@ -37,7 +37,7 @@ struct gpio_vbus_data {
 	struct regulator       *vbus_draw;
 	int			vbus_draw_enabled;
 	unsigned		mA;
-	struct work_struct	work;
+	struct delayed_work	work;
 };
 
 
@@ -51,8 +51,7 @@ struct gpio_vbus_data {
  * edges might be workable.
  */
 #define VBUS_IRQ_FLAGS \
-	( IRQF_SAMPLE_RANDOM | IRQF_SHARED \
-	| IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING )
+	( IRQF_SHARED | IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING )
 
 
 /* interface to regulator framework */
@@ -94,7 +93,7 @@ static int is_vbus_powered(struct gpio_vbus_mach_info *pdata)
 static void gpio_vbus_work(struct work_struct *work)
 {
 	struct gpio_vbus_data *gpio_vbus =
-		container_of(work, struct gpio_vbus_data, work);
+		container_of(work, struct gpio_vbus_data, work.work);
 	struct gpio_vbus_mach_info *pdata = gpio_vbus->dev->platform_data;
 	int gpio, status;
 
@@ -152,7 +151,7 @@ static irqreturn_t gpio_vbus_irq(int irq, void *data)
 		otg->gadget ? otg->gadget->name : "none");
 
 	if (otg->gadget)
-		schedule_work(&gpio_vbus->work);
+		schedule_delayed_work(&gpio_vbus->work, msecs_to_jiffies(100));
 
 	return IRQ_HANDLED;
 }
@@ -272,7 +271,7 @@ static int __init gpio_vbus_probe(struct platform_device *pdev)
 	if (res) {
 		irq = res->start;
 		res->flags &= IRQF_TRIGGER_MASK;
-		res->flags |= IRQF_SAMPLE_RANDOM | IRQF_SHARED;
+		res->flags |= IRQF_SHARED;
 	} else
 		irq = gpio_to_irq(gpio);
 
@@ -300,7 +299,7 @@ static int __init gpio_vbus_probe(struct platform_device *pdev)
 
 	ATOMIC_INIT_NOTIFIER_HEAD(&gpio_vbus->phy.notifier);
 
-	INIT_WORK(&gpio_vbus->work, gpio_vbus_work);
+	INIT_DELAYED_WORK(&gpio_vbus->work, gpio_vbus_work);
 
 	gpio_vbus->vbus_draw = regulator_get(&pdev->dev, "vbus_draw");
 	if (IS_ERR(gpio_vbus->vbus_draw)) {

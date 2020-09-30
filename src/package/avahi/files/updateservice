@@ -41,7 +41,8 @@ format(){
 #    [ "$mac_2g" = "Not-Associated" ] && mac_2g=000000000000
 #    chan_2g=$(sed -n '19s/<txt-record>2G_channel=\(.*\)<\/txt-record>/\1/p' /etc/avahi/mywifiext.service | awk '{printf("%02X", $0)}')
 #    data=$(echo "$ver $len $mac $extvie $mdns_joined $ip $mac_2g $chan_2g $mac_5g1 $chan_5g1 $mac_5g2 $chan_5g2 $name" | sed 's/ //g')
-    data=$(echo "$ver $len $mac $extvie $mdns_joined $ip XR500" | sed 's/ //g')
+    model_name=$(cat /module_name)
+    data=$(echo "$ver $len $mac $extvie $mdns_joined $ip $model_name" | sed 's/ //g')
     eval "sed -i '7s/<txt-record>.*<\/txt-record>/<txt-record>$data<\/txt-record>/' /etc/avahi/services/mywifiext.service"
 }
 

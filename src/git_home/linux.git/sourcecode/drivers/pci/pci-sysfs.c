@@ -302,7 +302,30 @@ static ssize_t bus_rescan_store(struct bus_type *bus, const char *buf,
 	return count;
 }
 
+#ifdef CONFIG_ARCH_MSM
+static ssize_t msm_bus_rescan_store(struct bus_type *bus, const char *buf,
+				size_t count)
+{
+	extern int msm_pcie_rescan(void);
+	unsigned long val;
+
+	if (strict_strtoul(buf, 0, &val) < 0)
+		return -EINVAL;
+
+	if (val) {
+		mutex_lock(&pci_remove_rescan_mutex);
+		msm_pcie_rescan();
+		mutex_unlock(&pci_remove_rescan_mutex);
+	}
+	return count;
+}
+
+#endif
+
 struct bus_attribute pci_bus_attrs[] = {
+#ifdef CONFIG_ARCH_MSM
+	__ATTR(rcrescan, (S_IWUSR|S_IWGRP), NULL, msm_bus_rescan_store),
+#endif
 	__ATTR(rescan, (S_IWUSR|S_IWGRP), NULL, bus_rescan_store),
 	__ATTR_NULL
 };
@@ -353,6 +376,32 @@ remove_store(struct device *dev, struct device_attribute *dummy,
 		count = ret;
 	return count;
 }
+
+#if defined(CONFIG_HOTPLUG) && defined(CONFIG_ARCH_MSM)
+static void msm_remove_callback(struct device *dev)
+{
+	extern void msm_pcie_remove_bus(void);
+	msm_pcie_remove_bus();
+}
+
+static ssize_t
+msm_bus_remove_store(struct device *dev, struct device_attribute *attr,
+		 const char *buf, size_t count)
+{
+	unsigned long val;
+	int ret = 0;
+
+	if (strict_strtoul(buf, 0, &val) < 0)
+		return -EINVAL;
+
+	if (val)
+		ret = device_schedule_callback(dev, msm_remove_callback);
+	if (ret)
+		count = ret;
+
+	return count;
+}
+#endif /* CONFIG_HOTPLUG && CONFIG_ARCH_MSM */
 
 static ssize_t
 dev_bus_rescan_store(struct device *dev, struct device_attribute *attr,
@@ -406,6 +455,9 @@ struct device_attribute pci_dev_attrs[] = {
 
 struct device_attribute pcibus_dev_attrs[] = {
 #ifdef CONFIG_HOTPLUG
+#ifdef CONFIG_ARCH_MSM
+	__ATTR(rcremove, (S_IWUSR|S_IWGRP), NULL, msm_bus_remove_store),
+#endif
 	__ATTR(rescan, (S_IWUSR|S_IWGRP), NULL, dev_bus_rescan_store),
 #endif
 	__ATTR(cpuaffinity, S_IRUGO, pci_bus_show_cpumaskaffinity, NULL),

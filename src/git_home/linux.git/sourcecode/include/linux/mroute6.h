@@ -228,9 +228,50 @@ struct mfc6_cache {
 #endif
 
 #ifdef __KERNEL__
+
+#define IP6MR_MFC_EVENT_UPDATE   1
+#define IP6MR_MFC_EVENT_DELETE   2
+
 struct rtmsg;
 extern int ip6mr_get_route(struct net *net, struct sk_buff *skb,
 			   struct rtmsg *rtm, int nowait);
+
+/*
+ * Callback to registered modules in the event of updates to a multicast group
+ */
+typedef void (*ip6mr_mfc_event_offload_callback_t)(struct in6_addr *origin,
+						   struct in6_addr *group,
+						   uint32_t max_dest_dev,
+						   uint32_t dest_dev_idx[],
+						   uint8_t op);
+
+/*
+ * Register the callback used to inform offload modules when updates occur
+ * to MFC. The callback is registered by offload modules
+ */
+extern bool ip6mr_register_mfc_event_offload_callback(ip6mr_mfc_event_offload_callback_t mfc_offload_cb);
+
+/*
+ * De-Register the callback used to inform offload modules when updates occur
+ * to MFC
+ */
+extern void ip6mr_unregister_mfc_event_offload_callback(void);
+
+/*
+ * Find the destination interface list given a multicast group and source
+ */
+extern int ip6mr_find_mfc_entry(struct net *net, struct in6_addr *origin,
+				struct in6_addr *group, uint32_t max_dst_cnt,
+				uint32_t dest_dev[]);
+
+/*
+ * Out-of-band multicast statistics update for flows that are offloaded from
+ * Linux
+ */
+extern int ip6mr_mfc_stats_update(struct net *net, struct in6_addr *origin,
+				  struct in6_addr *group, uint64_t pkts_in,
+				  uint64_t bytes_in, uint64_t pkts_out,
+				  uint64_t bytes_out);
 
 #ifdef CONFIG_IPV6_MROUTE
 extern struct sock *mroute6_socket(struct net *net, struct sk_buff *skb);

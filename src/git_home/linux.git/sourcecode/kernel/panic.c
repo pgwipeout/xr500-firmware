@@ -23,9 +23,20 @@
 #include <linux/init.h>
 #include <linux/nmi.h>
 #include <linux/dmi.h>
+#include <linux/coresight.h>
+#include <linux/mtd/mtd.h>
+#include <linux/kernel.h>
+#include <linux/fs.h>
+#include <linux/mm.h>
+#include <asm/uaccess.h>
+#include <linux/string.h>
+#include <asm/unistd.h>
 
 #define PANIC_TIMER_STEP 100
 #define PANIC_BLINK_SPD 18
+
+/* Machine specific panic information string */
+char *mach_panic_string;
 
 int panic_on_oops;
 static unsigned long tainted_mask;
@@ -33,7 +44,10 @@ static int pause_on_oops;
 static int pause_on_oops_flag;
 static DEFINE_SPINLOCK(pause_on_oops_lock);
 
-int panic_timeout;
+#ifndef CONFIG_PANIC_TIMEOUT
+#define CONFIG_PANIC_TIMEOUT 0
+#endif
+int panic_timeout = CONFIG_PANIC_TIMEOUT;
 EXPORT_SYMBOL_GPL(panic_timeout);
 
 ATOMIC_NOTIFIER_HEAD(panic_notifier_list);
@@ -57,7 +71,172 @@ void __weak panic_smp_self_stop(void)
 	while (1)
 		cpu_relax();
 }
+static void mtdoops_erase_callback(struct erase_info *done)
+{
+	wait_queue_head_t *wait_q = (wait_queue_head_t *)done->priv;
+	wake_up(wait_q);
+}
+/*
+ * @mtd: MTD device structure
+ * @offset: erase start place
+*/
+static int   mtd_erase_block(struct mtd_info *mtd,int offset)
+{
+	struct erase_info erase;
+	int ret;
+	DECLARE_WAITQUEUE(wait, current);
+	wait_queue_head_t wait_q;
+	init_waitqueue_head(&wait_q);
 
+	erase.mtd = mtd;
+	erase.callback = mtdoops_erase_callback;
+	erase.addr = offset;
+	erase.len = mtd->erasesize;
+	erase.priv = (u_long)&wait_q;
+	set_current_state(TASK_INTERRUPTIBLE);
+	add_wait_queue(&wait_q, &wait);
+
+	ret = mtd_erase(mtd,&erase);
+	if(ret){
+		printk("erase the block failed.\n");
+		return ret;
+	}
+
+	schedule();  /* Wait for erase to finish. */
+	remove_wait_queue(&wait_q, &wait);
+	return 0;
+}
+#define MAGIC_NUM 120
+int find_position(struct mtd_info  *mtd,int offset,int len)
+{
+	uint8_t buf[1];
+	size_t retlen;
+	int ret;
+	int count = 0;
+	ret = mtd_read(mtd, offset, len, &retlen, buf);
+	if((retlen != 1) || ((ret < 0) && (ret != -EUCLEAN))){
+		printk("read failure at %lx\n",offset);
+		return count;
+	}
+	count = *buf;
+	return count;
+}
+
+int log_buf_copy(char *dest, int idx, int len);
+#define PANIC_MSG_LEN 4096
+#define SKIP_LENGTH 4096
+#define SKIP_BLOCK  131072
+#define START_WRITE 0    
+#define ERASE_OFFSET 0        
+#define BLOCK 131072
+void skip_log_level(char msg[PANIC_MSG_LEN])
+{
+	int i;
+	/* skip the log level */
+	for(i=0; i<PANIC_MSG_LEN ; ){
+		if (msg[i + 0] == '<' && msg[i + 1] >= '0' &&
+				msg[i + 1] <= '7' && msg[i + 2] == '>') {
+			msg[i] = msg[i+1] = msg[i+2] = ' ';
+			i +=3;
+			continue;
+		}
+		else
+			i++;
+	}
+
+}
+int save_kernel_msg_to_flash()
+{
+	struct mtd_info *mtd = NULL;
+	char msg[PANIC_MSG_LEN + 1];
+	int ret, len = 0, idx = 0;
+	int offset, count, retbad, block_count;
+	offset = START_WRITE;
+	mtd = get_mtd_device(NULL, 9);
+	if (!mtd)
+		printk("can not get mtd9\n");
+	else
+	{
+		printk("the name of mtd9 is %s\n", mtd->name);
+		count = START_WRITE / SKIP_BLOCK;
+
+		while(1){
+			//flag = find_position(mtd,offset,1);
+			if(count < 4){
+				/*block check : check to avoid to write log into a bad block
+				 *if the block's  first two bytes is not 0xff,we regard it as
+				 * a bad block
+				 */
+				if(mtd_block_isbad(mtd, count*SKIP_BLOCK)){
+					printk(KERN_WARNING "mtdoops: bad block at %08lx\n",offset);
+					offset += SKIP_BLOCK;
+					count++;
+				}
+				else
+					break;
+
+			}
+		}
+		while(1)
+		{
+			if( find_position(mtd,offset,1) == MAGIC_NUM ){
+				offset += SKIP_LENGTH;
+				printk(KERN_WARNING "this page have been written,please check another.\n ");
+			}
+			else
+				break;
+			
+		}
+		block_count = offset % SKIP_BLOCK;
+		if( block_count == 0 ){
+			retbad = mtd_erase_block(mtd, offset / BLOCK * BLOCK);
+			if( retbad < 0 ){
+				printk( KERN_WARNING "erase failed ,please try agin.\n");
+				retbad  = mtd_erase_block(mtd, offset / BLOCK * BLOCK);
+			}
+			else
+				printk(KERN_WARNING "have erased successfully.\n");
+		}
+
+		while (1) {
+
+			ret = log_buf_copy(msg, idx, PANIC_MSG_LEN);
+			if (ret <= 0)
+				break;
+			#if 1
+				skip_log_level(msg);
+			#else
+
+			#endif
+
+			//personally set a magic number to know if this page has been written
+			msg[0] = MAGIC_NUM;
+			len = 0;
+
+			//write a block full
+			if(offset >= ((count + 1)*128*1024)){
+				offset = count*128*1024;
+				retbad = mtd_erase_block(mtd, offset);
+				if( retbad < 0 ){
+					printk( KERN_WARNING "erase failed ,please try agin.\n");
+					retbad  = mtd_erase_block(mtd, offset);
+				}
+				else
+					printk(KERN_WARNING "have erased successfully.\n");
+
+			}	
+
+
+			mtd_write(mtd, offset, PANIC_MSG_LEN, &len, msg);
+			offset += PANIC_MSG_LEN;
+			idx += ret;
+
+		}
+
+	}
+	return 0;
+
+}
 /**
  *	panic - halt the system
  *	@fmt: The text string to print
@@ -73,6 +252,23 @@ void panic(const char *fmt, ...)
 	va_list args;
 	long i, i_next = 0;
 	int state = 0;
+
+	coresight_abort();
+	/*
+	 * Disable local interrupts. This will prevent panic_smp_self_stop
+	 * from deadlocking the first cpu that invokes the panic, since
+	 * there is nothing to prevent an interrupt handler (that runs
+	 * after the panic_lock is acquired) from invoking panic again.
+	 */
+	local_irq_disable();
+
+	/*
+	 * Disable local interrupts. This will prevent panic_smp_self_stop
+	 * from deadlocking the first cpu that invokes the panic, since
+	 * there is nothing to prevent an interrupt handler (that runs
+	 * after the panic_lock is acquired) from invoking panic again.
+	 */
+	local_irq_disable();
 
 	/*
 	 * It's possible to come here directly from a panic-assertion and
@@ -109,6 +305,8 @@ void panic(const char *fmt, ...)
 	crash_kexec(NULL);
 
 	kmsg_dump(KMSG_DUMP_PANIC);
+
+	save_kernel_msg_to_flash();
 
 	/*
 	 * Note smp_send_stop is the usual smp shutdown function, which
@@ -375,6 +573,11 @@ late_initcall(init_oops_id);
 void print_oops_end_marker(void)
 {
 	init_oops_id();
+
+	if (mach_panic_string)
+		printk(KERN_WARNING "Board Information: %s\n",
+		       mach_panic_string);
+
 	printk(KERN_WARNING "---[ end trace %016llx ]---\n",
 		(unsigned long long)oops_id);
 }

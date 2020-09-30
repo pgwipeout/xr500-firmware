@@ -49,11 +49,15 @@
 
 #include <linux/usb/ch9.h>
 #include <linux/usb/gadget.h>
+#include <mach/msm_iomap.h>
+
+#include "dwc3_otg.h"
 
 /* Global constants */
 #define DWC3_ENDPOINTS_NUM	32
+#define DWC3_XHCI_RESOURCES_NUM	2
 
-#define DWC3_EVENT_BUFFERS_SIZE	PAGE_SIZE
+#define DWC3_EVENT_BUFFERS_SIZE	(2 * PAGE_SIZE)
 #define DWC3_EVENT_TYPE_MASK	0xfe
 
 #define DWC3_EVENT_TYPE_DEV	0
@@ -70,10 +74,21 @@
 #define DWC3_DEVICE_EVENT_ERRATIC_ERROR		9
 #define DWC3_DEVICE_EVENT_CMD_CMPL		10
 #define DWC3_DEVICE_EVENT_OVERFLOW		11
+#define DWC3_DEVICE_EVENT_VENDOR_DEV_TEST_LMP	12
 
 #define DWC3_GEVNTCOUNT_MASK	0xfffc
 #define DWC3_GSNPSID_MASK	0xffff0000
 #define DWC3_GSNPSREV_MASK	0xffff
+
+/* DWC3 registers memory space boundries */
+#define DWC3_XHCI_REGS_START		0x0
+#define DWC3_XHCI_REGS_END		0x7fff
+#define DWC3_GLOBALS_REGS_START		0xc100
+#define DWC3_GLOBALS_REGS_END		0xc6ff
+#define DWC3_DEVICE_REGS_START		0xc700
+#define DWC3_DEVICE_REGS_END		0xcbff
+#define DWC3_OTG_REGS_START		0xcc00
+#define DWC3_OTG_REGS_END		0xccff
 
 /* Global Registers */
 #define DWC3_GSBUSCFG0		0xc100
@@ -139,8 +154,9 @@
 /* OTG Registers */
 #define DWC3_OCFG		0xcc00
 #define DWC3_OCTL		0xcc04
-#define DWC3_OEVTEN		0xcc08
-#define DWC3_OSTS		0xcc0C
+#define DWC3_OEVT		0xcc08
+#define DWC3_OEVTEN		0xcc0c
+#define DWC3_OSTS		0xcc10
 
 /* Bit fields */
 
@@ -164,6 +180,71 @@
 #define DWC3_GCTL_SCALEDOWN_MASK DWC3_GCTL_SCALEDOWN(3)
 #define DWC3_GCTL_DISSCRAMBLE	(1 << 3)
 #define DWC3_GCTL_DSBLCLKGTNG	(1 << 0)
+#define DWC3_GCTL_U2EXIT_LFPS	(1 << 2)
+#define DWC3_GCTL_SOFITPSYNC	(1 << 10)
+
+/* Global User Control Register */
+#define DWC3_GUCTL_REFCLKPER (0x3FF << 22)
+
+/* PHY config Registers */
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_PHYSOFTRST			(1 << 31)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_RSVD(n)			((n) << 19)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_ULPIEXTVBUSINDIACTOR 	(1 << 18)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_ULPIEXTVBUSDRV		(1 << 17)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_ULPICLKSUSM			(1 << 16)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_ULPIAUTORES			(1 << 15)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_RSVD9			(1 << 14)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_USBTRDTIM(n)			((n) << 10)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_RSVD0			(1 << 9)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_ENBLSLPM			(1 << 8)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_PHYSEL			(1 << 7)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_SUSPENDUSB20			(1 << 6)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_FSINTF			(1 << 5)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_ULPI_UTMI_SEL		(1 << 4)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_PHYIF			(1 << 3)
+#define DWC3_SSUSB_REG_GUSB2PHYCFG_B1L(n)			((n) << 18)
+
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_PHYSOFTRST				(1 << 31)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_HSTPRTCMPL				(1 << 30)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_U2SSINACTP3OK			(1 << 29)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_DISRXDETP3				(1 << 28)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_UX_EXIT_IN_PX			(1 << 27)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_PING_ENHANCEMENT_EN			(1 << 26)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_U1U2EXITFAIL_TO_RECOV 		(1 << 25)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_REQUEST_P1P2P3			(1 << 24)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_STARTRXDETU3RXDET			(1 << 23)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_DISRXDETU3RXDET			(1 << 22)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_DELAYP1P2P3(n)			((n) << 19)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_DELAYP1TRANS			(1 << 18)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_SUSPENDENABLE			(1 << 17)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_DATWIDTH(n)				((n) << 15)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_ABORTRXDETINU2			(1 << 14)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_SKIPRXDET				(1 << 13)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_LFPSP0ALGN				(1 << 12)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_P3P2TRANOK				(1 << 11)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_P3EXSIGP2				(1 << 10)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_LFPSFILTER				(1 << 9)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_RX_DETECT_TO_POLLING_LFPS_CONTRO	(1 << 8)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_RESERVED_BIT7			(1 << 7)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_TX_SWING				(1 << 6)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_TX_MARGIN(n)			((n) << 3)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_TX_DE_EPPHASIS(n)			((n) << 1)
+#define DWC3_SSUSB_REG_GUSB3PIPECTL_ELASTIC_BUFFER_MODE			(1 << 0)
+
+#define DWC3_SSUSB_XHCI_REV_10			1
+#define DWC3_SSUSB_XHCI_REV_096			0
+
+#define IPQ806X_USB_CONT_TYPE			0x3
+#define IPQ806X_USB_REG_MAP_SIZE		0x4
+
+#define REG(off)				(MSM_CLK_CTL_BASE + (off))
+#define USB30_RESET				REG(0x3B50)
+#define USB30_1_RESET                           REG(0x3B58)
+
+#define DWC3_SSUSB_REG_GCTL			0xC110
+#define DWC3_SSUSB_REG_GUSB2PHYCFG(n)		(0xC200 + ((n) * 0x16))
+#define DWC3_SSUSB_REG_GUCTL			0xC12C
+#define DWC3_SSUSB_REG_GUSB3PIPECTL(n)		(0xC2C0 + ((n) * 0x16))
 
 /* Global USB2 PHY Configuration Register */
 #define DWC3_GUSB2PHYCFG_PHYSOFTRST (1 << 31)
@@ -172,6 +253,8 @@
 /* Global USB3 PIPE Control Register */
 #define DWC3_GUSB3PIPECTL_PHYSOFTRST (1 << 31)
 #define DWC3_GUSB3PIPECTL_SUSPHY (1 << 17)
+#define DWC3_GUSB3PIPECTL_DELAY_P1P2P3 (7 << 19)
+#define DWC3_GUSB3PIPECTL_DIS_RXDET_U3_RXDET (1 << 22)
 
 /* Global TX Fifo Size Register */
 #define DWC3_GTXFIFOSIZ_TXFDEF(n) ((n) & 0xffff)
@@ -181,6 +264,9 @@
 #define DWC3_GHWPARAMS1_EN_PWROPT(n)	(((n) & (3 << 24)) >> 24)
 #define DWC3_GHWPARAMS1_EN_PWROPT_NO	0
 #define DWC3_GHWPARAMS1_EN_PWROPT_CLK	1
+
+/* Global HWPARAMS6 Register */
+#define DWC3_GHWPARAMS6_SRP_SUPPORT	(1 << 10)
 
 /* Device Configuration Register */
 #define DWC3_DCFG_DEVADDR(addr)	((addr) << 3)
@@ -299,6 +385,60 @@
 #define DWC3_DEPCMD_TYPE_ISOC		1
 #define DWC3_DEPCMD_TYPE_BULK		2
 #define DWC3_DEPCMD_TYPE_INTR		3
+
+/* OTG Events Register */
+#define DWC3_OEVT_DEVICEMODE			(1 << 31)
+#define DWC3_OEVTEN_OTGCONIDSTSCHNGEVNT		(1 << 24)
+#define DWC3_OEVTEN_OTGADEVBHOSTENDEVNT		(1 << 20)
+#define DWC3_OEVTEN_OTGADEVHOSTEVNT		(1 << 19)
+#define DWC3_OEVTEN_OTGADEVHNPCHNGEVNT		(1 << 18)
+#define DWC3_OEVTEN_OTGADEVSRPDETEVNT		(1 << 17)
+#define DWC3_OEVTEN_OTGADEVSESSENDDETEVNT	(1 << 16)
+#define DWC3_OEVTEN_OTGBDEVBHOSTENDEVNT		(1 << 11)
+#define DWC3_OEVTEN_OTGBDEVHNPCHNGEVNT		(1 << 10)
+#define DWC3_OEVTEN_OTGBDEVSESSVLDDETEVNT	(1 << 9)
+#define DWC3_OEVTEN_OTGBDEVVBUSCHNGEVNT		(1 << 8)
+
+/* OTG OSTS register */
+#define DWC3_OTG_OSTS_OTGSTATE_SHIFT	(8)
+#define DWC3_OTG_OSTS_OTGSTATE		(0xF << DWC3_OTG_OSTS_OTGSTATE_SHIFT)
+#define DWC3_OTG_OSTS_PERIPHERALSTATE	(1 << 4)
+#define DWC3_OTG_OSTS_XHCIPRTPOWER	(1 << 3)
+#define DWC3_OTG_OSTS_BSESVALID		(1 << 2)
+#define DWC3_OTG_OSTS_VBUSVALID		(1 << 1)
+#define DWC3_OTG_OSTS_CONIDSTS		(1 << 0)
+
+/* OTG OSTS register */
+#define DWC3_OTG_OCTL_PERIMODE		(1 << 6)
+#define DWC3_OTG_OCTL_PRTPWRCTL		(1 << 5)
+#define DWC3_OTG_OCTL_HNPREQ		(1 << 4)
+#define DWC3_OTG_OCTL_SESREQ		(1 << 3)
+#define DWC3_OTG_OCTL_TERMSELDLPULSE	(1 << 2)
+#define DWC3_OTG_OCTL_DEVSETHNPEN	(1 << 1)
+#define DWC3_OTG_OCTL_HSTSETHNPEN	(1 << 0)
+
+
+/* PHY Registers */
+#define DWC3_SSUSB_PHY_TX_DEEMPH_MASK			0x3F80
+#define DWC3_SSUSB_PHY_AMP_MASK				0x7F
+#define DWC3_SSUSB_PHY_AMP_EN				(1 << 14)
+#define DWC3_SSUSB_PHY_TX_DEEMPH_SHIFT			7
+
+#define DWC3_SSUSB_PHY_RX_OVRD_IN_HI_RX_EQ_EN		6
+#define DWC3_SSUSB_PHY_RX_OVRD_IN_HI_RX_EQ_EN_OVRD	7
+#define DWC3_SSUSB_PHY_RX_OVRD_IN_HI_RX_EQ		8
+#define DWC3_SSUSB_PHY_RX_OVRD_IN_HI_RX_EQ_OVRD		11
+#define DWC3_SSUSB_PHY_RX_OVRD_IN_HI_RX_EQ_MASK		0x7
+#define DWC3_SSUSB_PHY_TX_DEBUG_RXDET_MEAS_TIME_VAL	0x400
+
+#define DWC3_SSUSB_PHY_TX_OVRD_DRV_LO_REG		0x1002
+#define DWC3_SSUSB_PHY_RX_OVRD_IN_HI_REG		0x1006
+#define DWC3_SSUSB_PHY_TX_ALT_BLOCK_REG			0x102D
+#define DWC3_SSUSB_PHY_RTUNE_RTUNE_CTRL_REG		0x34
+#define DWC3_SSUSB_PHY_RTUNE_DEBUG_REG			0x3
+#define DWC3_SSUSB_PHY_TX_DEBUG_REG			0x1010
+#define DWC3_SSUSB_PHY_MPLL				0x30
+#define DWC3_SSUSB_PHY_TX_ALT_BLOCK_EN_ALT_BUS		(1 << 7)
 
 /* Structures */
 
@@ -582,8 +722,9 @@ struct dwc3 {
 	spinlock_t		lock;
 	struct device		*dev;
 
+	struct dwc3_otg		*dotg;
 	struct platform_device	*xhci;
-	struct resource		*res;
+	struct resource		xhci_resources[DWC3_XHCI_RESOURCES_NUM];
 
 	struct dwc3_event_buffer **ev_buffs;
 	struct dwc3_ep		*eps[DWC3_ENDPOINTS_NUM];
@@ -593,8 +734,6 @@ struct dwc3 {
 
 	void __iomem		*regs;
 	size_t			regs_size;
-
-	int			irq;
 
 	u32			num_event_buffers;
 	u32			u1u2;
@@ -609,6 +748,7 @@ struct dwc3 {
 #define DWC3_REVISION_185A	0x5533185a
 #define DWC3_REVISION_188A	0x5533188a
 #define DWC3_REVISION_190A	0x5533190a
+#define DWC3_REVISION_230A	0x5533230a
 
 	unsigned		is_selfpowered:1;
 	unsigned		three_stage_setup:1;
@@ -633,6 +773,12 @@ struct dwc3 {
 
 	u8			test_mode;
 	u8			test_mode_nr;
+
+	/* Indicate if the gadget was powered by the otg driver */
+	bool			vbus_active;
+
+	/* Indicate if software connect was issued by the usb_gadget_driver */
+	bool			softconnect;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -641,8 +787,8 @@ struct dwc3 {
 
 struct dwc3_event_type {
 	u32	is_devspec:1;
-	u32	type:6;
-	u32	reserved8_31:25;
+	u32	type:7;
+	u32	reserved8_31:24;
 } __packed;
 
 #define DWC3_DEPEVT_XFERCOMPLETE	0x01
@@ -719,15 +865,15 @@ struct dwc3_event_depevt {
  *	12	- VndrDevTstRcved
  * @reserved15_12: Reserved, not used
  * @event_info: Information about this event
- * @reserved31_24: Reserved, not used
+ * @reserved31_25: Reserved, not used
  */
 struct dwc3_event_devt {
 	u32	one_bit:1;
 	u32	device_event:7;
 	u32	type:4;
 	u32	reserved15_12:4;
-	u32	event_info:8;
-	u32	reserved31_24:8;
+	u32	event_info:9;
+	u32	reserved31_25:7;
 } __packed;
 
 /**
@@ -771,6 +917,9 @@ union dwc3_event {
 /* prototypes */
 void dwc3_set_mode(struct dwc3 *dwc, u32 mode);
 int dwc3_gadget_resize_tx_fifos(struct dwc3 *dwc);
+
+int dwc3_otg_init(struct dwc3 *dwc);
+void dwc3_otg_exit(struct dwc3 *dwc);
 
 int dwc3_host_init(struct dwc3 *dwc);
 void dwc3_host_exit(struct dwc3 *dwc);

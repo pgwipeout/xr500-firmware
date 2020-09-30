@@ -289,6 +289,41 @@ static int old_dev_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 	case BRCTL_GET_FDB_ENTRIES:
 		return get_fdb_entries(br, (void __user *)args[1],
 				       args[2], args[3]);
+#ifdef CONFIG_BRIDGE_NETGEAR_ACL
+        case BRCTL_SET_ACL_ONOFF:
+                {
+                         br->acl_enabled = args[1];
+                         return 0;
+                }
+
+        case BRCTL_SET_ACL_TYPE:
+                {
+                        br->acl_type = args[1];
+                        return 0;
+                }
+
+        case BRCTL_ADD_ACL_MAC:
+                {
+                        unsigned char addr[6];
+                        if (copy_from_user(addr, (void __user *)args[1], ETH_ALEN))
+                               return -EFAULT;
+
+                        return br_acl_insert(br, addr);
+                }
+
+        case BRCTL_CLR_ACL_MAC_LIST:
+                {
+                        br_acl_cleanup(br);
+                        return 0;
+                }
+
+        case BRCTL_SET_ACL_DEBUG:
+                {
+                        br_acl_debug_onoff(br, args[1]);
+                        return 0;
+                }
+#endif
+
 	}
 
 	return -EOPNOTSUPP;

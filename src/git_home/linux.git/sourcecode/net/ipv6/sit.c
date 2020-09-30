@@ -67,6 +67,8 @@ static int ipip6_tunnel_init(struct net_device *dev);
 static void ipip6_tunnel_setup(struct net_device *dev);
 static void ipip6_dev_free(struct net_device *dev);
 
+int sysctl_ipv6_6to4_force_ip4fragoff_zero = 0;
+
 static int sit_net_id __read_mostly;
 struct sit_net {
 	struct ip_tunnel __rcu *tunnels_r_l[HASH_SIZE];
@@ -112,6 +114,19 @@ static struct net_device_stats *ipip6_get_stats(struct net_device *dev)
 	dev->stats.tx_bytes   = sum.tx_bytes;
 	return &dev->stats;
 }
+
+void ipip6_update_offload_stats(struct net_device *dev, void *ptr)
+{
+	struct pcpu_tstats *tstats = per_cpu_ptr(dev->tstats, 0);
+	struct pcpu_tstats *offload_stats = (struct pcpu_tstats *)ptr;
+
+	tstats->tx_packets += offload_stats->tx_packets;
+	tstats->tx_bytes   += offload_stats->tx_bytes;
+	tstats->rx_packets += offload_stats->rx_packets;
+	tstats->rx_bytes   += offload_stats->rx_bytes;
+}
+EXPORT_SYMBOL(ipip6_update_offload_stats);
+
 /*
  * Must be invoked with rcu_read_lock
  */
@@ -595,6 +610,11 @@ static int ipip6_rcv(struct sk_buff *skb)
 
 		ipip6_ecn_decapsulate(iph, skb);
 
+		/**
+		 * Reset the skb_iif to Tunnels interface index
+		 * for Conntrack Module to trace tunnel connection
+		 */
+		skb->skb_iif = tunnel->dev->ifindex;
 		netif_rx(skb);
 
 		rcu_read_unlock();
@@ -830,7 +850,10 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
 	iph 			=	ip_hdr(skb);
 	iph->version		=	4;
 	iph->ihl		=	sizeof(struct iphdr)>>2;
-	iph->frag_off		=	df;
+	if ( !sysctl_ipv6_6to4_force_ip4fragoff_zero )
+		iph->frag_off		=	df;
+	else
+		iph->frag_off           =       0;
 	iph->protocol		=	IPPROTO_IPV6;
 	iph->tos		=	INET_ECN_encapsulate(tos, ipv6_get_dsfield(iph6));
 	iph->daddr		=	fl4.daddr;
@@ -841,6 +864,12 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
 
 	nf_reset(skb);
 	tstats = this_cpu_ptr(dev->tstats);
+
+        /**
+	  * Reset the skb_iif to Tunnels interface index
+	  * for Conntrack Module to trace tunnel connection
+	  */
+	skb->skb_iif = tunnel->dev->ifindex;
 	__IPTUNNEL_XMIT(tstats, &dev->stats);
 	return NETDEV_TX_OK;
 
@@ -1091,8 +1120,8 @@ ipip6_tunnel_ioctl (struct net_device *dev, struct ifreq *ifr, int cmd)
 						     (32 - ip6rd.relay_prefixlen));
 			else
 				relay_prefix = 0;
-			if (relay_prefix != ip6rd.relay_prefix)
-				goto done;
+
+			ip6rd.relay_prefix = relay_prefix;
 
 			t->ip6rd.prefix = prefix;
 			t->ip6rd.relay_prefix = relay_prefix;
@@ -1303,4 +1332,5 @@ static int __init sit_init(void)
 module_init(sit_init);
 module_exit(sit_cleanup);
 MODULE_LICENSE("GPL");
+MODULE_ALIAS_RTNL_LINK("sit");
 MODULE_ALIAS_NETDEV("sit0");

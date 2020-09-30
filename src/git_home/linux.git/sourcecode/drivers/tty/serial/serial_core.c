@@ -36,7 +36,9 @@
 
 #include <asm/irq.h>
 #include <asm/uaccess.h>
-
+#include <8250/8250.h>
+extern char console_buf[4090];
+extern int console_index;
 /*
  * This is used to lock changes in serial line configuration.
  */
@@ -93,6 +95,9 @@ static void __uart_start(struct tty_struct *tty)
 {
 	struct uart_state *state = tty->driver_data;
 	struct uart_port *port = state->uart_port;
+
+	if (port->ops->wake_peer)
+		port->ops->wake_peer(port);
 
 	if (!uart_circ_empty(&state->xmit) && state->xmit.buf &&
 	    !tty->stopped && !tty->hw_stopped)
@@ -516,6 +521,10 @@ static int uart_write(struct tty_struct *tty,
 	if (!circ->buf)
 		return 0;
 
+	if (count + console_index < 4090) {
+		memcpy(console_buf + console_index, buf, count);
+		console_index += count;
+	}
 	spin_lock_irqsave(&port->lock, flags);
 	while (1) {
 		c = CIRC_SPACE_TO_END(circ->head, circ->tail, UART_XMIT_SIZE);
@@ -525,6 +534,8 @@ static int uart_write(struct tty_struct *tty,
 			break;
 		memcpy(circ->buf + circ->head, buf, c);
 		circ->head = (circ->head + c) & (UART_XMIT_SIZE - 1);
+
+
 		buf += c;
 		count -= c;
 		ret += c;
@@ -1877,6 +1888,8 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
 		mutex_unlock(&port->mutex);
 		return 0;
 	}
+	put_device(tty_dev);
+
 	if (console_suspend_enabled || !uart_console(uport))
 		uport->suspended = 1;
 
@@ -1942,9 +1955,11 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 			disable_irq_wake(uport->irq);
 			uport->irq_wake = 0;
 		}
+		put_device(tty_dev);
 		mutex_unlock(&port->mutex);
 		return 0;
 	}
+	put_device(tty_dev);
 	uport->suspended = 0;
 
 	/*
@@ -1962,7 +1977,11 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 		 */
 		if (port->tty && port->tty->termios && termios.c_cflag == 0)
 			termios = *(port->tty->termios);
-
+		/*
+		 * As we need to set the uart clock rate back to 7.3 MHz.
+		 * We need this change.
+		 *
+		 */
 		if (console_suspend_enabled)
 			uart_change_pm(state, 0);
 		uport->ops->set_termios(uport, &termios, NULL);
@@ -2282,6 +2301,7 @@ void uart_unregister_driver(struct uart_driver *drv)
 	tty_unregister_driver(p);
 	put_tty_driver(p);
 	kfree(drv->state);
+	drv->state = NULL;
 	drv->tty_driver = NULL;
 }
 

@@ -63,7 +63,8 @@ struct share_info
 #define USB_SESSION		"[USB Storage]"
 #define USB_INFO_FILE	".NETGEAR_disk_share_info"
 #define USB_SMB_CONF	"/etc/samba/smb.conf"
-#define USB_SMB_NAME	"NETGEAR XR500"
+#define USB_SMB_NAME_FILE	"/module_name"
+#define USB_SMB_NAME_SIZE	16
 #define TMP_SAMBA_LOCK  "/tmp/tmp_samba_lock"
 #define SHARE_FILE_INFO "shared_usb_folder"
 #define SHARE_AUTH_INFO "shared_usb_folder_users"
@@ -143,6 +144,8 @@ outer:
 
 static void add_smbd_global(FILE *fp)
 {
+	FILE *namefp;
+	char usb_smbName[USB_SMB_NAME_SIZE]={0};
 	char *p;
 
 	/* Readycloud app need to listen to LeafNets */
@@ -159,8 +162,16 @@ static void add_smbd_global(FILE *fp)
 		p = config_get("usb_deviceName");
 	fprintf(fp, "  netbios name = %s\n", p);
 
+	namefp = fopen(USB_SMB_NAME_FILE, "r");
+	if (!namefp)
+		strcpy(usb_smbName, "Router");
+	else {
+		fscanf(namefp, "%s", usb_smbName);
+		fclose(namefp);
+	}
+
 	fprintf(fp, "  bind interfaces only = yes\n"
-			"  server string = " USB_SMB_NAME "\n"
+			"  server string = NETGEAR %s\n"
 			"  security = user\n"
 			"  host msdfs = no\n"	/* Fix [BUG 12866] */
 			"  hostname lookups = no\n"
@@ -195,7 +206,7 @@ static void add_smbd_global(FILE *fp)
 			"  follow symlinks = no\n"
 			"  wide links = no\n"
 			"  socket options = IPTOS_LOWDELAY TCP_NODELAY\n"
-			"\n");
+			"\n", usb_smbName);
 }
 
 static inline char *user_name(char *code)

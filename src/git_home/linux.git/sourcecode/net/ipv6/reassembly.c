@@ -26,6 +26,9 @@
  *	YOSHIFUJI,H. @USAGI	Always remove fragment header to
  *				calculate ICV correctly.
  */
+
+#define pr_fmt(fmt) "IPv6: " fmt
+
 #include <linux/errno.h>
 #include <linux/types.h>
 #include <linux/string.h>
@@ -81,7 +84,6 @@ struct frag_queue
 	int			iif;
 	unsigned int		csum;
 	__u16			nhoffset;
-	int			fragment_count;		/* how many fragments had received	*/
 };
 
 static struct inet_frags ip6_frags;
@@ -241,9 +243,10 @@ fq_find(struct net *net, __be32 id, const struct in6_addr *src, const struct in6
 	hash = inet6_hash_frag(id, src, dst, ip6_frags.rnd);
 
 	q = inet_frag_find(&net->ipv6.frags, &ip6_frags, &arg, hash);
-	if (q == NULL)
+	if (IS_ERR_OR_NULL(q)) {
+		inet_frag_maybe_warn_overflow(q, pr_fmt());
 		return NULL;
-
+	}
 	return container_of(q, struct frag_queue, q);
 }
 
@@ -269,17 +272,6 @@ static int ip6_frag_queue(struct frag_queue *fq, struct sk_buff *skb,
 				  ((u8 *)&fhdr->frag_off -
 				   skb_network_header(skb)));
 		return -1;
-	}
-
-	if (net->ipv6.frags.single_max > 0) {
-		if (fq->fragment_count >= net->ipv6.frags.single_max) {
-			goto err;
-		} else {
-			fq->fragment_count++;
-			if (fq->fragment_count == net->ipv6.frags.single_max) {
-				mod_timer(&fq->q.timer, jiffies + net->ipv6.frags.over_single_max_timeout) ;
-			}
-		}
 	}
 
 	if (skb->ip_summed == CHECKSUM_COMPLETE) {
@@ -393,8 +385,17 @@ found:
 	}
 
 	if (fq->q.last_in == (INET_FRAG_FIRST_IN | INET_FRAG_LAST_IN) &&
-	    fq->q.meat == fq->q.len)
-		return ip6_frag_reasm(fq, prev, dev);
+	    fq->q.meat == fq->q.len) {
+		int res;
+		unsigned long orefdst = skb->_skb_refdst;
+
+		skb->_skb_refdst = 0UL;
+		res = ip6_frag_reasm(fq, prev, dev);
+		skb->_skb_refdst = orefdst;
+		return res;
+	}
+
+	skb_dst_drop(skb);
 
 	write_lock(&ip6_frags.lock);
 	list_move_tail(&fq->q.lru_list, &fq->q.net->lru_list);
@@ -515,6 +516,7 @@ static int ip6_frag_reasm(struct frag_queue *fq, struct sk_buff *prev,
 	head->tstamp = fq->q.stamp;
 	ipv6_hdr(head)->payload_len = htons(payload_len);
 	IP6CB(head)->nhoff = nhoff;
+	IP6CB(head)->flags |= IP6SKB_FRAGMENTED;
 
 	/* Yes, and fold redundant checksum back. 8) */
 	if (head->ip_summed == CHECKSUM_COMPLETE)
@@ -550,6 +552,9 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
 	const struct ipv6hdr *hdr = ipv6_hdr(skb);
 	struct net *net = dev_net(skb_dst(skb)->dev);
 
+	if (IP6CB(skb)->flags & IP6SKB_FRAGMENTED)
+		goto fail_hdr;
+
 	IP6_INC_STATS_BH(net, ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_REASMREQDS);
 
 	/* Jumbo payload inhibits frag. header */
@@ -570,6 +575,7 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
 				 ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_REASMOKS);
 
 		IP6CB(skb)->nhoff = (u8 *)fhdr - skb_network_header(skb);
+		IP6CB(skb)->flags |= IP6SKB_FRAGMENTED;
 		return 1;
 	}
 
@@ -628,20 +634,6 @@ static struct ctl_table ip6_frags_ns_ctl_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec_jiffies,
 	},
-	{
-		.procname	= "ip6frag_single_max",
-		.data		= &init_net.ipv6.frags.single_max,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec
-	},
-	{
-		.procname	= "ip6frag_over_single_max_timeout",
-		.data		= &init_net.ipv6.frags.over_single_max_timeout,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec_jiffies,
-	},
 	{ }
 };
 
@@ -670,8 +662,6 @@ static int __net_init ip6_frags_ns_sysctl_register(struct net *net)
 		table[0].data = &net->ipv6.frags.high_thresh;
 		table[1].data = &net->ipv6.frags.low_thresh;
 		table[2].data = &net->ipv6.frags.timeout;
-		table[3].data = &net->ipv6.frags.single_max;
-		table[4].data = &net->ipv6.frags.over_single_max_timeout;
 	}
 
 	hdr = register_net_sysctl_table(net, net_ipv6_ctl_path, table);
@@ -736,8 +726,6 @@ static int __net_init ipv6_frags_init_net(struct net *net)
 	net->ipv6.frags.high_thresh = IPV6_FRAG_HIGH_THRESH;
 	net->ipv6.frags.low_thresh = IPV6_FRAG_LOW_THRESH;
 	net->ipv6.frags.timeout = IPV6_FRAG_TIMEOUT;
-	net->ipv6.frags.single_max = 0;
-	net->ipv6.frags.over_single_max_timeout = IPV6_FRAG_BEYOND_SINGLE_MAX_TIMEOUT;
 
 	inet_frags_init_net(&net->ipv6.frags);
 

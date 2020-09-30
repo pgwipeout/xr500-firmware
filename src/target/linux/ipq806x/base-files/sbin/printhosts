@@ -4,7 +4,7 @@ ip=$(/bin/config get lan_ipaddr)
 name=$(/bin/config get netbiosname)
 if [ "x$name" = "x" ]; then
 	name=$(/bin/config get Device_name)
-	[ "x$name" = "x" ] && name=XR500
+	[ "x$name" = "x" ] && name="$(cat /module_name)"
 fi
 
 [ "x$ip" = "x" ] && ip=192.168.1.1

@@ -267,6 +267,8 @@ int symbol__annotate(struct symbol *sym, struct map *map, size_t privsize)
 	FILE *file;
 	int err = 0;
 	char symfs_filename[PATH_MAX];
+	u64 start_addr;
+	u64 end_addr;
 
 	if (filename) {
 		snprintf(symfs_filename, sizeof(symfs_filename), "%s%s",
@@ -327,14 +329,30 @@ fallback:
 	pr_debug("annotating [%p] %30s : [%p] %30s\n",
 		 dso, dso->long_name, sym, sym->name);
 
+	start_addr = map__rip_2objdump(map, sym->start);
+	end_addr = map__rip_2objdump(map, sym->end+1);
+
+#ifdef __mips__
+	/*
+	 * MIPS has signed addresses so if we're going from a 32-bit address
+	 * to a 64-bit then we have to sign extend from bit 31.
+	 */
+	if (start_addr & 0x80000000ULL) {
+		start_addr |= 0xffffffff00000000ULL;
+	}
+	if (end_addr & 0x80000000ULL) {
+		end_addr |= 0xffffffff00000000ULL;
+	}
+#endif
+
 	snprintf(command, sizeof(command),
 		 "objdump %s%s --start-address=0x%016" PRIx64
 		 " --stop-address=0x%016" PRIx64
 		 " -d %s %s -C %s|grep -v %s|expand",
 		 disassembler_style ? "-M " : "",
 		 disassembler_style ? disassembler_style : "",
-		 map__rip_2objdump(map, sym->start),
-		 map__rip_2objdump(map, sym->end+1),
+		 start_addr,
+		 end_addr,
 		 symbol_conf.annotate_asm_raw ? "" : "--no-show-raw",
 		 symbol_conf.annotate_src ? "-S" : "",
 		 symfs_filename, filename);

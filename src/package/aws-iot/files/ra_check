@@ -40,7 +40,8 @@ rae_password="qwaszxerdfcvtyghbnuijkmo"
 
 https_download_file ()
 {
-	curl -s "$1" -o "$2"
+	[ "$(config get skip_cert_auth_for_https)" = "yes" ] && curl_opt="-k"
+	curl ${curl_opt} -s "$1" -o "$2"
 }
 
 trace_log ()
@@ -101,8 +102,8 @@ cmp_version_string ()
 		return 1
 	fi
 
-	new="$(printf "%04d" $(echo "$1" | sed -r 's/\./ /g'))"
-	old="$(printf "%04d" $(echo "$2" | sed -r 's/\./ /g'))"
+	new="$(printf "%03d" $(echo "$1" | sed -r 's/\./ /g'))"
+	old="$(printf "%03d" $(echo "$2" | sed -r 's/\./ /g'))"
 
 	[ "${new:-0}" -gt "${old:-0}" ] && return 0 || return 1
 }

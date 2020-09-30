@@ -6,7 +6,7 @@
 <% hijack_language() %>
 </head>
 <body>
-<% form_submit("apply", "to_internet_no_auth.htm", "hijack_save_time")%>
+<% form_submit("apply", "BRS_register_router.html", "hijack_register_router")%>
 <div id="container">
 	<div class="dialog-content">
 		<!--checking new formware-->
@@ -32,7 +32,6 @@
 function toInternet()
 {
 	var cf = document.forms[0];
-	cf.target = "_top";
 	return true;
 }
 </script>

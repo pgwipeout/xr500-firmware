@@ -77,6 +77,10 @@ ifneq ($(CONFIG_ARCH_EBSA110),y)
   obj-y		+= io.o
 endif
 
+ifeq ($(CONFIG_ARCH_IPQ806X),y)
+  obj-$(CONFIG_DYNAMIC_FTRACE) += patch.o
+endif
+
 head-y			:= head$(MMUEXT).o
 obj-$(CONFIG_DEBUG_LL)	+= debug.o
 obj-$(CONFIG_EARLY_PRINTK)	+= early_printk.o

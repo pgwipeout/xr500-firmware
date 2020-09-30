@@ -8,7 +8,7 @@
 oc () { "$@" >> /dev/console 2>&1 ; } # stdout & stderr to /dev/console
 
 appname=kwilt
-modelname=xr500
+modelname="$(awk '{print tolower($0)}' /module_name)"
 app_pid_file=/var/run/$appname.pid
 app_info_file=/tmp/$appname.info
 app_tgz_file=/tmp/$appname.tar.gz

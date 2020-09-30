@@ -202,6 +202,7 @@ struct otp_info {
  * without OOB, e.g., NOR flash.
  */
 #define MEMWRITE		_IOWR('M', 24, struct mtd_write_req)
+#define MTDREFRESH		_IO('M', 50)
 
 /*
  * Obsolete legacy interface. Keep it in order not to break userspace
@@ -231,7 +232,7 @@ struct nand_oobfree {
  */
 struct nand_ecclayout_user {
 	__u32 eccbytes;
-	__u32 eccpos[MTD_MAX_ECCPOS_ENTRIES];
+	__u32 eccpos[256];
 	__u32 oobavail;
 	struct nand_oobfree oobfree[MTD_MAX_OOBFREE_ENTRIES];
 };

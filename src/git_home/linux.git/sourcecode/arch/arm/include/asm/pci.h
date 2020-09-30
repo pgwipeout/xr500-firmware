@@ -66,5 +66,9 @@ static inline int pci_get_legacy_ide_irq(struct pci_dev *dev, int channel)
 }
 
 #endif /* __KERNEL__ */
- 
+
+#ifdef CONFIG_ARCH_IPQ806X
+#define arch_setup_msi_irqs msm_setup_msi_irqs
+#endif
+
 #endif

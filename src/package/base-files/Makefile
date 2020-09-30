@@ -128,7 +128,6 @@ define Package/base-files/install
 	mkdir -p $(1)/etc
 	ln -sf /tmp/resolv.conf /tmp/fstab /tmp/TZ $(1)/etc/
 	ln -s /tmp/config/passwd $(1)/etc/passwd
-	ln -sv /etc/init.d/funjsq $(1)/etc/rc.d/S99funjsq
 
 	ln -sf /tmp/hosts $(1)/etc/hosts
 	chmod 1777 $(1)/tmp

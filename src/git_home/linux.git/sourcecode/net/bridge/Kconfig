@@ -6,7 +6,6 @@ config BRIDGE
 	tristate "802.1d Ethernet Bridging"
 	select LLC
 	select STP
-	depends on IPV6 || IPV6=n
 	---help---
 	  If you say Y here, then your Linux box will be able to act as an
 	  Ethernet bridge, which means that the different Ethernet segments it
@@ -46,3 +45,26 @@ config BRIDGE_IGMP_SNOOPING
 	  Say N to exclude this support and reduce the binary size.
 
 	  If unsure, say Y.
+config DNI_MCAST_TO_UNICAST
+	tristate "DNI_MCAST_TO_UNICAST"
+	---help---
+	  DNI_MCAST_TO_UNICAST
+config DNI_MULTI_LAN_SUPPORT
+	tristate "DNI_MULTI_LAN_SUPPORT"
+	---help---
+	  DNI_MULTI_LAN_SUPPORT
+config DNI_IPTV_MCAST_TO_UNICAST
+	tristate "DNI_IPTV_MCAST_TO_UNICAST"
+	depends on DNI_MCAST_TO_UNICAST
+	---help---
+	  support wireless multicast to unicast in IPTV mode
+config BRIDGE_NETGEAR_ACL
+	tristate "NETGEAR feature: block a client from accessing the network"
+	---help---
+	  Block a device according MAC address, If a client is blocked by this function,
+	  the DHCP and ARP packet will be passed, other packet to/from local, other port will be dropped
+
+config NTGR_GUEST_NETWORK_DHCP_LEASE
+	tristate "NETGEAR feature: dhcp lease time for wireless guest network client is 30 minute"
+	---help---
+	  Change dhcp lease time for wireless guest network client to 30 minutes

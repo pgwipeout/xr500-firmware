@@ -13,6 +13,7 @@
  */
 
 #include <linux/ftrace.h>
+#include <linux/module.h>
 #include <linux/uaccess.h>
 
 #include <asm/cacheflush.h>
@@ -20,6 +21,9 @@
 #include <asm/ftrace.h>
 
 #include "insn.h"
+#ifdef CONFIG_ARCH_IPQ806X
+#include "patch.h"
+#endif
 
 #ifdef CONFIG_THUMB2_KERNEL
 #define	NOP		0xf85deb04	/* pop.w {lr} */
@@ -63,6 +67,20 @@ static unsigned long adjust_address(struct dyn_ftrace *rec, unsigned long addr)
 }
 #endif
 
+int ftrace_arch_code_modify_prepare(void)
+{
+	set_kernel_text_rw();
+	set_all_modules_text_rw();
+	return 0;
+}
+
+int ftrace_arch_code_modify_post_process(void)
+{
+	set_all_modules_text_ro();
+	set_kernel_text_ro();
+	return 0;
+}
+
 static unsigned long ftrace_call_replace(unsigned long pc, unsigned long addr)
 {
 	return arm_gen_branch_link(pc, addr);
@@ -89,10 +107,13 @@ static int ftrace_modify_code(unsigned long pc, unsigned long old,
 			return -EINVAL;
 	}
 
+#ifdef CONFIG_ARCH_IPQ806X
+	patch_text((void *)pc, new);
+#else
 	if (probe_kernel_write((void *)pc, &new, MCOUNT_INSN_SIZE))
 		return -EPERM;
-
 	flush_icache_range(pc, pc + MCOUNT_INSN_SIZE);
+#endif
 
 	return 0;
 }

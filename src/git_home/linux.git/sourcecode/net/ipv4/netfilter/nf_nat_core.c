@@ -382,7 +382,28 @@ nf_nat_setup_info(struct nf_conn *ct,
 
 	NF_CT_ASSERT(maniptype == NF_NAT_MANIP_SRC ||
 		     maniptype == NF_NAT_MANIP_DST);
+
+	/*
+	* Endurance testing race condition debug info better than BUG.
+	* Hopefully fixed but if not get conninfo and try persist with
+	* dual link insertion avoidance below -@NETDDUMA_Iain
+	*/
+#if 0
 	BUG_ON(nf_nat_initialized(ct, maniptype));
+#else
+	if( nf_nat_initialized(ct, maniptype) ){
+		printk( KERN_INFO "nat already init ct=%p sip=%x sport=%x dip=%x dport=%x dproto=%x status=%lx maniptype=%x\n",
+			ct,
+			ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3.ip,
+			ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u.all,
+			ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.u3.ip,
+			ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.u.all,
+			ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.protonum,
+			nat->ct->status,
+			maniptype );
+		return NF_ACCEPT;
+	}
+#endif
 
 	/* What we've got will look like inverse of reply. Normally
 	   this is what is in the conntrack, except for prior
@@ -417,8 +438,23 @@ nf_nat_setup_info(struct nf_conn *ct,
 		/* nf_conntrack_alter_reply might re-allocate extension area */
 		nat = nfct_nat(ct);
 		nat->ct = ct;
-		hlist_add_head_rcu(&nat->bysource,
+
+		/*
+		* See ticket XR500 #197 for details -@NETDUMA_Iain
+		*/
+		if( nat->bysource.next || nat->bysource.pprev ){
+			printk( KERN_INFO "bysource rcu duplicate bysource=%p sip=%x sport=%x dip=%x dport=%x dproto=%x status=%lx\n",
+				&nat->bysource,
+				ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3.ip,
+				ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u.all,
+				ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.u3.ip,
+				ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.u.all,
+				ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.protonum,
+				nat->ct->status	);
+		} else {
+			hlist_add_head_rcu(&nat->bysource,
 				   &net->ipv4.nat_bysource[srchash]);
+		}
 		spin_unlock_bh(&nf_nat_lock);
 	}
 

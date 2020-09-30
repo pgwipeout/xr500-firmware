@@ -30,6 +30,10 @@ start() {
 	#syslogd -m 0
 	ifconfig lo up
 	/bin/datalib
+
+	# generate conf for wndr4500v3/wndr4300v2/wndr4520
+	/sbin/generate_board_conf.sh
+
         echo "$(/bin/config get netbiosname)" > /proc/sys/kernel/hostname
 	/sbin/printhosts
 
@@ -264,6 +268,8 @@ start() {
 			/bin/config set wl_ssid="$id_set"
 			if [ "$en_smart" = "0" ]; then
 				/bin/config set wla_ssid="$id_set-5G"
+			else
+				/bin/config set wla_ssid="$id_set"
 			fi
 			/bin/config set wl_wpa2_psk="$ps_set"
 			/bin/config set wla_wpa2_psk="$ps_set"
@@ -277,11 +283,6 @@ start() {
 			/bin/config set wla1_ssid="NETGEAR-5G-Guest"
 		fi
 		/bin/config set default_ssphrase="0"
-		commit_flag=1
-	fi
-
-	if [ "$(/bin/config get dumaos_signed)" != "1" ] && [ "$(/bin/config get agree_full_TC)" = "1" ]; then
-		/bin/config set dumaos_signed=1
 		commit_flag=1
 	fi
 

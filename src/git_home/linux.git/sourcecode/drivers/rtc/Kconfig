@@ -1077,6 +1077,15 @@ config RTC_DRV_PUV3
 	  This drive can also be built as a module. If so, the module
 	  will be called rtc-puv3.
 
+config RTC_DRV_PM8XXX
+	tristate "Qualcomm PMIC8XXX RTC"
+	depends on MFD_PM8XXX
+	help
+	  Say Y here if you want to support the Qualcomm PMIC8XXX RTC.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called rtc-pm8xxx.
+
 config RTC_DRV_LOONGSON1
 	tristate "loongson1 RTC support"
 	depends on MACH_LOONGSON1
@@ -1086,5 +1095,4 @@ config RTC_DRV_LOONGSON1
 
 	  This driver can also be built as a module. If so, the module
 	  will be called rtc-ls1x.
-
 endif # RTC_CLASS

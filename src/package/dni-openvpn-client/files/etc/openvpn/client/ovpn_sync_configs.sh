@@ -5,7 +5,7 @@
 . /etc/openvpn/openvpn_client.env
 
 product="$(awk '{print tolower($0)}' /module_name)"
-remote_location="https://http.fw.updates1.netgear.com/sw-apps/vpn-client/${product:-xr500}"
+remote_location="https://http.fw.updates1.netgear.com/sw-apps/vpn-client/${product}"
 id_file="updated_date.txt"
 
 curl_opt="-s --retry 5"

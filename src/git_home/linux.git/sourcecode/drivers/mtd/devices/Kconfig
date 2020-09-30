@@ -50,6 +50,16 @@ config MTD_MS02NV
 	  say M here and read <file:Documentation/kbuild/modules.txt>.
 	  The module will be called ms02-nv.
 
+config MTD_MSM_NAND
+	tristate "MSM NAND Device Support"
+	depends on MTD && ARCH_MSM
+	select CRC16
+	select BITREVERSE
+	select MTD_NAND_IDS
+	default y
+	help
+	  Support for some NAND chips connected to the MSM NAND controller.
+
 config MTD_DATAFLASH
 	tristate "Support for AT45xxx DataFlash"
 	depends on SPI_MASTER && EXPERIMENTAL
@@ -109,6 +119,14 @@ config MTD_SPEAR_SMI
 	default y
 	help
 	  This enable SNOR support on SPEAR platforms using SMI controller
+
+config M25PXX_PREFER_SMALL_SECTOR_ERASE
+	bool "Prefer small sector erase"
+	depends on MTD_M25P80
+	default y
+	help
+	  This option enables use of the small erase sectors if that is
+	  supported by the flash chip.
 
 config MTD_SST25L
 	tristate "Support SST25L (non JEDEC) SPI Flash chips"

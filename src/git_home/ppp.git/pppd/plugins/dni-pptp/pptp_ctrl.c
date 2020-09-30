@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <signal.h>
@@ -20,6 +21,8 @@ typedef int (*pptp_call_cb)(struct pptp_conn_mngr *, char *, int);
 
 static void send_ctrl_conn_rqst(struct pptp_conn_mngr * conn)
 {
+	FILE *fp;
+	char pptp_hostname[HOSTNAME_SIZE]={0};
 	struct pptp_start_ctrl_conn req;
 
 	memset(&req, 0, sizeof(req));
@@ -35,7 +38,15 @@ static void send_ctrl_conn_rqst(struct pptp_conn_mngr * conn)
 	req.max_channels	= hton16(PPTP_MAX_CHANNELS);
 	req.firmware_rev	= hton16(PPTP_FIRMWARE_VERSION);
 
-	strcpy(req.hostname, PPTP_HOSTNAME);
+	fp = fopen(MODULE_FILE, "r");
+	if (!fp) {
+		pptp_info("Get PPTP_HOSTNAME fail");
+		return;
+	}
+	fscanf(fp, "%s", pptp_hostname);
+	fclose(fp);
+
+	strcpy(req.hostname, pptp_hostname);
 	strcpy(req.vendor, PPTP_VENDOR);
 	
 	send(conn->call_socket, &req, sizeof(req), 0);	

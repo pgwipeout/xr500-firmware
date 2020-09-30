@@ -234,8 +234,9 @@ EOF
 
 print_common_head()
 {
+	model_name="$(cat /module_name)"
 	cat <<EOF
-ServerName		NETGEAR-XR500
+ServerName		NETGEAR-${model_name}
 ServerType		standalone
 UseReverseDNS		off
 Umask			022

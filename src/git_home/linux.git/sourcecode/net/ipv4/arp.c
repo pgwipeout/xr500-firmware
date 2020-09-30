@@ -116,7 +116,11 @@
 #include <linux/uaccess.h>
 
 #include <linux/netfilter_arp.h>
-
+static int arp_attack_count = 0;
+static __be32 s_ip = 0;
+static __be32 t_ip = 0;
+static struct timer_list expire_timer;
+static int ctl_arp_attack_protect = 0;
 /*
  *	Interface to generic neighbour cache.
  */
@@ -184,6 +188,144 @@ struct neigh_table arp_tbl = {
 	.gc_thresh3	= 1024,
 };
 EXPORT_SYMBOL(arp_tbl);
+
+#include <linux/proc_fs.h>
+#define IPMAC_PROC_NAME "ipmac"
+static struct proc_dir_entry *ipmac_proc_entry;
+
+unsigned long a2ln(char *addr)
+{
+      int i1 = 0, i2 = 0, i3 = 0, i4 = 0;
+      sscanf(addr,"%d.%d.%d.%d", &i4, &i3, &i2, &i1);
+      return (unsigned long)( (i1<<24) | (i2<<16) | (i3<<8) | (i4));
+}
+
+struct __ipmac_list
+{
+       unsigned long sip;
+       unsigned char mac[32];
+       struct __ipmac_list *prev;
+       struct __ipmac_list *next;
+};
+static struct __ipmac_list m_head;
+
+int insert_list(struct __ipmac_list *member)
+{
+       struct __ipmac_list *pos;
+       pos = &m_head;
+       member->prev = pos;
+       member->next = pos->next;
+       if(pos->next != NULL)
+               pos->next->prev = member;
+       pos->next = member;
+       return 0;
+
+}
+
+void remove_list(struct __ipmac_list *member)
+{
+       if(member == NULL || member == &m_head)
+               return;
+       if(member->next != NULL)
+               member->next->prev = member->prev;
+       member->prev->next = member->next;
+       kfree(member);
+}
+
+void clear_list()
+{
+       struct __ipmac_list *pos = m_head.next;
+        while(pos != NULL) {
+       //      struct __ipmac_list *next_pos = pos->next;
+        //     kfree(pos);
+               remove_list(pos);
+               pos = pos->next;
+       }
+}
+
+void add_ipmac_table(unsigned long sip, unsigned char mac[32])
+{
+       struct __ipmac_list *ptr = NULL;
+       ptr = (struct __ipmac_list *)kmalloc( sizeof(struct __ipmac_list), GFP_ATOMIC);
+       if (likely(ptr))
+       {
+               strcpy(ptr->mac, mac);
+               ptr->sip = sip;
+               ptr->prev = NULL;
+               ptr->next = NULL;
+       }
+       insert_list(ptr);
+}
+
+int ipmac_member(unsigned long sip, unsigned char mac[6])
+{
+       struct __ipmac_list *ptr = m_head.next;
+       char s_mac[32]="0";
+       int i = 0;
+       sprintf(s_mac, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1],mac[2],mac[3],mac[4],mac[5]);
+       while(s_mac[i] != '\0') {
+               if(s_mac[i] > ('a'-1) && s_mac[i] < ('z'+1))
+                       s_mac[i] -= 32;
+               i++;
+       }
+       while(ptr != NULL && sip != 0 && s_mac != NULL) {
+               if((sip == ptr->sip) && (strncmp(s_mac, ptr->mac, i) == 0)) {
+                       //printk("is one member\n");
+                       return 1;
+               }
+               ptr = ptr->next;
+       }
+       return 0;
+}
+
+int ipmac_read(char *page, char **start, off_t off,
+                                int count, int *eof, void *data)
+{
+       struct __ipmac_list *pos = m_head.next;
+       while(pos != NULL && pos->sip != 0) {
+               printk("ip mac entry:%u.%u.%u.%u %s", NIPQUAD(pos->sip), pos->mac);
+               pos=pos->next;
+       }
+       return 0;
+}
+
+int ipmac_write( struct file *filp, const char __user *buff,
+                                         unsigned long len, void *data )
+{
+       char line[64];
+       char *ptr =NULL, *mac =NULL ,*tmp = line;
+       unsigned long ip = 0;
+       if (copy_from_user( line, buff, len ))
+               return -EFAULT;
+       line[len] = 0;
+       if(tmp != NULL) {
+               ptr = strsep(&tmp, " ");
+               ip = a2ln(ptr);
+       }
+       if(tmp != NULL)
+               mac = strsep(&tmp, " ");
+       /* echo "0" > /proc/ipmac */
+       if(ip == 0 && mac == NULL) {
+               printk("clear list\n");
+               clear_list();
+       } else if(ip != 0 && mac != NULL) {
+               add_ipmac_table(ip, mac);
+               printk("add ip:%u.%u.%u.%u mac:%s\n", NIPQUAD(ip), mac);
+       } else
+               printk("error info\n");
+       return len;
+}
+
+void create_ipmac_proc_entry(void)
+{
+       ipmac_proc_entry = create_proc_entry(IPMAC_PROC_NAME, 0666, NULL);
+       if(ipmac_proc_entry) {
+               ipmac_proc_entry->read_proc = ipmac_read;
+               ipmac_proc_entry->write_proc = ipmac_write;
+       }
+       memset(&m_head, 0, sizeof(struct __ipmac_list));
+       printk("create ipmac proc\n");
+}
 
 int arp_mc_map(__be32 addr, u8 *haddr, struct net_device *dev, int dir)
 {
@@ -691,6 +833,21 @@ void arp_xmit(struct sk_buff *skb)
 }
 EXPORT_SYMBOL(arp_xmit);
 
+/*	timeout process to check if the event is arp attack
+ *	if yes, printk the log
+ */
+static void expire_process(unsigned long dummy)
+{
+	if(arp_attack_count > 10 && ctl_arp_attack_protect == 1) {
+		printk("[DoS Attack: ARP Attack] from source: %u.%u.%u.%u,\n", NIPQUAD(s_ip));
+	}
+	/* empty the data calculate */
+	s_ip = 0;
+	t_ip = 0;
+	arp_attack_count = 0;
+	del_timer(&expire_timer);
+}
+
 /*
  *	Create and send an arp packet.
  */
@@ -734,6 +891,8 @@ static int arp_process(struct sk_buff *skb)
 	int addr_type;
 	struct neighbour *n;
 	struct net *net = dev_net(dev);
+	struct ethhdr *ethernet = (struct ethhdr *)skb_mac_header(skb);
+	unsigned char *src_mac = ethernet->h_source;
 
 	/* arp_rcv below verifies the ARP header and verifies the device
 	 * is ARP'able.
@@ -834,6 +993,27 @@ static int arp_process(struct sk_buff *skb)
 			arp_send(ARPOP_REPLY, ETH_P_ARP, sip, dev, tip, sha,
 				 dev->dev_addr, sha);
 		goto out;
+	}
+
+	/* Implement ip-mac binding to drop lan arp reply */
+	if (IN_DEV_ARP_DROP_REPLY(in_dev)) {
+		if(!ipmac_member(sip, src_mac))
+			goto out;
+	}
+
+	/* Check arp attack and log this event: 
+	 * Note that we have not concluded arp attack specific definition.
+	 * Assume arp attack action like this:
+	 * quickly && almost 10 per second && almost has not gap.
+	 */
+	if(s_ip == 0 && t_ip == 0) {
+		s_ip = sip;
+		t_ip = tip;
+		ctl_arp_attack_protect = net->ipv4.sysctl_arp_attack_protect;
+		setup_timer(&expire_timer, expire_process, (unsigned long)dev);
+		mod_timer(&expire_timer, jiffies + msecs_to_jiffies(1000));
+	} else if(s_ip == sip && t_ip == tip) {
+		arp_attack_count++;
 	}
 
 	if (arp->ar_op == htons(ARPOP_REQUEST) &&
@@ -1279,6 +1459,7 @@ void __init arp_init(void)
 	neigh_sysctl_register(NULL, &arp_tbl.parms, "ipv4", NULL);
 #endif
 	register_netdevice_notifier(&arp_netdev_notifier);
+	create_ipmac_proc_entry();
 }
 
 #ifdef CONFIG_PROC_FS
