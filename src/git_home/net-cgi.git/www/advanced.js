@@ -193,7 +193,7 @@ function clickSubMenu(current_div, change_id)
 var array_name = ["wds_items", "ap_items", "bridge_items", "extender_items", "mapt_items", "devmode_items"];
 var enable_flags = ["enabled_wds", "enable_ap_flag", "enable_bridge_flag", "enable_extender_flag", "enable_mapt", "device_mode"];
 var wds_items = [ "vlan","internet", "adv_setup_wizard", "adv_wps", "wan", "block_site", "block_services", "forwarding", "triggering","qos","vpn", "dns", "static", "remote", "upnp", "traffic", "wl_bridge", "guest", "email", "schedule", "log"]; 
-var ap_items = ["vpn_client", "vlan", "internet", "adv_setup_wizard","wan", "block_site", "block_services", "forwarding", "triggering","qos","vpn", "remote", "upnp", "traffic", "wl_bridge", "lan", "ipv6", "parental", "access_control", "usb_set", "conn_status"];
+var ap_items = ["funjsq", "vpn_client", "vlan", "internet", "adv_setup_wizard","wan", "block_site", "block_services", "forwarding", "triggering","qos","vpn", "remote", "upnp", "traffic", "wl_bridge", "lan", "ipv6", "parental", "access_control", "usb_set", "conn_status"];
 var extender_items = [ "vlan","internet", "adv_setup_wizard", "wan", "block_site", "block_services", "forwarding", "triggering","vpn",  "remote", "upnp", "traffic", "wl_bridge", "lan", "ipv6", "led", "fbwifi","conn_status"];
 var bridge_items = ["vlan","internet", "adv_setup_wizard", "adv_wps", "wan", "block_site", "block_services", "forwarding", "triggering","qos","vpn", "dns", "static", "remote", "upnp", "traffic", "wireless", "guest", "lan", "parental","access_control",  "email", "schedule", "wds", "ipv6", "wlap"];
 var mapt_items= [ "internet" ,"adv_setup_wizard" ];
@@ -214,7 +214,7 @@ function enabledItemsClass()
 			if( !cur_div)// if not find cur_div, continue
 				continue;
 			var height  = cur_div.getElementsByTagName("a")[0].clientHeight;
-			if( cur_div.style.display == "none" ) break;
+			if( cur_div.style.display == "none" ) continue;
 
 			if(enable_flag == "1" )
 			{
@@ -419,6 +419,11 @@ function click_adv_action(id)
                 {
 			goto_formframe("LAN_lan.htm");
 			menu_color_change('lan');
+                }
+		else if( id == "wt" )
+                {
+			goto_formframe("wtfast.htm");
+                        menu_color_change('wt_fast');
                 }
 		else if( id == "qos")
 		{

@@ -448,6 +448,7 @@ bh_wl_password_2="2.4GHz 无线网络密码（网络密钥）："
 bh_wla_ssid_name="5GHz 无线网络名称 (SSID)："
 bh_wla_password_2="5GHz 无线网络密码（网络密钥）："
 bh_wl_finish_warning="警告：在将您的设备重新连接到路由器之前，请勿单击<b>完成</b>按钮。"
+ssid_not_allowed_same="此无线网络标识(SSID)已经存在，请指定一个不同的无线网络标识(SSID)。"
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR（美国网件公司）建议您采用接入点模式设置这台新路由器，因为不需要对您的网关进行任何配置更改。"
 bh_ap_suggest_str_2="如果您是高级用户，知道如何配置网关以支持某些高级功能，则可以单击<b>后退</b>按钮，采用路由器模式配置 NETGEAR 路由器。"

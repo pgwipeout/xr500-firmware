@@ -677,8 +677,9 @@ scan_sharefoler_in_this_disk() #$1: dev $2: vendor $3: volume $4:label $5:disk_i
                         break;
                 fi
 
-		# Trim the space for the share folder name
-		sharename=`echo "$sharefolder_item" | awk -F* '{print $1}' | sed 's/ //g'`
+		# Not trim the space for the share folder name according to SPEC
+		# And to fix XR-542, bug 90929
+		sharename=`echo "$sharefolder_item" | awk -F* '{print $1}'`
             relative_path=`echo "$sharefolder_item" | awk -F* '{print $2}'`
                  readable=`echo $sharefolder_item | awk -F* '{print $3}'`
                  writable=`echo $sharefolder_item | awk -F* '{print $4}'`

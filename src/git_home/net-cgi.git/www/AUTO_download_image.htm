@@ -22,7 +22,7 @@ var percComplete = 0;
 
 function loadvalue()
 {
-	if(wan_status == 0 || ftp_status == 0)
+	if(wan_status == 0 )
 	{
 		if(getTop(window).topframe)
 			getTop(window).topframe.location.href="top.html";
@@ -45,8 +45,6 @@ function detec_status()
 		getObj("msg").innerHTML=""
 		if(percComplete >= 100 && md5 == 1 )
 		{	
-			getObj("msg").innerHTML="$pro100";
-			getObj("msg").innerHTML+="<BR>";
 			getObj("msg").innerHTML+=getText(bh_downloading_ver, "$downloading_ver");
 			document.forms[0].submit();
 		}
@@ -54,8 +52,6 @@ function detec_status()
 		{
 			if( percComplete >= 100 )
 				percComplete = 99;
-			getObj("msg").innerHTML="$pro1"+percComplete+"$pro2"+percComplete+"$pro3"+(100-percComplete)+"$pro4";
-			getObj("msg").innerHTML+="<BR>";
 			getObj("msg").innerHTML+=getText(bh_downloading_ver, "$downloading_ver");
 
 			setTimeout("detec_status()",delay_time);

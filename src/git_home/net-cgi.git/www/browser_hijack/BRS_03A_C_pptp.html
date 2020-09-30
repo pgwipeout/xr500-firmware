@@ -103,9 +103,9 @@ function checkIPaddr()
 
 		var pptp_mask="255.255.255.0";
 
-		if( parseInt(cf.myip_array[0].value) < 128 )
+		if( parseInt(myip_array[0].value) < 128 )
 			pptp_mask="255.0.0.0";
-		else if( parseInt(cf.myip_array[0].value) < 192 )
+		else if( parseInt(myip_array[0].value) < 192 )
 			pptp_mask="255.255.0.0";
 		else
 			pptp_mask="255.255.255.0";
@@ -189,7 +189,7 @@ function checkIPaddr()
 		  </div>
 		</div>
 		    <div class="buttons">
-			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return checkPPTP();">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" id="pptp_next" onclick="return checkPPTP();">
 				<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
 			</button>
 		    </div>

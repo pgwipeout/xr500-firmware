@@ -4,9 +4,9 @@
 # v1 cu  v2 new
 # 0--> have new version
 check_new_version(){
-
-	for n in 1 2 3 
-	do  
+		
+	for n in 1 2 3
+	do
 		checkv1=$(echo $1 |awk -F. '{print $'$n'}')
 		checkv2=$(echo $2 |awk -F. '{print $'$n'}')
 		[ -z "$checkv2" ] && return 1 
@@ -15,12 +15,12 @@ check_new_version(){
 		if [ "$n" == "1" ]; then
 			[ "$checkv2" -gt "$checkv1" ] && return 0
 			[ "$checkv2" -lt "$checkv1" ] && return 1
-		fi  
+		fi
 
 		if [ "$n" == "2" ]; then
 			[ "$checkv2" -gt "$checkv1" ] && return 0
 			[ "$checkv2" -lt "$checkv1" ] && return 1
-		fi  
+		fi
 
 		if [ "$n" == "3" ]; then
 
@@ -28,15 +28,15 @@ check_new_version(){
 				return 0
 			else
 				return 1
-			fi  
-		fi  
+			fi
+		fi
 	done 
-
+	
 	return 1
 }
 start_update_app(){
 
-	update_flag=`curl https://asus-plugin.funjsq.com/netgear/update_flag.php -l -k -s`
+	update_flag=`curl https://asus-plugin.funjsq.com/netgear/v2/official/r7800/update_flag.php -l -k -s`
 
 	[ "x$update_flag" == "x" ] && return
 
@@ -44,16 +44,18 @@ start_update_app(){
 #		curl -s -l  -k https://static.funjsq.com/web_control/ipsetRule/funjsq100.conf -o /data/funjsq/config/dnsmasq.d/funjsq100.conf
 #		curl -s -l -k https://static.funjsq.com/web_control/ipsetRule/funjsq101.conf -o /data/funjsq/config/dnsmasq.d/funjsq101.conf
 #		curl -s -l  -k https://static.funjsq.com/web_control/ipsetRule/blocklistDL.conf -o /data/funjsq/config/dnsmasq.d/blocklistDL.conf
-#		curl -s -l -k https://static.funjsq.com/web_control/ipsetRule/blocklistGW.conf -o /data/funjsq/config/dnsmasq.d/blocklistGW.conf
-		curl -s -k https://static.funjsq.com/web_control/plugin_config/data/plugin_v1_config.tar.gz -o /tmp/plugin_v1_config.tar.gz
-		tar -zxvf /tmp/plugin_v1_config.tar.gz -C /    
+#                curl -s -l -k https://static.funjsq.com/web_control/ipsetRule/blocklistGW.conf -o /data/funjsq/config/dnsmasq.d/blocklistGW.conf
+		curl -s -k https://static.funjsq.com/web_control/plugin_config/v2/data/v2_config_dns.tar.gz -o /tmp/plugin_v2_config.tar.gz
+	
+		tar -zxvf /tmp/plugin_v2_config.tar.gz -C /		
 		DownloadConfig=`echo $?`
 
 		if [ "x$DownloadConfig" != "x0" ]; then  
-			rm -rf /tmp/plugin_v1_config.tar.gz
+			rm -rf /tmp/plugin_v2_config.tar.gz
 		else
-			rm -rf /tmp/plugin_v1_config.tar.gz    
-		fi 
+			rm -rf /tmp/plugin_v2_config.tar.gz	
+		fi
+
 	fi
 
 	if [ "x$update_flag" == "x2" ]; then
@@ -64,7 +66,7 @@ start_update_app(){
 	fi
 
 	local cu_version=`cat /data/funjsq/config/values/funjsq_version`
-	local update_version=`curl https://asus-plugin.funjsq.com/netgear/funjsq_version.php -l -k -s`
+	local update_version=`curl https://asus-plugin.funjsq.com/netgear/v2/official/r7800/funjsq_version.php -l -k -s`
 	
 	[ "x$cu_version" == "x" ] && return
 	[ "x$update_version" == "x" ] && return
@@ -78,26 +80,24 @@ start_update_app(){
 
 	check_new_version $cu_version $update_version && {
 
-		curl -s -k https://static.funjsq.com/web_control/netgear/funjsq_plugin_netgear.tar.gz -o /tmp/funjsq_plugin.tar.gz
+		curl -s -k https://static.funjsq.com/web_control/netgear/v2/funjsq_plugin_netgear_v2.tar.gz -o /tmp/funjsq_plugin.tar.gz
 	
 		tar -zxvf /tmp/funjsq_plugin.tar.gz -C /
 		DownloadFlag=`echo $?`
+		
 		rm -rf /tmp/funjsq_plugin.tar.gz
 
 		[ "x$DownloadFlag" != "x0" ] && { 
-			echo 0 >  /data/funjsq/config/values/funjsq_status
+		#	echo 0 >  /data/funjsq/config/values/funjsq_status
 			return 
 		}
-	
-		[ "$1" != "init" ] && {
-			killall funjsq_ctl 
-			killall funjsq_time.sh
-			killall funjsq_cli
-			killall tail
-			killall funjsq_conntime
-		}
 
-#		tar -zxvf /tmp/funjsq_plugin.tar.gz -C /
+#		killall funjsq_ctl 
+#		killall funjsq_time.sh
+#		killall funjsq_cli
+#		killall tail
+#		killall funjsq_conntime
+
 
 		/data/funjsq/bin/funjsq_ctl update 
 		echo "$update_version" >  /data/funjsq/config/values/funjsq_version
@@ -105,29 +105,20 @@ start_update_app(){
 		nvram set funjsq_version="$update_version"
 		nvram set funjsq_update_version="$update_version"
 
-		[ "$1" != "init" ] && {
-			echo 9 >  /data/funjsq/config/values/funjsq_status
-			nvram set funjsq_status=9
-		}
+
+#		echo 9 >  /data/funjsq/config/values/funjsq_status
+#		nvram set funjsq_status=9
 
 	}
 	
-
-#	uci  commit &
 }
 
 start_funjsq(){
-	stop_funjsq
+#	stop_funjsq
 
 	[ "x$1" == "x" ] && return
 	[ "x$2" == "x" ] && return
-
-#	Old_funjsq_accType=`cat /data/funjsq/config/values/funjsq_accType`
-#	[ "x$1" != "x$Old_funjsq_accType" ] && {
-#		/data/funjsq/bin/funjsq_ctl unbind >/dev/null 2>&1
-#		echo $1 > /data/funjsq/config/values/funjsq_accType
-#		echo $2 > /data/funjsq/config/values/funjsq_accArea
-#	}
+	[ "x$3" == "x" ] && return
 
 	NTP_time=`date -u | awk -F 'UTC' '{print $2}' | sed 's/ //g'`
 	[ $NTP_time -lt 2017 ] && {
@@ -135,30 +126,86 @@ start_funjsq(){
 		date -s 111512122018
 	}
 
+	accMAC="$1"
+	accType="$2"
+	accArea="$3"
 	board_name=`cat /module_name`
 
 	[ "$board_name" == "XR500" ] && {
-		json100=`ubus call com.netdumasoftware.autoadmin reserve '{ "field" : "pmark", "subfield" : "funjsq100", "bits" : 1 }'`
-		
-		mark100=`echo $json100 | awk -F 'mask' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' `
+		json1=`ubus call com.netdumasoftware.autoadmin reserve '{ "field" : "pmark", "subfield" : "funjsq1", "bits" : 1 }'`
+		mark1=`echo $json1 | awk -F 'mask' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' `
+		[ "x$mark1" != "x" ] &&  {
+			echo $mark1 > /data/funjsq/config/values/mark1
+		}
 
+		json2=`ubus call com.netdumasoftware.autoadmin reserve '{ "field" : "pmark", "subfield" : "funjsq2", "bits" : 1 }'`
+		mark2=`echo $json2 | awk -F 'mask' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' `
+		[ "x$mark2" != "x" ] &&  {
+			echo $mark2 > /data/funjsq/config/values/mark2
+		}
+
+		json3=`ubus call com.netdumasoftware.autoadmin reserve '{ "field" : "pmark", "subfield" : "funjsq3", "bits" : 1 }'`
+		mark3=`echo $json3 | awk -F 'mask' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' `
+		[ "x$mark3" != "x" ] &&  {
+			echo $mark3 > /data/funjsq/config/values/mark3
+		}
+
+		json4=`ubus call com.netdumasoftware.autoadmin reserve '{ "field" : "pmark", "subfield" : "funjsq4", "bits" : 1 }'`
+		mark4=`echo $json4 | awk -F 'mask' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' `
+		[ "x$mark4" != "x" ] &&  {
+			echo $mark4 > /data/funjsq/config/values/mark4
+		}
+
+		json5=`ubus call com.netdumasoftware.autoadmin reserve '{ "field" : "pmark", "subfield" : "funjsq5", "bits" : 1 }'`
+		mark5=`echo $json5 | awk -F 'mask' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' `
+		[ "x$mark5" != "x" ] &&  {
+			echo $mark5 > /data/funjsq/config/values/mark5
+		}
+
+		json100=`ubus call com.netdumasoftware.autoadmin reserve '{ "field" : "pmark", "subfield" : "funjsq100", "bits" : 1 }'`
+		mark100=`echo $json100 | awk -F 'mask' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' `
 		[ "x$mark100" != "x" ] &&  {
 			echo $mark100 > /data/funjsq/config/values/mark100
-			lable100=`ubus call com.netdumasoftware.autoadmin acquire_rtable '{ "label" : "funjsq_rtable100" }'`
-			table_id100=`echo $lable100 | awk -F 'result' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' | sed  's/}//g'`
-			
-			echo $table_id100 > /data/funjsq/config/values/rtable_id
-
-
 		}
 
 		json101=`ubus call com.netdumasoftware.autoadmin reserve '{ "field" : "pmark", "subfield" : "funjsq101", "bits" : 1 }'`
-		
 		mark101=`echo $json101 | awk -F 'mask' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' `
-
 		[ "x$mark101" != "x" ] &&  {
 			echo $mark101 > /data/funjsq/config/values/mark101
+
 		}
+
+		lable1=`ubus call com.netdumasoftware.autoadmin acquire_rtable '{ "label" : "funjsq_rtable1" }'`
+		table_id1=`echo $lable1 | awk -F 'result' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' | sed  's/}//g'`
+		[ "x$table_id1" != "x" ] &&  {
+			echo $table_id1 > /data/funjsq/config/values/rtable_id1
+		}
+
+		lable2=`ubus call com.netdumasoftware.autoadmin acquire_rtable '{ "label" : "funjsq_rtable2" }'`
+		table_id2=`echo $lable2 | awk -F 'result' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' | sed  's/}//g'`
+		[ "x$table_id2" != "x" ] &&  {
+			echo $table_id2 > /data/funjsq/config/values/rtable_id2
+		}
+
+		lable3=`ubus call com.netdumasoftware.autoadmin acquire_rtable '{ "label" : "funjsq_rtable3" }'`
+		table_id3=`echo $lable3 | awk -F 'result' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' | sed  's/}//g'`
+		[ "x$table_id3" != "x" ] &&  {
+			echo $table_id3 > /data/funjsq/config/values/rtable_id3
+		}
+
+		lable4=`ubus call com.netdumasoftware.autoadmin acquire_rtable '{ "label" : "funjsq_rtable4" }'`
+		table_id4=`echo $lable4 | awk -F 'result' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' | sed  's/}//g'`
+		[ "x$table_id4" != "x" ] &&  {
+			echo $table_id4 > /data/funjsq/config/values/rtable_id4
+		}
+
+
+		lable5=`ubus call com.netdumasoftware.autoadmin acquire_rtable '{ "label" : "funjsq_rtable5" }'`
+		table_id5=`echo $lable5 | awk -F 'result' '{print $2}'  | cut -d ',' -f 1 | cut -d ':' -f 2| tr '\n' ' ' | sed  's/ //g' | sed  's/}//g'`
+		[ "x$table_id5" != "x" ] &&  {
+			echo $table_id5 > /data/funjsq/config/values/rtable_id5
+		}
+
 
 	}
 
@@ -174,24 +221,27 @@ start_funjsq(){
 	nvram set funjsq_accArea="$2"
 
 
-	start_update_app &
-	
-	[ -f /dev/net/tun ] && {
-		
-		tun_path=`find /lib/modules/ -name tun.ko`
-		insmod $tun_path
-        }
 
-	/data/funjsq/bin/funjsq_ctl start >/dev/null 2>&1 &
+
+	start_update_app &
+
+	/data/funjsq/bin/funjsq_ctl start $accMAC  $accType $accArea >/dev/null 2>&1 &
 	
 }
 
 stop_funjsq(){
-	/data/funjsq/bin/funjsq_ctl stop >/dev/null 2>&1
-	killall funjsq_ctl >/dev/null 2>&1
+
+	accMAC="$1"
+	/data/funjsq/bin/funjsq_ctl stop $accMAC >/dev/null 2>&1
 	nvram  commit &
 }
 
+GetStatus_funjsq(){
+
+	/data/funjsq/bin/funjsq_ctl GetStatus > /www/mul_device.aspx 
+	cat /www/mul_device.aspx
+	nvram  commit &
+}
 
 install_funjsq(){
 	
@@ -201,20 +251,18 @@ install_funjsq(){
 	
 	/data/funjsq/bin/funjsq_ctl unbind >/dev/null 2>&1
 	/data/funjsq/bin/funjsq_ctl install >/dev/null &
-
-		
 	nvram  commit &
 
 }
-
 
 uninstall_funjsq(){
-	/data/funjsq/bin/funjsq_ctl remove >/dev/null 2>&1
+	unbind_funjsq 
+	/data/funjsq/bin/funjsq_ctl logout >/dev/null 2>&1
 	nvram  commit &
 }
 
-
 unbind_funjsq(){
+	start_update_app init &
 	stop_funjsq
 	/data/funjsq/bin/funjsq_ctl unbind >/dev/null 2>&1
 	killall funjsq_ctl >/dev/null 2>&1
@@ -229,13 +277,11 @@ Reg_funjsq(){
 	code=`echo $Jsondata | sed 's/.$//' | awk -F 'code' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
 	ExpireTime=`echo $Jsondata | sed 's/.$//' | awk -F 'ExpireTime' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
 	password=`echo $Jsondata | sed 's/.$//' | awk -F 'EncryptPassword' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
+	AccNum=`echo $Jsondata | sed 's/.$//' | awk -F 'AccNum' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
+
 	echo $code 
 	echo $ExpireTime
-	nvram set funjsq_expire="$ExpireTime"
-	nvram set funjsq_mobile="$1"
-	nvram set funjsq_password="$password"
-	nvram  commit &
-
+	
 }
 
 SMS_funjsq(){
@@ -258,21 +304,28 @@ Login_funjsq(){
 	code=`echo $Jsondata | sed 's/.$//' | awk -F 'code' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
 	ExpireTime=`echo $Jsondata | sed 's/.$//' | awk -F 'ExpireTime' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
 	password=`echo $Jsondata | sed 's/.$//' | awk -F 'EncryptPassword' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
+	AccNum=`echo $Jsondata | sed 's/.$//' | awk -F 'AccNum' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
 	echo $code
 	echo $ExpireTime
-	[ "$code"  !=  "1000" ] && exit
-	nvram set funjsq_expire="$ExpireTime"
-	nvram set funjsq_mobile="$1"
-	nvram set funjsq_password="$password"
-	install_funjsq
-	nvram  commit &
+}
+
+Load_Info_funjsq(){
+	start_update_app init &
+
+	Jsondata=`/data/funjsq/bin/funjsq_ctl LoadUserStatus`
+	if [ "x$Jsondata" == "x" ]; then
+		return 
+	fi
+	code=`echo $Jsondata | sed 's/.$//' | awk -F 'code' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
+	ExpireTime=`echo $Jsondata | sed 's/.$//' | awk -F 'ExpireTime' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
+	AccNum=`echo $Jsondata | sed 's/.$//' | awk -F 'AccNum' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
+	echo $code
+	echo $ExpireTime
+
 }
 
 LogOut_funjsq(){
-	unbind_funjsq
-	nvram unset funjsq_expire
-	nvram unset funjsq_mobile
-	rm /data/funjsq/config/usrinfo
+	uninstall_funjsq
 	nvram  commit &
 }
 
@@ -283,12 +336,9 @@ CPW_funjsq(){
 	fi
 	code=`echo $Jsondata | sed 's/.$//' | awk -F 'code' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
 	echo $code 
-	nvram  commit &
 }
 
 CheckPay_funjsq(){
-	start_update_app init &
-	
 	Jsondata=`/data/funjsq/bin/funjsq_ctl FunjsqCheckPay `
 	if [ "x$Jsondata" != "x" ]; then
 		echo $Jsondata > /tmp/FunjsqCheckPay
@@ -297,111 +347,29 @@ CheckPay_funjsq(){
 	ExpireTime=`echo $Jsondata | sed 's/.$//' | awk -F 'ExpireTime' '{print $2}' | cut -d ',' -f 1  | sed 's/"//g'|sed  's/^.//'`
 	echo $code
 
-	[ "x$ExpireTime" != "x" ] && nvram set funjsq_expire="$ExpireTime"
-	[ "x$code" == "x1000" ] && {
-		nvram set funjsq_expire="$ExpireTime"
-		funjsq_status=`nvram get funjsq_status`
-		[ "x$funjsq_status" == "x3" ] && {
-			echo "0" > /data/funjsq/config/values/funjsq_status
-			nvram set funjsq_status=0
-		}
-	}
-	nvram commit &
 }
 
 init_funjsq(){
-
+#	sleep 40
 	#读取旧的配置信息
-	mobile=`nvram get  funjsq_mobile`
-	password=`nvram get funjsq_password`
-	expire=`nvram get  funjsq_expire`
-	accType=`nvram get funjsq_accType`
-	accArea=`nvram get funjsq_accArea`
-	ip=`nvram get funjsq_ip`
-	mac=`nvram get funjsq_mac`
-	RXbyte=`nvram get funjsq_RXbyte`
-	TXbyte=`nvram get funjsq_TXbyte`
-	update_time=`nvram get funjsq_update_time`
-	old_version=`nvram get funjsq_version`
-	old_status=`nvram get funjsq_status`
-	QQSupport=`nvram get funjsq_QQSupport`
-	funjsq_ps4_ip=`nvram get funjsq_ps4_ip`
-	funjsq_win_ip=`nvram get funjsq_win_ip`
-	funjsq_xbox_ip=`nvram get funjsq_xbox_ip`
-	funjsq_ns_mac=`nvram get funjsq_ns_ip`
-	funjsq_ps4_mac=`nvram get funjsq_ps4_mac`
-	funjsq_win_mac=`nvram get funjsq_win_mac`
-	funjsq_xbox_mac=`nvram get funjsq_xbox_mac`
-	funjsq_ns_mac=`nvram get funjsq_ns_mac`
-	board_name=`cat /module_name`
+	funjsq_login=`nvram get funjsq_no_need_login`
 
-	funjsq_start_flag=`nvram get funjsq_start_flag`
+	old_version=`nvram get funjsq_version`
+	mkdir -p /data/funjsq/config/values
 	echo "$old_version" > /data/funjsq/config/values/funjsq_version
 
-	start_update_app init
+	start_update_app init &
 
-	new_status=`nvram get funjsq_status`
-
-	[ "x$new_status" == "x9" ] && {
-		old_version=`nvram get funjsq_version`	
-		update_time=`nvram get funjsq_update_time`
-		QQSupport=`nvram get funjsq_QQSupport`
-		nvram set funjsq_status="$old_status"
-		nvram set funjsq_ip="$ip"
-		nvram set funjsq_mac="$mac"
-		nvram set funjsq_accType="$accType"
-		nvram set funjsq_accArea="$accArea"
-		nvram set funjsq_ps4_ip="$funjsq_ps4_ip"
-		nvram set funjsq_win_ip="$funjsq_win_ip"
-		nvram set funjsq_xbox_ip="$funjsq_xbox_ip"
-		nvram set funjsq_ns_ip="$funjsq_ns_ip"
-		nvram set funjsq_ps4_mac="$funjsq_ps4_mac"
-		nvram set funjsq_win_mac="$funjsq_win_mac"
-		nvram set funjsq_xbox_mac="$funjsq_xbox_mac"
-		nvram set funjsq_ns_mac="$funjsq_ns_mac"
-
+	[ "x$funjsq_login" != "x1" ]  && {
+		killall funjsq_detect
+		rm -rf /data/funjsq/config/values/*
+		/data/funjsq/bin/funjsq_detect -i br0 -d
 	}
 	
-	echo  "$mobile" > /data/funjsq/config/usrinfo
-	echo  "$password" >> /data/funjsq/config/usrinfo
-	echo "$board_name" > /data/funjsq/config/values/board_name
-
-	echo  "$mobile" > /data/funjsq/config/values/funjsq_mobile
-	echo  "$accType" > /data/funjsq/config/values/funjsq_accType
-	echo  "$accArea" > /data/funjsq/config/values/funjsq_accArea
-	echo  "$expire" > /data/funjsq/config/values/funjsq_expire
-	echo "$old_status" > /data/funjsq/config/values/funjsq_status
-	echo "0.0 B" > /data/funjsq/config/values/funjsq_RXbyte
-	echo "0.0 B" > /data/funjsq/config/values/funjsq_TXbyte
-	echo "00:00:00" > /data/funjsq/config/values/funjsq_conntime
-	echo "$old_version" > /data/funjsq/config/values/funjsq_version
-	echo "$ip" > /data/funjsq/config/values/funjsq_ip
-	echo "$mac" > /data/funjsq/config/values/funjsq_mac
-	echo "$update_time" > /data/funjsq/config/values/funjsq_update_time
-	echo "$QQSupport" > /data/funjsq/config/values/funjsq_QQSupport
-
-	echo "$funjsq_ps4_ip" > /data/funjsq/config/values/funjsq_ps4_ip
-	echo "$funjsq_win_ip" > /data/funjsq/config/values/funjsq_win_ip
-	echo "$funjsq_xbox_ip" > /data/funjsq/config/values/funjsq_xbox_ip
-	echo "$funjsq_ns_ip" > /data/funjsq/config/values/funjsq_ns_ip
-
-	echo "$funjsq_ps4_mac" > /data/funjsq/config/values/funjsq_ps4_mac
-	echo "$funjsq_win_mac" > /data/funjsq/config/values/funjsq_win_mac
-	echo "$funjsq_xbox_mac" > /data/funjsq/config/values/funjsq_xbox_mac
-	echo "$funjsq_ns_mac" > /data/funjsq/config/values/funjsq_ns_mac
-
-	echo "$funjsq_start_flag" > /data/funjsq/config/values/funjsq_start_flag
-	
-	echo "0" > /data/funjsq/config/values/funjsq_windows_enable
-	echo "0" > /data/funjsq/config/values/funjsq_enable_delayLoss
-	echo "" > /data/funjsq/config/values/funjsq_loss1
-	echo "" > /data/funjsq/config/values/funjsq_loss2
-	echo "" > /data/funjsq/config/values/funjsq_delay1
-	echo "" > /data/funjsq/config/values/funjsq_delay2
-
+	/data/funjsq/bin/funjsq_ctl init 
 }
 
-
+echo "$1" "$2" "$3" "$4" >> /tmp/funjsq_api_debug 
 
 ACTION=$1
 case $ACTION in
@@ -409,13 +377,16 @@ init)
 	init_funjsq
 	;;
 start)
-	start_funjsq $2 $3
+	start_funjsq $2 $3 $4
 	;;
 restart)
 	start_funjsq 
 	;;
 stop)
-	stop_funjsq 
+	stop_funjsq $2 
+	;;
+GetStatus)
+	GetStatus_funjsq  
 	;;
 install)
 	install_funjsq  
@@ -442,6 +413,9 @@ FunjsqLogin)
 	rm -rf /tmp/FunjsqLogin
 	Login_funjsq $2 $3
 	;;
+LoadUserStatus)
+	Load_Info_funjsq
+	;;
 FunjsqLogOut)
 	LogOut_funjsq 
 	;;
@@ -453,6 +427,5 @@ FunjsqCheckPay)
 	rm -rf /tmp/FunjsqCheckPay
 	CheckPay_funjsq
 	;;
-
 esac
 

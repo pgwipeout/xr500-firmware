@@ -41,13 +41,13 @@ var usb_router_flag=parent.usb_router_flag;
 <input type="hidden" name="service_ip">
 <input type="hidden" name="hidden_pt_name">
 <TR>
-	<TD nowrap>$forward_service_name</TD>
+	<TD nowrap>$forward_service_name:</TD>
 	<TD nowrap>
 	<input type="text" name="pt_name" id="pt_name" size="20" maxlength="30">
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$trigger_ser_user</TD>
+	<TD nowrap>$trigger_ser_user:</TD>
 	<TD nowrap> 
 	<select name="src_ip_type" id="src_ip_type" onChange="setsrc(document.forms[0]);">
 		<option value="Any">$any</option>
@@ -65,7 +65,7 @@ var usb_router_flag=parent.usb_router_flag;
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$block_ser_service_type</TD>	
+	<TD nowrap>$block_ser_service_type:</TD>	
 	<TD nowrap>
 	<select NAME="pt_type" id="pt_type" size="1" >
 		<option value="TCP">$block_ser_setup_tcp</option>
@@ -74,7 +74,7 @@ var usb_router_flag=parent.usb_router_flag;
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$trigger_port</TD>
+	<TD nowrap>$trigger_port:</TD>
 	<TD nowrap>
 	<input type="text" name="pt_port" id="pt_port" size="7" maxlength="5" onKeyPress="return getkey('num', event)">(1~65535)
 	</TD>
@@ -84,7 +84,7 @@ $bluebar
 	<TD nowrap colspan=2><B>$trigger_in_connect</B></TD>
 </TR>
 <TR>
-	<TD nowrap>$trigger_contype</TD>
+	<TD nowrap>$trigger_contype:</TD>
 	<TD nowrap>
 	<select name="in_port_type" id="in_port_type" size="1">
 		<option value="TCP/UDP">TCP/UDP</option>
@@ -94,13 +94,13 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$block_ser_start_port</TD>
+	<TD nowrap>$block_ser_start_port:</TD>
 	<TD nowrap> 
 	<input type="text" name="in_port_start" id="in_port_start" size="7" maxlength="5" onKeyPress="return getkey('num', event)">(1~65535)
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$block_ser_end_port</TD>
+	<TD nowrap>$block_ser_end_port:</TD>
 	<TD nowrap>
 	<input type="text" name="in_port_end" id="in_port_end" size="7" maxlength="5" onKeyPress="return getkey('num', event)">(1~65535)
 	</TD>

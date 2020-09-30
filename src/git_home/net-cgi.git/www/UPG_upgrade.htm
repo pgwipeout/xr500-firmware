@@ -1,4 +1,4 @@
-<% http_header("style/form.css", "/funcs.js", "/upgrade.js") %>
+<% http_header("style/form.css", "/funcs.js", "/upgrade.js", "style/formframe_wait.css") %>
 <body onLoad="loadvalue(); please_wait(false);">
 <div id="black_over_lay" class="black_overlay">
 </div>
@@ -132,8 +132,8 @@ $bluebar
 <tr>
 	<td nowrap>
 		<div class="agree_option">
-			<div><input id="aua" type="radio" name="agree_upg"><label for="aua">$tnc_agree</label></div>
-			<div><input id="aud" type="radio" name="agree_upg"><label for="aud">$tnc_disagree</label></div>
+			<div><input id="aua" type="radio" name="agree_upg" value="agree_upg"><label for="aua">$tnc_agree</label></div>
+			<div><input id="aud" type="radio" name="agree_upg" value="disagree_upg"><label for="aud">$tnc_disagree</label></div>
 		</div>
 		<div style="clear:both"></div>
 	</td>
@@ -147,8 +147,8 @@ $bluebar
 <tr style="display:none" id="coll-tr_4">
 	<td nowrap>
 		<div class="agree_option">
-			<div><input id="tca" type="radio" name="agree_col"><label for="tca">$tnc_agree</label></div>
-			<div><input id="tcd" type="radio" name="agree_col"><label for="tcd">$tnc_disagree</label></div>
+			<div><input id="tca" type="radio" name="agree_col" value="agree_col"><label for="tca">$tnc_agree</label></div>
+			<div><input id="tcd" type="radio" name="agree_col" value="disagree_col"><label for="tcd">$tnc_disagree</label></div>
 		</div>
 		<div style="clear:both"></div>
 	</td>
@@ -172,18 +172,13 @@ $bluebar
 </form>
 
 </div>
-
-<div id="pls_wait_div" class="pls_wait_div" style="display:none">
-			<div>
-        $wizard_pls_wait
-        <div class="loader">
-          <svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-            <circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
-          </svg>
-        </div>    
 </div>
-
-</div>
-<% help_box("0","_upgrade") %>
-</body>
+<div id="formframe_wait_div" style="display:none;">
+	<div>$wizard_pls_wait
+		<div class="loader">
+			<svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+			<circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+			</svg></div></div></div>
+		<% help_box("0","_upgrade") %>
+		</body>
 </html>

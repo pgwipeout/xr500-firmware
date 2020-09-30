@@ -124,23 +124,22 @@ function convert_string(value)
 	
 	len1 = value.length;
 	len2 = numbers.length;
-	
 	if(len1 < len2)
 	{
 		for(var i=0; i<len1; i++)
 		{
 			a = value.charCodeAt(i);
 			b = numbers.charCodeAt(i);
-			m0 = a-33-b
-			m1 = a-33+94-b;
-			m2 = a-33+94*2-b;
-			if( m0>32 && m0<127)
+			m0 = a-32-b
+			m1 = a-32+95-b;
+			m2 = a-32+95*2-b;
+			if( m0>31 && m0<127)
 				c = m0;
-			if( m1>32 && m1<127)
+			if( m1>31 && m1<127)
 				c = m1;
-			if(m2>32 && m2<127)
+			if(m2>31 && m2<127)
 				c = m2;
-
+			
 			chr = String.fromCharCode(c);
 			str = str + chr;
 		}
@@ -151,15 +150,16 @@ function convert_string(value)
 		{
 			a = value.charCodeAt(i);
 			b = numbers.charCodeAt(i);
-			m0 = a-33-b;
-			m1 = a-33+94-b;
-			m2 = a-33+94*2-b;
-			if( m0>32 && m0<127)
+			m0 = a-32-b;
+			m1 = a-32+95-b;
+			m2 = a-32+95*2-b;
+			if( m0>31 && m0<127)
 				c = m0;
-			if( m1>32 && m1<127)
+			if( m1>31 && m1<127)
 				c = m1;
-			if(m2>32 && m2<127)
-				c = m2;			
+			if(m2>31 && m2<127)
+				c = m2;	
+			
 			chr = String.fromCharCode(c);
 			str = str + chr;
 		}

@@ -119,12 +119,12 @@ function loadvalue()
 		}
 		else
 		{
-			form.pppoe_passwd.outerHTML='<input type="text" name="pppoe_passwd" id="pppoe_passwd" maxlength="64" size="16" onFocus="this.select();change_pppoe_password(this);" onKeyPress="return getkey(\'ssid\', event)">';
+			form.pppoe_passwd.outerHTML='<input type="text" name="pppoe_passwd" id="pppoe_passwd" maxlength="64" size="16" onFocus="this.select();change_pppoe_password(this);" onKeyPress="return getkey(\'ssid\', event)" autocomplete="off">';
 		}
 	}
 	else if( get_browser() == "IE" )
 	{
-		form.pppoe_passwd.outerHTML='<input type="password" name="pppoe_passwd" id="pppoe_passwd" maxlength="64" size="16" style="width: 126px" onFocus="change_pppoe_password(this);" onKeyPress="return getkey(\'ssid\', event)">';
+		form.pppoe_passwd.outerHTML='<input type="password" name="pppoe_passwd" id="pppoe_passwd" maxlength="64" size="16" style="width: 126px" onFocus="change_pppoe_password(this);" onKeyPress="return getkey(\'ssid\', event)" autocomplete="off">';
 	}
 	init_passwd();
 	form.pppoe_dod.value = '<% cfg_get("wan_pppoe_demand") %>';
@@ -290,7 +290,7 @@ else
 <div id="bas_top">
 <TABLE cellspacing=5 cellPadding=0 width=100% border=0>
 <TR><TD nowrap>
-<A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','question')"><B>$basic_top_info</B></A>
+<B>$basic_top_info</B>
 </TD></TR>
 <TR>
         <TD nowrap>
@@ -314,7 +314,7 @@ $bluebar
 
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','isp')"><B>$basic_intserv_provider</B></A>
+	<B>$basic_intserv_provider:</B>
 	</TD>
 	<TD nowrap >
 	<select name="login_type" id="login_type" onChange="change_serv(document.forms[0])">
@@ -338,7 +338,7 @@ $bluebar
 $bluebar
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','login')"><B>$basic_pppoe_login</B></A>
+	<B>$basic_pppoe_login:</B>
 	</TD>
 	<TD nowrap >
 	<input type="text" name="pppoe_username" id="pppoe_username" maxLength="64" size="16" onKeyPress="return getkey('ssid', event)" value="<% cfg_sed_xss("wan_pppoe_username") %>">
@@ -346,15 +346,15 @@ $bluebar
 </TR>
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','password')"><B>$basic_pppoe_passwd</B></A>
+	<B>$basic_pppoe_passwd:</B>
 	</TD>
 	<TD nowrap >
-	<input type="password" name="pppoe_passwd" id="pppoe_passwd" maxlength="64" size="16" onFocus="change_pppoe_password(this);" onKeyPress="return getkey('ssid', event)">
+	<input type="password" name="pppoe_passwd" id="pppoe_passwd" maxlength="64" size="16" onFocus="change_pppoe_password(this);" onKeyPress="return getkey('ssid', event)" autocomplete="off">
 	</TD>
 </TR>
 <TR>
 	<TD>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','serv_name')">$basic_pppoe_serv_name</A>
+	$basic_pppoe_serv_name:
 	</TD>
 	<TD nowrap >
 	<input type="text" name="pppoe_servername" id="pppoe_servername" maxLength="50" size="16" onKeyPress="return getkey('ssid', event)" value="<% cfg_sed_xss("wan_pppoe_service") %>">
@@ -362,7 +362,7 @@ $bluebar
 </TR>
 <TR> 
 	<TD>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','conn_mode')"><B>$basic_int_connection_mode</B></A></TD> 
+	<B>$basic_int_connection_mode:</B></TD> 
 	<TD > 
 	<select name="pppoe_dod" id="pppoe_dod" onchange="show_idleout(document.forms[0],this.value)"> 
 		<option value="0">$basic_mode_always</option>
@@ -373,7 +373,7 @@ $bluebar
 </TR> 
 <TR>
 	<TD>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','pppoe_idletime')">$basic_pppoe_idle</A>
+	$basic_pppoe_idle:
 	</TD>
 	<TD >
 	<input type="text" name="pppoe_idletime" id="pppoe_idletime" maxLength="5" size="16" value="<% idle_time("wan_pppoe_idletime") %>" onKeyPress="return getkey('num', event)">
@@ -437,7 +437,7 @@ $bluebar
 $bluebar
 <TR id=intranet_myip style="display:none">
         <TD nowrap>
-        <A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','myip')"><B>$basic_pptp_myip</B></A>
+        <B>$basic_pptp_myip:</B>
         </TD>
         <TD nowrap ><!--bug 22411:when manually input IP,don't click the mouse,the subnet mask can be used -->
         <input type="text" name="myip_1"  size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onChange="myip_update();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);myip_update();" >.
@@ -448,7 +448,7 @@ $bluebar
 </TR>
 <TR id=intranet_mask style="display:none">
 	<TD nowrap>
-        <A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','myip')"><B>$lan_mark_subnet</B></A>
+        <B>$lan_mark_subnet:</B>
 	</td>
         <TD nowrap >
         <input type="text" name="mymask_1"  size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
@@ -461,7 +461,7 @@ $bluebar
 
 <TR>
        <TD nowrap colspan=2>
-       <A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','InternetIP')"><B>$basic_int_intip</B></A>
+       <B>$basic_int_intip</B>
        </TD>
 </TR>
 <TR>
@@ -475,7 +475,7 @@ $bluebar
        </TD>
 </TR>
 <TR>
-        <TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$lan_mark_ip</TD>
+        <TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$lan_mark_ip:</TD>
         <TD nowrap >
         <input type="text" name="WPethr1" id="wpethr1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
         <input type="text" name="WPethr2"  id="wpethr2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -486,7 +486,7 @@ $bluebar
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','DNSaddress')"><B>$basic_int_dns</B></A>
+	<B>$basic_int_dns</B>
 	</TD>
 </TR>
 <TR>
@@ -500,7 +500,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_primary_dns</TD>
+	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_primary_dns:</TD>
 	<TD nowrap >
 	<input type="text" name="DAddr1" id="daddr1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="DAddr2" id="daddr2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -509,7 +509,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_second_dns</TD>
+	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_second_dns:</TD>
 	<TD nowrap >
 	<input type="text" name="PDAddr1" id="pdaddr1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="PDAddr2" id="pdaddr2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -520,7 +520,7 @@ $bluebar
 $bluebar
 <TR id=mac_head style="display:none">
         <TD nowrap colspan=2>
-        <A tabindex=-1 href="javascript:loadhelp('_BAS_pppoe','localaddress')"><B>$basic_int_mac</B></A>
+        <B>$basic_int_mac:</B>
         </TD>
 </TR>
 <TR id=mac_default style="display:none">

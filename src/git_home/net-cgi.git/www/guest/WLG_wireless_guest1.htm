@@ -150,7 +150,7 @@ var wps_alert="<% cfg_get("wps_alert") %>";
 <TABLE width=100% border=0 cellpadding=0 cellspacing=3>
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wireless')"><B>$wlan_mark<script> if( parent.an_router_flag == 1) document.write("(2.4GHz b/g/n)")</script></B></A>
+	<B>$wlan_mark<script> if( parent.an_router_flag == 1) document.write("(2.4GHz b/g/n)")</script></B>
 	</TD>
 </TR>
 <TR>
@@ -170,7 +170,7 @@ var wps_alert="<% cfg_get("wps_alert") %>";
 </TR>
 <TR>	
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','guest_ssid')">$wlan_guest_ssidName :</A>
+	$wlan_guest_ssidName :
 	</TD>
 	<TD nowrap><input type="text" name="ssid" id="ssid" value="<% cfg_get_ssid_value("wlg1_ssid") %>" size="20" maxlength="32"></TD>
 </TR>
@@ -185,7 +185,7 @@ $bluebar
 
 <TABLE width=100% border=0 cellpadding=0 cellspacing=3>
 <TR>
-	<TD nowrap colspan=2><A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','security')"><B>$sec_type</B></A></TD>
+	<TD nowrap colspan=2><B>$sec_type</B></A>
 </TR>
 <TR>
 	<TD nowrap colspan=2>
@@ -234,7 +234,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wep')"><B>$sec_enc_head</B></A>
+		<B>$sec_enc_head</B>
 		</TD>
 	</TR>
 	<TR>
@@ -258,7 +258,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wepkey')"><B>$sec_key</B></A>
+		<B>$sec_key</B>
 		</TD>
 	</TR>
 	<TR>
@@ -306,7 +306,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wpa-psk')"><B>$sec_type (WPA-PSK)</B></A>
+		<B>$sec_type (WPA-PSK)</B>
 		</TD>
 	</TR>
 	<TR>
@@ -324,7 +324,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wpa2-psk')"><B>$sec_type (WPA2-PSK)</B></A>
+		<B>$sec_type (WPA2-PSK)</B>
 		</TD>
 	</TR>
 	<TR>
@@ -344,7 +344,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wpa-psk+wpa2-psk')"><B>$sec_type (WPA-PSK + WPA2-PSK)</B></A>
+		<B>$sec_type (WPA-PSK + WPA2-PSK)</B>
 		</TD>
 	</TR>
 	<TR>
@@ -364,7 +364,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wpawpa2')"><B>$sec_type ( $sec_wpa_enterprise )</B></A>
+		<B>$sec_type ( $sec_wpa_enterprise )</B>
 		</TD>
 	</TR>
 	<TR>
@@ -407,14 +407,14 @@ $bluebar
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wireless')"><B>
+	<B>
         <script>
                 if( parent.ac_router_flag == 1)
                         document.write("$wlan_mark (5GHz 802.11a/n/ac)")
                 else
                         document.write("$wlan_mark (5GHz a/n) ")
         </script>
-	</B></A>
+	</B>
 	</TD>
 </TR>
 <TR>
@@ -439,7 +439,7 @@ $bluebar
 </TR>
 <TR>	
 	<TD nowrap >
-	<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','guest_ssid')">$wlan_guest_ssidName :</A></TD>
+	$wlan_guest_ssidName :</TD>
 	<TD nowrap ><input type="text" name="ssid_an" id="ssid_an" value="<% cfg_get_ssid_value("wla1_ssid") %>" size="20" maxlength="32"></TD>
 </TR>
 $bluebar
@@ -447,7 +447,7 @@ $bluebar
 
 <TABLE width=100% border=0 cellpadding=0 cellspacing=3>
 <TR>
-	<TD nowrap colspan=2><A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','security')"><B>$sec_type</B></A></TD>
+	<TD nowrap colspan=2><B>$sec_type</B></TD>
 </TR>
 <TR>
 	<TD nowrap colspan=2>
@@ -494,7 +494,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wep_auth')"><B>$sec_enc_head</B></A>
+		<B>$sec_enc_head</B>
 		</TD>
 	</TR>
 	<TR>
@@ -518,7 +518,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wepkey')"><B>$sec_key</B></A>
+		<B>$sec_key</B>
 		</TD>
 	</TR>
 	<TR>
@@ -566,7 +566,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wpa-psk')"><B>$sec_type (WPA-PSK)</B></A>
+		<B>$sec_type (WPA-PSK)</B>
 		</TD>
 	</TR>
 	<TR>
@@ -584,7 +584,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wpa2-psk')"><B>$sec_type (WPA2-PSK)</B></A>
+		<B>$sec_type (WPA2-PSK)</B>
 		</TD>
 	</TR>
 	<TR>
@@ -604,7 +604,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wpa-psk+wpa2-psk')"><B>$sec_type (WPA-PSK + WPA2-PSK)</B></A>
+		<B>$sec_type (WPA-PSK + WPA2-PSK)</B>
 		</TD>
 	</TR>
 	<TR>
@@ -624,7 +624,7 @@ $bluebar
 	$bluebar
 	<TR>
 		<TD nowrap colspan=2>
-		<A tabindex=-1 href="javascript:loadhelp('_wlan_guest_bgn','wpawpa2')"><B>$sec_type ( $sec_wpa_enterprise )</B></A>
+		<B>$sec_type ( $sec_wpa_enterprise )</B>
 		</TD>
 	</TR>
 	<TR>

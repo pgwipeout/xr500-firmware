@@ -448,6 +448,7 @@ bh_wl_password_2="2,4 GHz Kablosuz Ağ Parolası (Ağ Anahtarı): "
 bh_wla_ssid_name="5 GHz Kablosuz Ağ Adı (SSID): "
 bh_wla_password_2="5 GHz Kablosuz Ağ Parolası (Ağ Anahtarı): "
 bh_wl_finish_warning="UYARI: Aygıtınızı router'a yeniden bağlayıncaya kadar <b>Son</b> düğmesine tıklamayın."
+ssid_not_allowed_same="SSID yineleniyor, lütfen başka birine geçin."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR, bu yeni router'ı ağ geçidinizde hiçbir yapılandırma değişikliği yapmanızı gerektirmediği için erişim noktası modunda kurmanızı önerir."
 bh_ap_suggest_str_2="Gelişmiş kullanıcıysanız ve ağ geçidinizi bu gelişmiş işlevleri destekleyecek şekilde yapılandırmayı biliyorsanız <b>Geri</b> düğmesine tıklayabilir ve NETGEAR router'ı router modunda yapılandırabilirsiniz."

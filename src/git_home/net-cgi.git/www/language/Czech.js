@@ -448,6 +448,7 @@ bh_wl_password_2="Heslo bezdrátové sítě 2,4 GHz (síťový klíč): "
 bh_wla_ssid_name="Název bezdrátové sítě 5 GHz (SSID):"
 bh_wla_password_2="Heslo bezdrátové sítě 5 GHz (síťový klíč): "
 bh_wl_finish_warning="VAROVÁNÍ: Neklikejte na tlačítko <b>Dokončit</b>, dokud znovu nepřipojíte zařízení k routeru."
+ssid_not_allowed_same="Název SSID je duplicitní, zadejte jiný název."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="Společnost NETGEAR doporučuje, abyste pro nový router nastavili režim přístupového bodu, protože takto nebude třeba měnit konfiguraci brány."
 bh_ap_suggest_str_2="Pokud jste pokročilý uživatel a víte, jak bránu nakonfigurovat tak, aby některé rozšířené funkce podporovala, klikněte na tlačítko<b>Zpět</b> a nakonfigurujte router NETGEAR v režimu routeru."

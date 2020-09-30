@@ -1,0 +1,15 @@
+<HTML>
+	<script>
+		function loadvalue()
+		{
+			var funjsq_no_need_login = "<% cfg_get("funjsq_no_need_login") %>";
+			if(funjsq_no_need_login != "1")
+			this.location.href="funjsq_login.htm";
+			else
+			this.location.href="funjsq_select.htm";
+		}
+	</script>
+	<body onLoad="loadvalue();">
+	</body>
+</HTML>
+

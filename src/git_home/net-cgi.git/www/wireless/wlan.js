@@ -335,7 +335,7 @@ function check_dfs()
         var ch_index = channel.selectedIndex;
         var ch_name = channel.options[ch_index].text;
 	var ch_value = channel.options[ch_index].value;
-	var ht160_enabled= (getTop(window).support_ht160_flag == 1 && enable_ht160 == "1" && ((index == 10 || index == 4) && (currentMode != 1 && currentMode != 2 && currentMode != 7 && currentMode != 8)))
+	var ht160_enabled= (getTop(window).support_ht160_flag == 1 && enable_ht160 == "1" && ((index == 10 || index == 4 || index == 7) && (currentMode != 1 && currentMode != 2 && currentMode != 7 && currentMode != 8)))
 
 	if( ch_name.indexOf('(DFS)') == -1 && !ht160_enabled)
 	{ // not a DFS channel and  ht160 disabled, return true, continue other check.
@@ -609,10 +609,14 @@ function setAChannel(channel)
 	var i, j=0, val;
 	var tmp_array = ht40_array[index];
 
-	if(enable_ht160 == "1" && currentMode == 9 && index == 10)
+	if(enable_ht160 == "1" && currentMode == 9 && (index == 10 || index == 7))
 	{
 		tmp_array = ht160_array10;
 	}
+	else if(enable_ht160 == "1" && currentMode == 9 && index == 7)
+       {
+		tmp_array = ht160_array7;
+       }
 	else if ( 1 == currentMode || 2 == currentMode || 7 == currentMode )
 	{
 		tmp_array = ht20_array[index];
@@ -637,7 +641,7 @@ function setAChannel(channel)
 			( dfs_canada_router_flag == 1 &&  index == 3 ) || //Australia, Canada, Europe
 			( dfs_australia_router_flag == 1 &&  index == 2 ) ||
 			( dfs_europe_router_flag == 1 &&  index == 4 ) ||
-			( dfs_japan_router_flag && index == 6 ) || index == 10 ) ||
+			( dfs_japan_router_flag && index == 6 ) || index == 10 || (dfs_korea_router_flag &&index == 7)) ||
 			( dfs_russia_router_flag && index == 19 ) || index ==12)//India
 		{
 			if(currentMode == 9 && index == 21)//50244
@@ -734,6 +738,13 @@ function check_wlan()
 	{
 		alert("$ssid_null");
 		return false;
+	}
+	
+	if(cf.enable_smart_connect.checked==false){
+        if(cf.ssid.value==cf.ssid_an.value){
+			alert("$ssid_not_allowed_same");
+			return false;				
+			}
 	}
 	
 	if(ssid_bgn == wlg1_ssid)
@@ -2027,6 +2038,7 @@ var ht80_array = new Array(
 );
 var ht160_array10 = new Array("36", "40", "44", "48", "52(DFS)", "56(DFS)", "60(DFS)", "64(DFS)", "100(DFS)", "104(DFS)", "108(DFS)", "112(DFS)", "116(DFS)", "120(DFS)", "124(DFS)", "128(DFS)", "132(DFS)", "136(DFS)", "140(DFS)", "149", "153", "157", "161");
 
+
 function handle_samrt_connect() {
 	var cf = document.forms[0];
 
@@ -2089,7 +2101,7 @@ function check_smart_ssid(){
 	var cf = document.forms[0];
         /*bug81087*/
         if(cf.enable_smart_connect.checked==false){
-                if(cf.ssid.value==cf.ssid_an.value)
+                if((cf.ssid.value==cf.ssid_an.value)&&(cf.ssid_an.value.length<30))
                         cf.ssid_an.value +="-5G";
         }
         if(cf.opmode.options[0].selected == true && bgn_mode1_value == 54 && cf.enable_smart_connect.checked == false)

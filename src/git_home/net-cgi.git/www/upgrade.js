@@ -14,17 +14,13 @@ function clickUpgrade(form)
 	}
 
 	var page_title_div = document.getElementById("page_title_div");
-	var FW_checking_div = document.getElementById("FW_checking_div"); 
-	var FW_upg_div = document.getElementById("FW_upg_div");
-	var condition_div = document.getElementById("condition_div");
-	//var pls_wait_div = document.getElementById("pls_wait_div");
+	var main = document.getElementById("main");
+	var pls_wait_div = document.getElementById("formframe_wait_div");
 
 	page_title_div.style.display = "none";
-	FW_checking_div.style.display = "none";
-	FW_upg_div.style.display = "none";
-	condition_div.style.display = "none";
-	//pls_wait_div.style.display = "block";
-	please_wait(true);
+	main.style.display = "none";	
+	pls_wait_div.style.display = "block";
+	//please_wait(true);
 	
 	form.submit();
 	return true;

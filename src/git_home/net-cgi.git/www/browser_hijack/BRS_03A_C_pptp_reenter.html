@@ -72,9 +72,9 @@ function checkIPaddr()
 		var myip_array = cf.ip_address.value.split(".");
 		var pptp_mask="255.255.255.0";
 
-		if( parseInt(cf.myip_array[0].value) < 128 )
+		if( parseInt(myip_array[0].value) < 128 )
 			pptp_mask="255.0.0.0";
-		else if( parseInt(cf.myip_array[0].value) < 192 )
+		else if( parseInt(myip_array[0].value) < 192 )
 			pptp_mask="255.255.0.0";
 		else
 			pptp_mask="255.255.255.0";
@@ -158,7 +158,7 @@ function manuallyConfig()
 
 		  <div class="row input-row">
 			<div class="input-field col m6">
-				<script>document.write('<input type="text" placeholder="'+bh_pppoe_login_name+'>" id="pptp_username" maxlength="60" name="pptp_username" class="validate"><label for="pptp_username">'+bh_pptp_login_name+'</label>');</script>
+				<script>document.write('<input type="text" placeholder="'+bh_pppoe_login_name+'" id="pptp_username" maxlength="60" name="pptp_username" class="validate"><label for="pptp_username">'+bh_pptp_login_name+'</label>');</script>
 			</div>
 
 			<div class="input-field col m6">

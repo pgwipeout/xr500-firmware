@@ -35,9 +35,9 @@
 				</button>
 				<script>
 				if(updateFirmware == 1)
-					document.write('<button class="waves-effect btn-flat button-nav-skip" onclick="return toInternet();"> <span>'+bh_orbi_skip_mark+'</span></button>');
+					document.write('<button class="waves-effect btn-flat button-nav-skip" id="new_ver_skip" onclick="return toInternet();"> <span>'+bh_orbi_skip_mark+'</span></button>');
 				else
-					document.write('<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return toInternet();"> <span>'+bh_orbi_next_mark+'</span><i class="material-icons">navigate_next</i></button>');
+					document.write('<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return toInternet();" id="no_new_next"> <span>'+bh_orbi_next_mark+'</span><i class="material-icons">navigate_next</i></button>');
 				</script>
 			</div>
 		</div>

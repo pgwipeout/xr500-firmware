@@ -1,3 +1,14 @@
+//pop out warning
+		function pop_out(msg){
+			document.getElementById("warning_m").innerHTML=msg;
+			document.getElementById("black_over_lay").style.display="block";
+			document.getElementById("warning_msg").style.display="block";
+		}
+		function close_warning(){
+			document.getElementById("black_over_lay").style.display="none";
+			document.getElementById("warning_msg").style.display="none";
+		}
+
 (function ($$) {
 
         "use strict";
@@ -51,6 +62,7 @@
 
 	// regular expression
 	$$.REG_PASSWORD = /^[0-9a-zA-Z]{6,32}$/;
+	$$.REG_PASSWORD2 = /^(?![0-9]+$$)(?![a-zA-Z]+$$)[0-9A-Za-z]{6,32}$/;
 	$$.REG_NUM = /^([\x30-\x39]){1,6}$/;
 	$$.REG_PHONE = /^([\x30-\x39]|[\x2B]){1,20}$/;;
 
@@ -68,14 +80,14 @@
 		$$('#loginBt').click(function() {
 			var cf=document.forms[0];
 			if ( !$$.REG_PHONE.test($$('#loginName').val()) ) {
-                                alert("无效的账号！");
+                                pop_out("无效的账号！");
                                 return false;
                         }else{
                                 cf.hidden_funjsq_username.value = cf.funjsq_username.value;
                         }
 
 			if ( !$$.REG_PASSWORD.test($$('#loginPwd').val()) ) {
-				alert("无效的密码！");
+				pop_out("无效的密码！");
 				return false;
 			}else{
 				cf.hidden_funjsq_password.value = cf.funjsq_password.value;
@@ -87,34 +99,34 @@
 			//$$('body').css('background','black');
 			$$.postForm('#loginForm', '', function(json) {
 				if ( json.status == "success" && json.code =="1000") {
-                                        location.href = "funjsq_select.htm";
-                                } else if ( json.code !="1000"){
+                     location.href = "funjsq_select.htm";
+                } else if ( json.code !="1000"){
 					$$('#loginForm').css('display','block');
 					$$('#formframe_wait_div').css('display','none');
-					//$$('body').css('background','rgb(229,229,229)');
 					if( json.code == "1001"){
-						alert("该号码尚未注册完成，请确认输入是否正确");
+						pop_out("该号码尚未注册完成，请确认输入是否正确");
 					}else if( json.code == "1002" || json.code == "1003"){
 						count++;
 						if(count < 3){
 							if( json.code == "1002" )
-								alert("手机号码输入错误，请确认输入是否正确");
+								pop_out("手机号码输入错误，请确人输入是否正确");
 							else
-								alert("密码输入错误，请确认输入是否正确");
-                                                }else {
-                                                        count=0;
-                                                        alert("您已重复输入错误的账号或密码3次，请您提供电话号码，以便我们提供验证码做确认");
+								pop_out("密码输入错误，请确认输入是否正确");
+                        }else{
+                            count=0;
+                            pop_out("您已重复输入错误的账号或密码3次，请您提供电话号码，以便我们提供验证码做确认");
 							$$('#forgetBt').trigger("click");
-                                                }
+                        }
+                        }else{
+
+                            pop_out("请检查你的网络连接。");
+                                        //location.href = "funjsq_login.htm";
+							
 					}
                                         //location.href = "funjsq_login.htm";
-                                } else{
-					$$('#loginForm').css('display','block');
-                                        $$('#formframe_wait_div').css('display','none');
-					//$$('body').css('background','rgb(229,229,229)');
-                                        alert("请检查你的网络连接。");
-                                        //location.href = "funjsq_login.htm";
-                                }
+                } 
+								
+								
 			});
 		});
 
@@ -167,7 +179,7 @@
 		{
 			var cf=document.forms[num];
 			if ( !$$.REG_PHONE.test($$('#'+form+'Name').val()) ) {
-                                alert("无效的账号！");
+                                pop_out("无效的账号！");
                                 return false;
                         }else{
                                 cf.hidden_funjsq_username.value = cf.funjsq_username.value;
@@ -183,17 +195,17 @@
 				} else if ( json.status == "error"){
 					if( json.code == "1001"){
 						if( form == "register")
-							alert("该手机号码已注册，请确认");
+							pop_out("该手机号码已注册，请确认");
 						else
-							alert("该号码尚未注册完成，请确认输入是否正确");
+							pop_out("该号码尚未注册完成，请确认输入是否正确");
 					}else if( json.code == "1002"){
-						alert("手机号码输入错误，请确认输入是否正确");
+						pop_out("手机号码输入错误，请确人输入是否正确");
 					}else if( json.code == "1003"){
-                                                alert("验证码调用次数过多，请一天后重试");
+                                                pop_out("验证码调用次数过多，请一天后重试");
 					}
 					wait=0;
 				} else{
-					alert("请检查你的网络连接。");
+					pop_out("请检查你的网络连接。");
 					wait=0;
 				}
 			});
@@ -204,20 +216,30 @@
 		{
 			var cf=document.forms[num];
 			if ( !$$.REG_PHONE.test($$('#'+form+'Name').val()) ) {
-                                alert("无效的账号！");
+                                pop_out("无效的账号！");
                                 return false;
                         }else{
                                 cf.hidden_funjsq_username.value = cf.funjsq_username.value;
                         }
-			if ( !$$.REG_PASSWORD.test($$('#'+form+'Pwd').val()) ) {
-                                alert("无效的密码！");
-                                return false;
-                        }else{
-                                cf.hidden_funjsq_password.value = cf.funjsq_password.value;
-                        }
 
+			if(form == "register"){
+                                if ( !$$.REG_PASSWORD2.test($$('#'+form+'Pwd').val()) ) {
+                                        pop_out("无效的密码！");
+                                        return false;
+                                }else{
+                                        cf.hidden_funjsq_password.value = cf.funjsq_password.value;
+                                }
+			}else{
+				if ( !$$.REG_PASSWORD.test($$('#'+form+'Pwd').val()) ) {
+                                        pop_out("无效的密码！");
+                                        return false;
+                                }else{
+                                        cf.hidden_funjsq_password.value = cf.funjsq_password.value;
+                                }
+			}
+ 
 			if ( !$$.REG_NUM.test($$('#'+form+'Vry').val()) ) {
-                                alert("无效的验证码！");
+                                pop_out("无效的验证码！");
                                 return false;
                         }else{
                                 cf.hidden_funjsq_verify.value = cf.funjsq_verify.value;
@@ -238,45 +260,43 @@
 						}else{
 							$$('#formframe_wait_div').css('display','none');
 							$$('#loginForm').css('display','block');
-							//$$('body').css('background','rgb(229,229,229)');
-							alert("请重新登陆");
+							pop_out("请重新登陆");
 						}
 					});
 				}else{
 					$$('#formframe_wait_div').css('display','none');
-					//$$('body').css('background','rgb(229,229,229)');
 					$$('#'+form+'Form').css('display','block');
 					if ( json.code == "1002" ) {
-						alert("手机号码输入错误，请确人输入是否正确");
+						pop_out("手机号码输入错误，请确人输入是否正确");
 					}else if ( json.code == "5001" ) {
-						alert("验证码未输入，请确认");
+						pop_out("验证码未输入，请确认");
 					}else if ( json.code == "5002" || json.code == "5003") {
 						if( form == "forget"){
                                                         verify_count++;
                                                         if(verify_count < 3){
 								if( json.code == "5003" )
-                                                                        alert("验证码输入错误，请重新输入验证码");
+                                                                        pop_out("验证码输入错误，请重新输入验证码");
 								else
-									alert("验证码已失效，请重新获取验证码");
+									pop_out("验证码已失效，请重新获取验证码");
                                                         }else{
-                                                                alert("验证码输入错误，请联系客服");
+                                                                pop_out("验证码输入错误，请联系客服");
                                                         }
                                                 }else{
 							if( json.code == "5003" )
-								alert("验证码输入错误，请重新输入验证码");
+								pop_out("验证码输入错误，请重新输入验证码");
 							else
-								alert("验证码已失效，请重新获取验证码");
+								pop_out("验证码已失效，请重新获取验证码");
                                                 }
 					}
 					if(form == "register"){
 						if ( json.code == "1001" ) {
-							alert("该手机号码已注册，请确认");
+							pop_out("该手机号码已注册，请确认");
 						}else if ( json.code == "1003" ) {
-							alert("验证码调用次数过多，请一天后重试");
+							pop_out("验证码调用次数过多，请一天后重试");
 						}
 					}else if(form == "forget"){
 						if ( json.code == "1001" ) {
-                                                        alert("该号码尚未注册完成，请确认输入是否正确");
+                                                        pop_out("该号码尚未注册完成，请确认输入是否正确");
                                                 }
 					}
 				}
@@ -383,7 +403,7 @@
                                         //setTimeout(function(){$$.getPluginInfo();},3*1000);
 				}else if (json.funjsq_status == "5"){
 					progress=0;
-					alert("密码发生变动，请重新登陆账号");
+					pop_out("密码发生变动，请重新登陆账号");
 					var cf=document.forms[0];
 					cf.submit_flag.value = "need_login";
 					cf.action="/admin.cgi?/funjsq_select.htm timestamp="+ts;
@@ -391,7 +411,7 @@
                                                         if ( json.status == "1" ) {
                                                                 location.href = "funjsq_login.htm";
 							} else {
-								alert("请重试");
+								pop_out("请重试");
 							}
 					});
 				}else {
@@ -454,20 +474,20 @@
 
 			if($$('#accType').val() == "0")
 			{
-				alert("请选择加速类型！");
+				pop_out("请选择加速类型！");
 				return false;
 			}
 
 			if ($$('#accType').val() == "2"){
 				if(is_win_req() == false){
-					alert("请使用Window PC访问");
+					pop_out("请使用Window PC访问");
 					return false;
 				}
 			}
 
 			if($$('#accArea').val() == "0")
                         {
-                                alert("请选择加速节点！");
+                                pop_out("请选择加速节点！");
                                 return false;
                         }
 
@@ -492,14 +512,14 @@
 						//location.href = "funjsq_select.htm";
 					} else {
 						//location.href = "funjsq_pay.htm";
-						alert("请重试");
+						pop_out("请重试");
 					}
 				}else{
 					if ( json.status == "1" ) {
 						$$.checkStatus();
 						//location.href = "funjsq_select.htm";
 					} else {
-						alert("无效的请求，请重试");
+						pop_out("无效的请求，请重试");
 						//location.href = "funjsq_select.htm";
 					}
 				}
@@ -516,7 +536,7 @@
 					$$.checkStatus();
 					location.href = "funjsq_select.htm";
 				} else {
-					alert("无效的请求，请重试");
+					pop_out("无效的请求，请重试");
 					//location.href = "funjsq_select.htm";
 				}
 			});
@@ -534,7 +554,7 @@
 				last_select = cf.accType.value;
 
 			if(is_win_req() == false && $$('#accType').val() == "2"){
-				alert("请使用Window PC访问");
+				pop_out("请使用Window PC访问");
 				$$('#accType').val(last_select);
 				return false;
 			}
@@ -554,7 +574,7 @@
 								//getPluginInfo();
 								return true;
 							} else {
-								alert("请检查你的网络连接。");
+								pop_out("请检查你的网络连接。");
 								//location.href = "funjsq_select.htm";
 							}
 						});
@@ -567,7 +587,7 @@
 								//setTimeout(function(){$$.getPluginInfo();},3000);
 								return true;
                                                         } else {
-								alert("请检查你的网络连接。");
+								pop_out("请检查你的网络连接。");
                                                                 //location.href = "funjsq_select.htm";
                                                         }
                                                 });
@@ -617,7 +637,8 @@
 				$$.selectSuit("1");
 			}
 			if( json.code == "1001")
-				alert("用户不存在");
+				//alert("用户不存在");
+				pop_out("用户不存在");
 		},function(){});
 
 		$$.chExpireTime = function(){
@@ -681,9 +702,9 @@
 
 		$$('#payTrouble').click(function() {
 			if(QQSupport== "" )
-				alert("请加入帆游用户QQ群（492072361）");
+				pop_out("请加入帆游用户QQ群（492072361）");
 			else
-				alert("请加入帆游用户QQ群（"+QQSupport+"）");
+				pop_out("请加入帆游用户QQ群（"+QQSupport+"）");
 			location.href="funjsq_select.htm";
 		});
 
@@ -696,12 +717,13 @@
                                 if ( json.code == "1000" ) {
 					location.href="funjsq_select.htm";
 				} else if(json.code == "1001"){
-					alert(json.msg);
+					//alert(json.msg);
+					pop_out(json.msg);
 					$$('#payForm').css('display','block');
 					$$('#confirmForm').css('display','none');
 					$$('#formframe_wait_div').css('display','none');
                                 } else{
-                                        alert("请检查你的网络连接。");
+                                        pop_out("请检查你的网络连接。");
 					$$('#formframe_wait_div').css('display','none');
 					$$('#payForm').css('display','block');
                                         $$('#confirmForm').css('display','none');

@@ -448,6 +448,7 @@ bh_wl_password_2="2.4GHz 無線網路密碼（網路金鑰）："
 bh_wla_ssid_name="5GHz 無線網路名稱 (SSID)："
 bh_wla_password_2="5GHz 無線網路密碼（網路金鑰）："
 bh_wl_finish_warning="警告：請勿在裝置重新連線至路由器前按下<b>完成</b>按鈕。"
+ssid_not_allowed_same="此 SSID 重複，請指定一個不同的 SSID。"
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR 建議您將此新路由器設到「存取點模式」，因為該模式不需要變更您的閘道配置。"
 bh_ap_suggest_str_2="若您是進階使用者，並且瞭解如何設定您的閘道以支援這些進階功能，您可以按一下<b>上一步</b>按鈕，並且將 NETGEAR 路由器設到「路由器模式」。"

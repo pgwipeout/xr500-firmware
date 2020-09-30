@@ -448,6 +448,7 @@ bh_wl_password_2="Geslo brezžičnega omrežja 2,4 GHz (omrežni ključ): "
 bh_wla_ssid_name="Ime brezžičnega omrežja 5 GHz (SSID): "
 bh_wla_password_2="Geslo brezžičnega omrežja 5 GHz (omrežni ključ): "
 bh_wl_finish_warning="OPOZORILO: ne kliknite gumba <b>Dokončaj</b>, dokler naprave ponovno ne povežete z usmerjevalnikom."
+ssid_not_allowed_same="SSID je podvojen, spremenite ga."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR priporoča, da novi usmerjevalnik nastavite v načinu dostopovne točke, saj konfiguracije vašega prehoda ni treba spreminjati."
 bh_ap_suggest_str_2="Če ste napreden uporabnik in znate konfigurirati prehod tako, da podpira nekatere napredne funkcije, lahko kliknete gumb <b>Nazaj</b> ter konfigurirate usmerjevalnik NETGEAR v načinu usmerjevalnika."

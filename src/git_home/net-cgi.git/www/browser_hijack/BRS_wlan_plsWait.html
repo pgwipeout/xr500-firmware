@@ -77,6 +77,8 @@
 <script>
 var not_change="<% cfg_get("wireless_not_change") %>";
 var apply_time="<% cfg_get("wlan_apply_time") %>";
+var hijack_process="<% cfg_get("hijack_process") %>";
+var ping_result = "<% hijack_apply_result("/tmp/ping_result") %>";
 <% from_wireless() %>
 
 var get_smart_connect="<% cfg_get("enable_smart_connect") %>";  
@@ -89,6 +91,7 @@ if(get_smart_connect=="1"){
 }
 var is_from_wireless = 0;//this value for temp testing.
 var c_time=0;
+var l_time=0;
 var wait_time = 40;
 if(not_change == "1")
         location.href="BRS_orbi_complete.html";
@@ -100,45 +103,99 @@ else if(apply_time != "")
 	wait_time = wait_time > 40? 40: (wait_time < 1? 1: wait_time);
 }
 else
-	wait_time = 40;
+wait_time = 40;
 
 if(is_from_wireless != 1)
-	click_conn();
+click_conn();
 function click_conn()
 {
 	document.getElementById("confirm_div").style.display="none";
 	document.getElementById("wait_note").style.display="";
 	document.getElementById("wait_img").style.display="";
-	print_time();
+	if(hijack_process==1 && (ping_result != "none" && ping_result != "failed")){
+		ajaxCheckStatus();
+		}
+	else
+		print_time();
+}
+function createXMLHttpRequest()
+{
+	if(typeof XMLHttpRequest == "undefined")
+	XMLHttpRequest = function(){
+		try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}
+		catch(e){}
+		try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}
+		catch(e){}
+		try{return new ActiveXObject("Msxml2.XMLHTTP");}
+		catch(e){}
+		return false;
+	}
+	return new XMLHttpRequest();
+}
+function ajaxCheckStatus()
+{
+	var file="/language_status.txt";
+	var xmlHttp = createXMLHttpRequest();
+	var result;
+	xmlHttp.onreadystatechange=function()
+	{
+		var cf=document.forms[0];
+		if(xmlHttp.readyState==4)
+		{
+			if(xmlHttp.status==200){
+				result=xmlHttp.responseText;
+				if(result==1){
+					setTimeout("ajaxCheckStatus()", 1000);
+					console.log(result);
+				}else{
+					wait_time=wait_time-l_time;
+					console.log(result);
+					print_time();
+				}
+					
+				l_time++;
+			}else{
+				print_time();
+			}
+		}
+	}
+	xmlHttp.open("GET", file, true);
+	xmlHttp.send();
 }
 function print_time()
 {
 	c_time++;
-	if(c_time == wait_time)
+	if(wait_time<0)
 		location.href="BRS_orbi_complete.html";
-	else if(c_time >60 && !(c_time%3))
-	{
-		/*var file="get_satellite_num.txt";
-		var xmlhttp,result;
-		if ( window.XMLHttpRequest)
-			xmlhttp = new XMLHttpRequest();
-		else
-			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-		xmlhttp.onreadystatechange = function()
+	else{
+		if(c_time >= wait_time)
 		{
-			if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 )
-			{
-				result=xmlhttp.responseText;
-				if(satellite_num!=0 && result == satellite_num)
-					location.href="BRS_orbi_complete.html";
-			}
+			location.href="BRS_orbi_complete.html";
 		}
-		xmlhttp.open("GET", file, true);
-		xmlhttp.send();*/
+		else if(c_time >60 && !(c_time%3))
+		{
+			/*var file="get_satellite_num.txt";
+			var xmlhttp,result;
+			if ( window.XMLHttpRequest)
+			xmlhttp = new XMLHttpRequest();
+			else
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			xmlhttp.onreadystatechange = function()
+			{
+				if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 )
+				{
+					result=xmlhttp.responseText;
+					if(satellite_num!=0 && result == satellite_num)
+					location.href="BRS_orbi_complete.html";
+				}
+			}
+			xmlhttp.open("GET", file, true);
+			xmlhttp.send();*/
+			setTimeout("print_time()",1000);
+		}
+		else
 		setTimeout("print_time()",1000);
 	}
-	else
-		setTimeout("print_time()",1000);
 }
 </script>
 

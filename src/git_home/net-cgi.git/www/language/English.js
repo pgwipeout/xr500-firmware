@@ -448,6 +448,7 @@ bh_wl_password_2="2.4GHz Wireless Network Password (Network Key): "
 bh_wla_ssid_name="5GHz Wireless Network Name (SSID): "
 bh_wla_password_2="5GHz Wireless Network Password (Network Key): "
 bh_wl_finish_warning="WARNING: Do not click the <b>Finish</b> button until you reconnect your device to the router."
+ssid_not_allowed_same="The SSID is duplicate, please change to another one."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR recommends that you set up this new router in access point mode because it does not require any configuration changes on your gateway."
 bh_ap_suggest_str_2="If you are advanced user and know how to configure your gateway to support some of these advanced functions, you can click the <b>Back</b> button and configure the NETGEAR router in router mode."

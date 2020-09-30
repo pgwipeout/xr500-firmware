@@ -55,7 +55,7 @@ function change_pptp_password(obj)
                 }
                 else
                 {
-			obj.outerHTML='<input type="text" name="pptp_passwd" maxlength="50" size="16" onFocus="this.select();change_pptp_password(this);" onKeyPress="return getkey(\'ssid\', event)" value="">';
+			obj.outerHTML='<input type="text" name="pptp_passwd" maxlength="50" size="16" onFocus="this.select();change_pptp_password(this);" onKeyPress="return getkey(\'ssid\', event)" value="" autocomplete="off">';
 			document.forms[0].pptp_passwd.select();
                 }
         }

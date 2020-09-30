@@ -132,13 +132,13 @@ function change_mulpppoe_password(obj)
 		{
 			if( obj.name == "pppoe_passwd" )
 			{
-				obj.outerHTML = '<input type="text" name="pppoe_passwd" maxlength="64" size="16" onFocus="this.select();" onKeyPress="return getkey(\'ssid\', event)" value="">';
+				obj.outerHTML = '<input type="text" name="pppoe_passwd" maxlength="64" size="16" onFocus="this.select();" onKeyPress="return getkey(\'ssid\', event)" value="" autocomplete="off">';
 				document.forms[0].pppoe_passwd.focus();
 				document.forms[0].pppoe_passwd.focus();
 			}
 			else if( obj.name == "pppoe2_password" )
 			{
-				obj.outerHTML = '<input type="text" name="pppoe2_password" maxlength="64" size="16" onFocus="this.select();" onKeyPress="return getkey(\'ssid\', event)" value="">';
+				obj.outerHTML = '<input type="text" name="pppoe2_password" maxlength="64" size="16" onFocus="this.select();" onKeyPress="return getkey(\'ssid\', event)" value="" autocomplete="off">>';
 				document.forms[0].pppoe2_password.focus();
 				document.forms[0].pppoe2_password.focus();
 			}

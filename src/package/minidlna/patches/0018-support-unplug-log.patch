@@ -1,0 +1,20 @@
+--- minidlna/cmddlna.in	2018-08-03 11:02:10.130469142 -0400
++++ minidlna/cmddlna.in.new	2018-08-07 04:54:37.310430533 -0400
+@@ -13,6 +13,7 @@
+ MAX_FREE_SPACE=0
+ 
+ DISK_FIND_TABLE=/tmp/find_disk_abcxzy
++DISK_FIND_TABLE_OLD=/tmp/find_disk_abcxzy_old
+ TMP_DATA_XYZ=/tmp/tmp_data_xyz
+ TMP_DEVICE_NAME=/tmp/tmp_device_name_xyz
+ 
+@@ -279,7 +280,8 @@
+ 	i=0
+ 	j=0
+ 	k=0
+-	rm -f $DISK_FIND_TABLE
++	# move to another place for unplug script to use
++	mv -f $DISK_FIND_TABLE $DISK_FIND_TABLE_OLD
+ 	cat /proc/partitions | awk '{print $3,$4}' | grep sd >$TMP_DATA_XYZ
+ 	while read LINE
+ 	do

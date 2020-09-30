@@ -448,6 +448,7 @@ bh_wl_password_2="Wachtwoord (netwerksleutel) van draadloos 2,4GHz-netwerk: "
 bh_wla_ssid_name="Naam (SSID) van draadloos 5GHz-netwerk: "
 bh_wla_password_2="Wachtwoord (netwerksleutel) van draadloos 5GHz-netwerk: "
 bh_wl_finish_warning="WAARSCHUWING: klik niet op de knop <b>Voltooien</b> totdat uw apparaat opnieuw verbinding heeft gemaakt met de router."
+ssid_not_allowed_same="De SSID is al in gebruik. Gebruik een andere."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR raadt aan om deze nieuwe router te configureren in access point-modus, omdat er dan geen configuratiewijzigingen op uw gateway nodig zijn."
 bh_ap_suggest_str_2="Als u een geavanceerde gebruiker bent en weet hoe u uw gateway moet configureren om geavanceerde functies te ondersteunen, klik dan op de knop<b>Terug</b> en configureer de NETGEAR-router in de routermodus."

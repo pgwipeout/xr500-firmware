@@ -65,8 +65,8 @@ function check_dev()
 
 	var message='<table cellpadding=0 cellspacing=2  border=0>'+
 		'<tr><td colspan=3><h3>$readyshare_devname \\\\'+ show_deviceName+'?</h3></td></tr>'+
-		'<tr><td colspan=3><input type=radio name="device_name_change" id="device_name_change_ra" checked><label for="device_name_change_ra">$change_readyshare_path \\\\'+ show_deviceName +' $to_mark2 \\\\'+ user_dev_name +'</label></td></tr>'+
-		'<tr><td colspan=3><input type=radio name="device_name_change" id="device_name_change_keep"><label for="device_name_change_keep">$keep_readyshare_path \\\\'+ show_deviceName +'</label></td></tr>'+
+		'<tr><td colspan=3><input type=radio name="device_name_change" id="device_name_change_ra" value="change" checked><label for="device_name_change_ra">$change_readyshare_path \\\\'+ show_deviceName +' $to_mark2 \\\\'+ user_dev_name +'</label></td></tr>'+
+		'<tr><td colspan=3><input type=radio name="device_name_change" id="device_name_change_keep" value="keep"><label for="device_name_change_keep">$keep_readyshare_path \\\\'+ show_deviceName +'</label></td></tr>'+
 		'<tr><td colspan=3 height="20px"></td></tr>'+
 	'</table>';
 	if(show_deviceName != user_dev_name || user_dev_name != dev_name )

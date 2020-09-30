@@ -555,10 +555,10 @@ sterBt {
   color: rgb(166,38,37);
 }
 .funjsq{
-  margin-left: 130px;
+  
   margin-top: 50px;
-  float: left;
-  position: absolute;
+  float: right;
+  
 }
 .funjsq_tab{
   text-align: center;
@@ -613,8 +613,9 @@ sterBt {
   margin: 80px 0 0 100px;
   width: 460px;
   height: 300px;
-  border-style: solid;
-  border-color: #1965b1;
+  border-style: none;
+  background-color:rgba(0,0,0,0.5);
+  
 }
 .funjsq_pay div:first-child {
   float: right;
@@ -708,7 +709,7 @@ sterBt {
   list-style: none outside none;
 }
 .tab h1 {
-  color: #0db59c;
+
   margin-left: 40px;
   font-size: 1.2rem;
 }
@@ -716,14 +717,14 @@ sterBt {
   margin: 0.5rem 0;
 }
 .pay li p > em {
-  background: none repeat scroll 0 0 #aaa;
+  background: none repeat scroll 0 0 #e2262e;
   border-radius: 10px;
   color: #fff;
   padding: 0 0.4rem;
 }
 .pay li > span.active {
-  border: 3px solid #1965b1;
-  color: #1965b1;
+  border: 3px solid #e2262e;
+  color: #e2262e;
 }
 .pay li > span{
   border: 3px solid #e5e5e5;
@@ -754,7 +755,7 @@ sterBt {
   color: #f74d4a;
 }
 .payButton > input{
-  background: none repeat scroll 0 0 #1965b1;
+  
   border-radius: 8px;
   color: #fff;
   display: block;
@@ -764,7 +765,7 @@ sterBt {
   position: relative;
 }
 #payTrouble {
-  background: none repeat scroll 0 0 rgb(255,210,0);
+  background: none repeat scroll 0 0 #de1821;
   color: black;
   font-size: 1.0rem;
   padding:0.4rem 1.5rem;
@@ -772,7 +773,7 @@ sterBt {
   margin-top: 90px;
 }
 #payFinish {
-  background: none repeat scroll 0 0 #1965b1;
+  background: none repeat scroll 0 0 #de1821;
   color: white;
   font-size: 1.0rem;
   margin: 1.4rem auto;
@@ -842,10 +843,464 @@ sterBt {
   top: 130px;
 }
 .circleProgress_wrapper{
-  width: 84px;
-  height: 84px;
-  margin: 23px auto;
-  position: relative;
+	width: 84px;
+	height: 84px;
+	margin: 23px auto;
+	position: relative;
+}
+/*funjsq new GUI*/
+.funjsq_login_new {
+	margin: 40px 20px;
+	width: 580px;
+	height: 300px;
+	font-size: 11px;
+	float: left;
+}
+.funjsq_login_image {
+	width: 330px;
+	margin: 70px 2px;
+}
+.funjsq_login_new .funjsq {
+	margin: -370px 282px;
+}
+.funjsq_login_new .icon_account {
+	margin: 62px 0px 0px 55px;
+}
+.funjsq_login_new h1 {
+	margin: -40px 100px;
+	width: 150px;
+	color: rgb(78,78,78);
+}
+.funjsq_login_new h3 {
+	margin: 70px 0 0 70px;
+	color: rgb(78,78,78);
+}
+#payForm {
+  width: 599px;
+  height: 420px;
+}
+.funjsq_new{
+	margin-top: 10px;
+	width: 720px;
+	height: 530px;
+	border-radius: 8px;
+	border: 3px solid #7b0e13;
+	font-size: 11px;
+	overflow: scroll;
+	background:#260407;
+	margin-left:5%;
+}
+.funjsq_new select {
+	  font-size: 11px;
+	}
++.funjsq_bt_new {
+	  background: rgb(117,150,5);
+	  border-radius: 5px;
+	  color: rgb(208,232,122);
+	  height: 22px;
+	  margin: 2px 0px;
+	  font-size: 11px;
+	}
+.funjsq_title_new{
+	background:#260407;
+	position: absolute;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+	width: 720px;
+	height: 130px;
+	border-bottom: 1px solid #7b0e13;
+	z-index: 100;
+	position: absolute;
+
+}
+.funjsq_title_new h1 {
+	
+	font-size: 15px;
+}
+.funjsq_tab_new {
+  margin-left: 30px;
+}
+#funjsq_account_new {
+	background: #7b0e13;
+	border-radius: 10px;
+	color: rgb(251,251,251);
+	height: 21px;
+	width: 135px;
+	padding-top: 3px;
+	text-align: center;
+}
+.funjsq_basic_info {
+	margin: -75px 90px;
+	width: 200px;
+}
+.funjsq_alert {
+	margin-left: 265px;
+	margin-top: -85px;
+	padding: 10px;
+}
+.funjsq_alert div {
+	position: absolute;
+}
+.funjsq_type_new{
+	background: #260407;
+	margin-top: 130px;
+}
+.funjsq_no_device {
+	height: 400px;
+}
+.funjsq_no_device .title {
+	font-size: 13px;
+	position: absolute;
+	margin: 110px 195px;
+	font-weight: bold;
+}
+.funjsq_type_new td {
+	font-size: 11px;
+}
+#funjsq_update td:first-child {
+	width: 3%;
+}
+.funjsq_new_image {
+	width: 100px;
+}
+.icon_account {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -10px -341px;
+	height: 66px;
+	width: 66px;
+	margin: 12px;
+}
+.icon_update_shop {
+	width: 50px;
+	height: 55px;
+}
+#funUpdate {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -225px -350px;
+}
+#funShop {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -108px -350px;
+}
+.funjsq_enable {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -463px 20px;
+}
+.funjsq_disable {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -463px -273px;
+}
+.funjsq_enable2 {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -463px 20px;
+}
+.funjsq_disable2 {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -463px -260px;
+}
+.icon_new_gui {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -70px 0;
+	height: 84px;
+	width: 84px;
+	margin: 15px 50px;
+}
+.funjsq_mul_device {
+	border-bottom: 2px dotted rgb(186 186 186);
+	width: 100%;
+	background:#260407;
+}
+.funjsq_mul_device tr:first-child {
+	vertical-align: bottom;
+}
+.funjsq_mul_device tr:last-child {
+	vertical-align: top;
+}
+/*******************************************************************
+  *
+  *  modal overlay
+  *
+  ******************************************************************/
+#modalOverlay.active {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: #fff;
+  opacity: 0.4;
+  filter:alpha(opacity=40);
+  -moz-opacity:0.4;
+  -khtml-opacity: 0.4;
+}/*******************************************************************
+ *
+ *  modal overlay
+ *
+ ******************************************************************/
+#modalOverlay.active {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: black;
+  opacity: 0.4;
+  filter:alpha(opacity=40);
+  -moz-opacity:0.4;
+  -khtml-opacity: 0.4;
+}
+.loadingModal {
+	  position: fixed;
+	  top: 0;
+	  bottom: 0;
+	  left: 0;
+	  right: 0;
+	  z-index: 101;
+	  background: transparent url('../img/loading-on-white.gif') no-repeat 50% 50% ;
+	  opacity: 0.4;
+	  filter:alpha(opacity=40);
+	  -moz-opacity:0.4;
+	  -khtml-opacity: 0.4;
+	}
+	.centerButtons {
+	  padding: 20px;
+	}
+.modalBox {
+	  position: absolute;
+	  top: 0;
+	  left: 40%;
+	  z-index: 102;
+	  width: 400px;
+	  height: 140px;
+	  padding: 30px;
+	  margin: 120px 0 0 -180px;
+	  border: 2px solid black;
+	  background: black;
+	  -moz-border-radius: 5px;
+	  -webkit-border-radius: 5px;
+	  -o-border-radius: 5px;
+	  border-radius: 20px;
+	  -webkit-box-shadow:0 0 5px rgba(0,0,0,0.4);
+	  box-shadow:0 0 5px rgba(0,0,0,0.4);
+	}
+.modalBox.form {
+	  width: 70%;
+	  margin: 200px 0 0;
+	  left: 15%;
+	}
+.isTablet .modalBox.form {
+	  width: 90%;
+	  margin: 200px 0 0;
+	  left: 5%;
+	}
+.modalBox.hidden {
+	  display: none;
+	}
+.boxButtons {
+	  text-align: center;
+	}
+#alertImage {
+	  width: 70px;
+	  float: left;
+	  margin-left: -15px;
+	  margin-top: 20px;
+	}
+#alertMsg {
+	  font-size: 22px;
+	  margin-left: 110px;
+	}
+.recommendation {
+  height: 130px;
+}
+.recommendation p{
+	  font-size: 15px;
+	  margin-left: 70px;
+	}
+.alertClose {
+	  background: none repeat scroll 0 0 #de1821;
+	  color: white;
+	  font-size: 1.0rem;
+	  padding:0.4rem 1.5rem;
+	}
+.icon_device {
+	  vertical-align: top;
+	  height:94px;
+	  width:140px;
+}
+.icon_device div{
+	  text-align: center;
+	  font-size: 13px;
+}
+.icon_play {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -10px 0px;
+	height: 54px;
+	width: 140px;
+}
+.icon_play_gray {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -10px -50px;
+	height: 54px;
+	width: 140px;
+}
+.icon_xbox {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -155px 0px;
+	height: 54px;
+	width: 140px;
+}
+.icon_xbox_gray {
+	  background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -155px -40px;
+	  height: 54px;
+	  width: 140px;
+}
+.icon_nint {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -310px 0px;
+	height: 54px;
+	width: 140px;
+}
+.icon_nint_gray {
+	  background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -310px -50px;
+	  height: 54px;
+	  width: 140px;
+}
+.icon_windows {
+	 background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -5px -126px;
+	 height: 94px;
+	 width: 140px;
+}
+.icon_windows_gray {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -5px -225px;
+	height: 94px;
+	width: 140px;
+}
+.icon_mac {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -130px -125px;
+	height: 94px;
+	width: 140px;
+}
+.icon_mac_gray {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -130px -225px;
+	height: 94px;
+	width: 140px;
+}
+.icon_iphone {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -239px -130px;
+	height: 94px;
+	width: 122px;
+}
+.icon_iphone_gray {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -239px -230px;
+	height: 94px;
+	width: 122px;
+}
+.icon_android {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -320px -130px;
+	height: 94px;
+	width: 122px;
+}
+.icon_android_gray {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -320px -230px;
+	height: 94px;
+	width: 122px;
+}
+.icon_unknow {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -313px -320px;
+	height: 94px;
+	width: 130px;
+}
+.icon_unknow_gray {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -417px -320px;
+	height: 94px;
+	width: 130px;
+}
+.icon_unknow2 {
+	background: rgba(0,0,0,0) url("../image/funjsq_new_GUI.png") no-repeat scroll -320px -330px;
+	height: 94px;
+	width: 120px;
+	position: absolute;
+	margin: 80px;
+}
+.circleProgress_wrapper_new{
+	width: 42px;
+	height: 42px;
+	position: relative;
+}
+.wrapper_new{
+	width: 21px;
+	height: 48px;
+	position: absolute;
+	top:0;
+	overflow: hidden;
+}
+.right_new{
+	right:0;
+}
+.left_new{
+	left:0;
+}
+.progress_new {
+	position: absolute;
+	margin-top: 15px;
+	margin-left: 10px;
+}
+.circleProgress_new{
+	width: 33.5px;
+	height: 33.5px;
+	border:6px solid rgb(251,251,251);
+	border-radius: 50%;
+	position: absolute;
+	top:0;
+	-webkit-transform: rotate(45deg);
+}
+.rightcircle_new{
+            border-top:6px solid rgb(150,197,238);
+            border-right:6px solid rgb(150,197,238);
+            right:0;
+            -webkit-animation: circleProgressLoad_right 30s linear infinite;
+}
+.leftcircle_new{
+	border-bottom:6px solid rgb(150,197,238);
+	border-left:6px solid rgb(150,197,238);
+	left:0;
+	-webkit-animation: circleProgressLoad_left 30s linear infinite;
+}
+@-webkit-keyframes circleProgressLoad_right{
+	0%{
+		/*border-top:20px solid #ED1A1A;
+		border-right:20px solid #ED1A1A;*/
+-webkit-transform: rotate(-135deg);
+  }
+  50%{
+	  /* border-top:20px solid rgb(232, 232, 12);
+	  border-right:20px solid rgb(232, 232, 12);
+	  border-left:20px solid rgb(81, 197, 81);
+	  border-bottom:20px solid rgb(81, 197, 81);*/
+-webkit-transform: rotate(45deg);
+  }
+  100%{
+	  /*border-left:20px solid green;
+	  border-bottom:20px solid green;*/
+-webkit-transform: rotate(45deg);
+  }
+}
+@-webkit-keyframes circleProgressLoad_left{
+	  0%{
+		                /*
+		       border-bottom:20px solid #ED1A1A;
+		                border-left:20px solid #ED1A1A;
+	                */
+           -webkit-transform: rotate(-135deg);
+  }
+  50%{
+	        /*
+	                border-bottom:20px solid rgb(232, 232, 12);
+	                border-left:20px solid rgb(232, 232, 12);
+	                border-top:20px solid rgb(81, 197, 81);
+	                border-right:20px solid rgb(81, 197, 81);
+	        */
+                -webkit-transform: rotate(-135deg);
+  }
+100%{
+	        /*
+	                border-top:20px solid green;
+	                border-right:20px solid green;
+	                border-bottom:20px solid green;
+	                border-left:20px solid green;
+	        */
+                -webkit-transform: rotate(45deg);
+  }
 }
 
 .wrapper{

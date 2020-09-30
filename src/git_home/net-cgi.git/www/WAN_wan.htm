@@ -280,7 +280,7 @@ $bluebar
 <tr>
 	<td nowrap>
 	<input type="checkbox" name="dmz_enable" id="dmz_enable" value="dmz_enable" onclick="checkdmzip();"><label for="dmz_enable">
-	<b>$adva_wansetup_dmz</b></label>
+	<b>$adva_wansetup_dmz:</b></label>
 	</td>
 	<td nowrap>
 	<input type="text" name="dmzip1" id="dmz_ipaddress1" size="4" maxlength="3" autocomplete="off" onFocus="this.select();" onKeyPress="return getkey('num',event)" onkeydown="keydown(event,this);" onkeyup="keyup(event,this);">.
@@ -317,7 +317,7 @@ $bluebar
 <tr id=igmp_bluebar style="display:none;"><td colspan=2><img src=/liteblue.gif width=100% height=12></td></tr>
 <tr>
 	<td nowrap>
-	<b>$adva_wansetup_mtu</b>$adva_wansetup_byte
+	<b>$adva_wansetup_mtu</b>$adva_wansetup_byte:
 	</td>
 	<td nowrap>
 	<input type="text" name="wan_mtu" id="wan_mtu" size="8" maxlength="4" onKeyPress="return getkey('num',event)">
@@ -326,7 +326,7 @@ $bluebar
 $bluebar
 <tr>
 	<td nowrap>
-	<b>$adva_wansetup_nat</b>
+	<b>$adva_wansetup_nat:</b>
 	</td>
 	<td nowrap>
 	<input type="radio" name="NatInboundFiltering" id="nat_filtering_secured" value="Secured"><label for="nat_filtering_secured">$adva_wansetup_nat_secured</label>&nbsp;
@@ -343,12 +343,12 @@ $bluebar
 <tr id=bluebar style="display:none;"><td colspan=2><img src=/liteblue.gif width=100% height=12></td></tr>
 <tr id=vpn_name style="display:none;">
         <td nowrap>
-	<a tabindex=-1 href="javascript:loadhelp('_WAN_wan','vpn')"><b>$vpn_passthrough</b></a>
+	<b>$vpn_passthrough</b>
 	</td>
 </tr>
 <tr id=ipsec_passthrough style="display:none;">
         <td nowrap>
-	$ipsec_passthrough
+	$ipsec_passthrough:
 	</td>
 	
 	<td nowrap>
@@ -358,7 +358,7 @@ $bluebar
 </tr>
 <tr id=pptp_passthrough style="display:none;">
 	<td nowrap>
-	$pptp_passthrough
+	$pptp_passthrough:
 	</td>
         <td nowrap>
         <input type="radio" name="enable_pptp_passthrough" value="1" id="enable_pptp_passthrough1"><label for="enable_pptp_passthrough1">$r_enable</label>&nbsp;
@@ -367,7 +367,7 @@ $bluebar
 </tr>
 <tr id=l2tp_passthrough style="display:none;">
 	<td nowrap>
-	$l2tp_passthrough
+	$l2tp_passthrough:
 	</td>
         <td nowrap>
         <input type="radio" name="enable_l2tp_passthrough" value="1" id="enable_l2tp_passthrough1"><label for="enable_l2tp_passthrough1">$r_enable</label>&nbsp;

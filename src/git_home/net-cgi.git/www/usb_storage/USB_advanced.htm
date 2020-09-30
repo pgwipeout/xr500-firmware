@@ -310,7 +310,7 @@ else
 	</TR>
 	<TR class="odd_line">
 		<TD><input type="checkbox" name="enable_wan_http" id="enable_http_via"><label for="enable_http_via"></label></TD>
-		<TD nowrap >$http_mark($via_internet)</TD>
+		<TD nowrap >$block_ser_setup_https($via_internet)</TD>
 <script>
 	if( show_HTTP_via_port == "443" )
 	{	//bug 22003:if the links are shown like http://0.0.0.0/...or ftp://0.0.0.0/...(black and no underline)and no hyperlink

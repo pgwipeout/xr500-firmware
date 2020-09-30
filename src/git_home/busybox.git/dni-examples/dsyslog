@@ -50,7 +50,13 @@ start ()
 	# the fisrt log
 	local sys_first=`$CONFIG get syslog_up_first`
 	if [ "x$sys_first" = "x0" ]; then
-		logger "[Initialized, firmware version: $(cat /firmware_version)$(cat /firmware_region)]"
+		if [ -f /tmp/overlay_ubi_problem_solved ]; then
+				append="UBI file system was corrupted and fixed."
+		else if [ -f /tmp/overlay_ubi_problem ]; then
+				append="UBI file system was corrupted and router tried to fix it but failed."
+			fi
+		fi
+		logger "[Initialized, firmware version: $(cat /firmware_version)$(cat /firmware_region)] ${append}"
 		$CONFIG set syslog_up_first=1
 	fi
 }

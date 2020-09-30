@@ -130,7 +130,7 @@ check_fileinfo_and_download_rae ()
 					trace_log "New RAE found, update!"
 					g_rae_new_version="$version"
 					g_rae_new_file="$file"
-					g_rae_new_file_md5="$md5"
+					g_rae_new_file_md5="$(echo $md5 | tr 'A-Z' 'a-z')"
 					g_have_new_rae=1
 				else
 					trace_log "No newer RAE on server!"

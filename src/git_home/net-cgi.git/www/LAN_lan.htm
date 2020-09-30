@@ -151,7 +151,7 @@ function loadvalue()
 <input type="hidden" name="dhcp_pool_tag">
 <TR> 
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_lan','device_name')"><B>$lan_mark_name</B></A>
+	<B>$lan_mark_name</B>
 	</TD>
 	<TD nowrap >
 	<script>
@@ -172,11 +172,11 @@ function loadvalue()
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_lan','tcp')"><B>$lan_mark_ip_head</B></A>
+	<B>$lan_mark_ip_head</B>
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><span id="iptext">$lan_mark_ip</span></TD>
+	<TD nowrap><span id="iptext">$lan_mark_ip:</span></TD>
 	<TD nowrap >
 	<input type="text" size="3" autocomplete="off" maxlength="3" name="sysLANIPAddr1" id="sys_lan_ipaddress1" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" onblur="lanip_change(document.forms[0])">.
 	<input type="text" size="3" autocomplete="off" maxlength="3" name="sysLANIPAddr2" id="sys_lan_ipaddress2" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" onblur="lanip_change(document.forms[0])">.
@@ -185,7 +185,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><span id="subtext">$lan_mark_subnet</span></TD>
+	<TD nowrap><span id="subtext">$lan_mark_subnet:</span></TD>
 	<TD nowrap >
 	<input type="text" size="3" autocomplete="off" maxlength="3" name="sysLANSubnetMask1" id="sys_lan_netmask1" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" onblur="lanip_change(document.forms[0])">.
 	<input type="text" size="3" autocomplete="off" maxlength="3" name="sysLANSubnetMask2" id="sys_lan_netmask2" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" onblur="lanip_change(document.forms[0])">.
@@ -194,7 +194,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$rip_dir</TD>
+	<TD nowrap>$rip_dir:</TD>
 	<TD nowrap >
 	<select name="rip_direction" id="rip_direction">
 		<option value="Both">$rip_both</option>
@@ -204,7 +204,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$rip_ver</TD>
+	<TD nowrap>$rip_ver:</TD>
 	<TD nowrap >
 	<select name="sysRIPVersion" id="sys_rip_version">
 		<option value="Disabled">$rip_disable</option>
@@ -222,7 +222,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><span id="iptext">$lan_dhcp_start</span></TD>
+	<TD nowrap><span id="iptext">$lan_dhcp_start:</span></TD>
 	<TD nowrap >
 	<input type="text" name="sysPoolStartingAddr1" id="sys_pool_starting_address1" size="3" autocomplete="off" maxlength="3" disabled>.
 	<input type="text" name="sysPoolStartingAddr2" id="sys_pool_starting_address2" size="3" autocomplete="off" maxlength="3" disabled>.
@@ -231,7 +231,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><span id="subtext">$lan_dhcp_end</span></TD>
+	<TD nowrap><span id="subtext">$lan_dhcp_end:</span></TD>
 	<TD nowrap >
 	<input type="text" name="sysPoolFinishAddr1" id="sys_pool_finish_address1" size="3" autocomplete="off" maxlength="3" disabled>.
 	<input type="text" name="sysPoolFinishAddr2" id="sys_pool_finish_address2" size="3" autocomplete="off" maxlength="3" disabled>.

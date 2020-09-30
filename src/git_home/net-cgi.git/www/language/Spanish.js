@@ -448,6 +448,7 @@ bh_wl_password_2="Contraseña de la red inalámbrica (Clave de red) de 2,4 GHz:
 bh_wla_ssid_name="Nombre de la red inalámbrica (SSID) de 5GHz:"
 bh_wla_password_2="Contraseña de la red inalámbrica (Clave de red) de 5GHz:"
 bh_wl_finish_warning="ADVERTENCIA: No haga clic en el botón <b>Finalizar</b> hasta que no vuelva a conectar el dispositivo al router."
+ssid_not_allowed_same="El SSID está duplicado, cámbielo por otro."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR le recomienda que configure este nuevo router en el modo de punto de acceso, que no requiere ningún cambio de configuración en la puerta de enlace."
 bh_ap_suggest_str_2="Si es un usuario avanzado y sabe cómo configurar la puerta de enlace para admitir algunas de estas funciones avanzadas, haga clic en el botón <b>Atrás</b> y configure el router NETGEAR en el modo router."

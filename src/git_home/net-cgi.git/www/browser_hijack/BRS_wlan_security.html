@@ -124,6 +124,14 @@ function checkwlan(cf)
 		if(document.getElementById("check_same").checked == true)
 			cf.hid_same_ssid.value = "1";
 	}
+	if(document.getElementById("check_same").checked == false)
+	{
+		if(cf.wl_ssid.value==cf.wla_ssid.value)
+		{
+			alert(ssid_not_allowed_same);
+			return false;
+		}
+	}
 	return true;
 }
 function checksameid()
@@ -134,17 +142,16 @@ function checksameid()
 		document.getElementById("5gpass").style.display="none";
 	}else
 	{
+		if(document.getElementById("wla_ssid").value==document.getElementById("wl_ssid").value)
+		{
+			if(document.getElementById("wla_ssid").value.length<30)
+				document.getElementById("wla_ssid").value+="-5G";
+		}
 		document.getElementById("5gssid").style.display="";
 		document.getElementById("5gpass").style.display="";
 	}
 }
-function check_smart_ssid(){
-	var cf=document.forms[0];
-	if(get_smart_connect =="0"){
-		if(cf.wl_ssid.value==cf.wla_ssid.value)
-			cf.wla_ssid.value +="5G";
-}
-}
+
 </script>
 <% form_submit("apply", "BRS_wlan_plsWait.html", "hijack_wlan") %>
 <input type="hidden" name="wl_sec_wpaphrase_len" />
@@ -165,7 +172,7 @@ function check_smart_ssid(){
 			<div class="desc-text"><script>document.write(bh_orbi_wlan_msg);</script></div>
 
 			<div class="input-field">			
-				<script>document.write('<input type="text" placeholder="'+bh_orbi_ssid+'" onblur="check_smart_ssid()" name="wl_ssid" id="wl_ssid" maxlength="32" value="<% cfg_get_ssid_value("wl_ssid") %>"/><label for="wl_ssid">2.4GHz '+bh_orbi_ssid+'</label>');</script>
+				<script>document.write('<input type="text" placeholder="'+bh_orbi_ssid+'"  name="wl_ssid" id="wl_ssid" maxlength="32" value="<% cfg_get_ssid_value("wl_ssid") %>"/><label for="wl_ssid">2.4GHz '+bh_orbi_ssid+'</label>');</script>
 			</div>
 
 			<div class="input-field">			
@@ -173,7 +180,7 @@ function check_smart_ssid(){
 			</div>
 			
 			<div class="input-field" id="5gssid">							
-				<script>document.write('<input type="text" placeholder="'+bh_orbi_ssid+'" onblur="check_smart_ssid()" name="wla_ssid" id="wla_ssid" maxlength="32" value="<% cfg_get_ssid_value("wla_ssid") %>"/><label for="wla_ssid">5GHz '+bh_orbi_ssid+'</label>');</script>
+				<script>document.write('<input type="text" placeholder="'+bh_orbi_ssid+'"  name="wla_ssid" id="wla_ssid" maxlength="32" value="<% cfg_get_ssid_value("wla_ssid") %>"/><label for="wla_ssid">5GHz '+bh_orbi_ssid+'</label>');</script>
 			</div>
 			
 			<div class="input-field" id="5gpass">			
@@ -186,7 +193,7 @@ function check_smart_ssid(){
 			 <label for="check_same"><script>document.write(bh_use_same_ssid)</script></label>
 			</div>
 		     <div class="buttons">
-			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return checkwlan(document.forms[0]);">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" id="setup_wifi_next" onclick="return checkwlan(document.forms[0]);">
 				<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
 			</button>
 		     </div>

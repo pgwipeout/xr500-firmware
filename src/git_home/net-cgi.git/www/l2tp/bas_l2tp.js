@@ -67,7 +67,7 @@ function change_l2tp_password(obj)
                 }
                 else
                 {
-			obj.outerHTML='<input type="text" name="l2tp_passwd" maxlength="50" size="16" onFocus="this.select();change_l2tp_password(this);" onKeyPress="return getkey(\'ssid\', event)" value="">';
+			obj.outerHTML='<input type="text" name="l2tp_passwd" maxlength="50" size="16" onFocus="this.select();change_l2tp_password(this);" onKeyPress="return getkey(\'ssid\', event)" value="" autocomplete="off">';
 			document.forms[0].l2tp_passwd.select();
 		
                 }

@@ -38,6 +38,7 @@ enum {
 };
 void arp_mac(char *ipaddr, char *mac, char *dev);
 char *cat_file(char *name);
+void echo_set(char *value, char *file);
 
 static char *uh_index_files[] = {
 	"start.html",
@@ -1078,18 +1079,58 @@ resp:
 
 			if(!token)
 				token = "get token fail";
+
+			#define LOGIN_ERROR    "/tmp/AUTH_login_error"         // value = "eee" will show unauth.cgi; else pop up login dialog
+			char retry[4];
+			char *recovery = "<html><head>\r\n"
+				"<meta http-equiv='Pragma' content='no-cache'>\r\n"
+				"<meta http-equiv='Cache-Control' content='no-cache'>\r\n"
+				"<title> 401 Authorization</title>\r\n"
+				"<script language=\"javascript\" type=\"text/javascript\">\r\n"
+				"function cancelevent()\r\n"
+				"{\r\n"
+				"       top/*can not remove*/.location.href='/unauth.cgi';\r\n"
+				"}\r\n"
+				"</script>\r\n"
+				"</head><body onload=cancelevent()></body></html>";
+			int clen = strlen(recovery);
+
+			strlcpy(retry,cat_file(LOGIN_ERROR),sizeof(retry));
+			if(strcmp(retry, "eee") == 0)
+			{
+				echo_set("", LOGIN_ERROR);
+				uh_http_sendf(cl, NULL,
+						"HTTP/%.1f 200 OK\r\n"
+						"Content-Type: text/html\r\n"
+						"Content-Length: %d\r\n"
+						"Connection: close\r\n"
+						"\r\n"
+						"%s",
+						req->version,
+						clen,
+						recovery);
+
+			}else{
+				strcat(retry, "e");
+				echo_set(retry, LOGIN_ERROR);
+			
+
 			uh_http_sendf(cl, NULL,
 					"HTTP/%.1f %d Unauthorized\r\n"
 					"Set-Cookie: auth_token=%s; Path=/;\r\n"
 					"WWW-Authenticate: Basic realm=\"NETGEAR %s\"\r\n"
-					"Content-Type: text/plain\r\n"
-					"Content-Length: 23\r\n"
-					"Connection: close\r\n\r\n"
-					"Authorization Required\n",
+					"Content-Type: text/html\r\n"
+					"Content-Length: %d\r\n"
+					"Connection: close\r\n"
+					"\r\n"
+					"%s",
 					req->version,
 					401,
 					token,
-					cat_file("/module_name"));
+					cat_file("/module_name"),
+					clen, 
+					recovery);
+			}
 			return 0;
 		}
 	}

@@ -1,5 +1,7 @@
 <% http_header("style/form.css", "/jquery-1.7.2.min.js", "style/form2.css","/funcs.js", "/funjsq.js" ) %>
 <body onLoad="loadvalue(); please_wait(false);" >
+<div id="black_over_lay" class="black_overlay">
+</div>
 <style>
 .WeChat .clear{
 position:absolute;
@@ -47,6 +49,7 @@ var funjsq_RXbyte = "<% cfg_get("funjsq_RXbyte") %>";
 		<div id="funjsq_account" class="funjsq_sel">
 			<div id="funjsq_icon1"></div>
 			<script>
+				mobile=mobile.substr(0,3)+"****"+mobile.substr(7);
 				document.write('<div id="account_info">'+mobile+'</div>');
 			</script>
 			<div class="ui-corner-all" id="pay_bt"><a href="funjsq_pay.htm" style="color:rgb(242,187,111);">续费</a>
@@ -111,5 +114,7 @@ var funjsq_RXbyte = "<% cfg_get("funjsq_RXbyte") %>";
         <img id="WeChatImg" src="/image/WeChat.png" />
 	<div class="clear" onclick="clearwechat()">X</div>
 </div>
+
+<div id="warning_msg" style="width:40%;height:25%;margin:auto;z-index:1002;border-radius:15px; position:fixed;margin-left:25%;top:30%;z-index:1002;background:#120203;display:none;text-align:center;min-width:400px;min-height:195px;"><h2 id="warning_m" style="margin-top:13%;margin-left:13px;margin-right:13px;line-height:23px;"></h2><input type="button" onclick="close_warning()" value="确定" style="right:8%;position:absolute;bottom:9%;"></div>
 </body>
 </html>

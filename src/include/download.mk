@@ -190,13 +190,13 @@ METHOD:=$(call dl_method,$(URL),$(PROTO))
 	case $(FILE) in \
 		linux-3.*.tar.bz2) \
 			if [ "x$(LINUX_TREEISH)" = "x" ]; then	\
-				$(DownloadMethod/$(call dl_method,$(URL),$(PROTO))) 	\
+				$(DownloadMethod/$(call dl_method,$(URL),$(PROTO))); 	\
 			else					\
 				touch $(DL_DIR)/$(FILE); 	\
 			fi	\
 		;; \
 		*) \
-			$(DownloadMethod/$(call dl_method,$(URL),$(PROTO))) 		\
+			$(DownloadMethod/$(call dl_method,$(URL),$(PROTO))); 		\
 		;; \
 	esac
 endef

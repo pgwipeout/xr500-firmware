@@ -319,74 +319,76 @@ document.getElementById("ap_pdaddr").style.display="none";
 <div id="content1"  style="font-size:14px;">
 <TABLE width=100% border=0 cellpadding=0 cellspacing=2>
 <TR>
-	<TD  colspan=5><b>$ap_mode:</b> $ap_descript</TD>
+	<TD colspan=2><b>$ap_mode:</b> $ap_descript</TD>
 </TR>
+</table>
+<TABLE width=100% border=0 cellpadding=0 cellspacing=2>
 <TR><TD height="20px"></TD></TR>
 <TR>
-	<td nowrap colspan=3>$ap_IP</td>
+	<td nowrap>$ap_IP</td>
 </TR>
+
 <TR id=ap_radio_1>
-	<TD nowrap colspan=3>
+	<TD nowrap>
 	<A tabindex=-1 href="javascript:loadhelp('_rae_ap','mac_tag')"><input type="radio" name="dyn_get_ip" checked value="1" onclick="ap_show(0)" id="dyn_get_ip_dyn"><label for="dyn_get_ip_dyn">$dyn_get_dns</label></A>
 	</TD>
 </TR>
 <TR id=ap_radio_2>
-	<TD nowrap colspan=3>
+	<TD nowrap>
 	<A tabindex=-1 href="javascript:loadhelp('_rae_ap','name_tag')"><input type="radio" name="dyn_get_ip" value="0" onclick="ap_show(1)" id="dyn_get_ip_fix"><label for="dyn_get_ip_fix">$fix_dns</label></A>
 	</TD>
 </TR>
 
-
+</table>
+<TABLE width=100% border=0 cellpadding=0 cellspacing=2>
 <tr height="15px" style="display:none;"></tr>
 <TR id=ap_addr style="display:none;">
-<TD width="10px"></TD>	
-	<TD nowrap style="width:15px">$block_ser_setup_ip_jp</TD>
-		<TD width="1px"></TD>
+	<TD nowrap>$block_ser_setup_ip_jp:</TD>
+
 	<TD nowrap align=left>
 		<input type="text" name="APaddr1"  size="20" autocomplete="off" maxlength="20" onFocus="this.select();"  onKeyPress="return getkey1();" >
 	</TD>
-	<td width="40px"></td>
 </TR>
 
 <TR id=ap_mask style="display:none;">
-<TD width="10px"></TD>
 
-	<TD nowrap width="15px">$router_status_ip_sub</TD>	
-	<TD width="1px"></TD>
+
+	<TD nowrap>$router_status_ip_sub:</TD>	
+
 	<TD nowrap align=left>
 		<input type="text" name="APmask1"  size="20" autocomplete="off" maxlength="20" onFocus="this.select();" onKeyPress="return getkey1();" >
 	</TD> 
-	<td width="40px"></td>
+
 </TR>
 <TR id=ap_gateway style="display:none;">
-<TD width="10px"></TD>
 
-	<TD nowrap width="15px">$sta_routes_gtwip</TD>	
-<TD width="1px"></TD>
+
+	<TD nowrap>$sta_routes_gtwip:</TD>	
+
 	<TD nowrap align=left>
 		<input type="text" name="APgateway1"  size="20" autocomplete="off" maxlength="20" onFocus="this.select();"  onKeyPress="return getkey1();" >
 	</TD>
-	<td width="40px"></td>
+
 </TR>
 <TR id=ap_daddr style="display:none;">
-<TD width="10px"></TD>
 
-	<TD nowrap width="15px">$basic_int_primary_dns</TD>
-<TD width="1px"></TD>
+
+	<TD nowrap>$basic_int_primary_dns:</TD>
+
 	<TD nowrap align=left>
 	<input type="text" name="APDAddr1"  size="20" autocomplete="off" maxlength="20" onFocus="this.select();" onKeyPress="return getkey1();">
 	</TD>
-	<td width="40px"></td>
+
 </TR>
 <TR id=ap_pdaddr style="display:none;">
-<TD width="10px"></TD>
 
-	<TD nowrap width="15px">$basic_int_second_dns</TD>
-<TD width="1px"></TD>
+
+	<TD nowrap>$basic_int_second_dns:</TD>
+
 	<TD nowrap align=left>
 	<input type="text" name="APPDAddr1"  size="20" autocomplete="off" maxlength="20" onFocus="this.select();" onKeyPress="return getkey1();">
 	</TD>
-	<td width="40px"></td>
+
 </TR>
 <tr height="15px" style="display:none;"></tr>
 

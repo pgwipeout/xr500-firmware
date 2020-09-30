@@ -28,6 +28,11 @@ User application
         DNI
         DNI
         Binary
+[at]
+        at_3.1.13.orig.tar.gz
+        http://ftp.debian.org/debian/pool/main/a/at
+        GPL
+        Source Code
 [avahi]
         avahi-0.6.31
         http://avahi.org/download/

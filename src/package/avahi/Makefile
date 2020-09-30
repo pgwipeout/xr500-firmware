@@ -388,10 +388,6 @@ define Package/avahi-daemon/install
 	$(INSTALL_DIR) $(1)/etc/avahi/services
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/avahi-daemon.init $(1)/etc/init.d/avahi-daemon
-	$(INSTALL_BIN) ./files/updateservice $(1)/usr/sbin/updateservice
-	$(INSTALL_BIN) ./files/mdnsrecord $(1)/usr/sbin/mdnsrecord
-	$(INSTALL_BIN) ./files/deal-mdns-result $(1)/usr/sbin/deal-mdns-result
-	$(INSTALL_BIN) ./files/format_record $(1)/usr/sbin/format_record
 endef
 
 Package/avahi-dbus-daemon/install=$(Package/avahi-daemon/install)
@@ -404,8 +400,6 @@ endef
 
 define Package/avahi-daemon-service-mywifiext/install
 	$(INSTALL_DIR) $(1)/etc/avahi/services
-	$(INSTALL_DATA) ./files/service-mywifiext $(1)/etc/avahi/services/mywifiext.service
-	$(INSTALL_DATA) ./files/mywifiext $(1)/etc/avahi/mywifiext.service
 endef
 
 define Package/avahi-daemon-service-ssh/install

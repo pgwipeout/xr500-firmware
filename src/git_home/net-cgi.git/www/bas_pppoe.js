@@ -77,7 +77,7 @@ function change_pppoe_password(obj)
 		}
 		else
 		{
-			obj.outerHTML = '<input type="text" name="pppoe_passwd" maxlength="64" size="16" onFocus="this.select();change_pppoe_password(this);" onKeyPress="return getkey(\'ssid\', event)" value="">';
+			obj.outerHTML = '<input type="text" name="pppoe_passwd" maxlength="64" size="16" onFocus="this.select();change_pppoe_password(this);" onKeyPress="return getkey(\'ssid\', event)" value="" autocomplete="off">';
 			document.forms[0].pppoe_passwd.select();
 		}
 	}

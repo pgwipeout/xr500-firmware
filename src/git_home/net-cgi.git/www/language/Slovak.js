@@ -448,6 +448,7 @@ bh_wl_password_2="Heslo bezdrôtovej siete 2,4 GHz (sieťový kľúč): "
 bh_wla_ssid_name="Názov bezdrôtovej siete 5 GHz (SSID): "
 bh_wla_password_2="Heslo bezdrôtovej siete 5 GHz (sieťový kľúč): "
 bh_wl_finish_warning="VAROVANIE: Neklikajte na tlačidlo<b> Dokončiť</b>, kým zariadenie znova nepripojíte k smerovaču."
+ssid_not_allowed_same="Identifikátor SSID je duplicitný, zmeňte ho na iný."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="Spoločnosť NETGEAR odporúča, aby ste tento nový smerovač nastavili v režime prístupového bodu, pretože v takom prípade nevyžaduje žiadne zmeny konfigurácie vašej brány."
 bh_ap_suggest_str_2="Ak ste pokročilý používateľ a viete, ako nakonfigurovať vašu bránu tak, aby podporovala niektoré z týchto rozšírených funkcií, môžete kliknúť na tlačidlo <b>Späť</b> a nakonfigurovať smerovač NETGEAR v režime smerovača."

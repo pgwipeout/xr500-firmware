@@ -251,7 +251,7 @@ function loadvalue()
 <input type="hidden" name="hidden_round_up">
 <input type="hidden" name="hidden_traff_dir">
 <input type="hidden" name="hidden_tm_type">
-	<tr><td nowrap colspan=2><A tabindex=-1 href="javascript:loadhelp('_traffic','internet')"><b>$traffic_int</b></A></td></tr>
+<tr><td nowrap colspan=2><b>$traffic_int</b></td></tr>
 	<tr><td nowrap colspan=2>
 		<input type="checkbox" name="checkTraffic" id="check_traffic" value="1" onclick="set_gray();"><label for="check_traffic">$traffic_endis</label>
 		</td>
@@ -278,13 +278,13 @@ function loadvalue()
 		</td>
 	</tr>
 	<tr>
-		<td nowrap> <img src=/spacer.gif width=20 height=12 border=0>$traffic_mon_limit</td>
+		<td nowrap> <img src=/spacer.gif width=20 height=12 border=0>$traffic_mon_limit:</td>
 		<td nowrap> 
 			<input type="text" name="volume_monthly_limit" id="volume_monthly_limit" maxlength="6" size="16" onKeyPress="return getkey('num', event)">&#40;$mbytes_mark&#41;
 		</td>
 	</tr>
 	<tr>	
-		<td nowrap> <img src=/spacer.gif width=20 height=12 border=0>$traffic_round_up</td>
+		<td nowrap> <img src=/spacer.gif width=20 height=12 border=0>$traffic_round_up:</td>
 		<td nowrap> 
 			<input type="text" name="round_up_volume" id="round_up_volume" maxlength="16" value="$round_up" size="16" onKeyPress="return getkey('num', event)">&#40;$mbytes_mark&#41;
 		</td>
@@ -295,14 +295,14 @@ function loadvalue()
 		</td>
 	</tr>
 	<tr>	
-		<td nowrap> <img src=/spacer.gif width=20 height=12 border=0>$traffic_mon_limit</td>
+		<td nowrap> <img src=/spacer.gif width=20 height=12 border=0>$traffic_mon_limit:</td>
 		<td nowrap> 
 			<input type="text" name="conntime_monthly_limit" id="conntime_monthly_limit" maxlength="5" size="16" onKeyPress="return getkey('num', event)">&#40;$hours_mark&#41;
 		</td>
 	</tr>
 $bluebar
 	<tr>
-		<td nowrap colspan=2><A tabindex=-1 href="javascript:loadhelp('_traffic','counter')"><b>$traffic_counter</b></A></td>
+		<td nowrap colspan=2><b>$traffic_counter</b></td>
 	</tr>
 	<tr>
 		<td nowrap colspan=2>$traffic_counter_restart
@@ -353,7 +353,7 @@ else
 	document.write('<TR><TD nowrap colspan=2 align=right><input id="restart_counter" class="long_common_gray_bt" type="button" name="Restart Counter Now" value="$traffic_btn_counter" disabled></TD></TR>');
 </script>
 $bluebar
-	<tr><td nowrap colspan=2><A href="javascript:loadhelp('_traffic', 'reached')"><b>$traffic_ctrl</b></A></td></tr>
+	<tr><td nowrap colspan=2><b>$traffic_ctrl</b></td></tr>
 	<tr><td nowrap colspan=2>$traffic_popup</td></tr>
 	<tr>
 		<td nowrap colspan=2>
@@ -368,7 +368,7 @@ $bluebar
 		<td nowrap colspan=2><input type="checkbox" name="checkBlock" id="check_block" value=1><label for="check_block">$traffic_block</label></td>
 	</tr>
 $bluebar
-	<tr><td nowrap colspan=2><A href="javascript:loadhelp('_traffic', 'statistics')"><b>$traffic_statistics</b></A></td></tr>
+	<tr><td nowrap colspan=2><b>$traffic_statistics</b></td></tr>
 	<tr><td nowrap colspan=2 id="start_time"><script>document.write(traffic_startday)</script></td></tr>
 	<tr><td nowrap colspan=2 id="current_time"><script>document.write(traffic_currentdate)</script></td></tr>
 	<tr><td nowrap colspan=2 id="left_traffic"><script>document.write(traffic_volumnleft)</script></td></tr>

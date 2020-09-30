@@ -105,7 +105,7 @@ function checkpasswd(cf)
 			</div>
 			<div class="row input-row">
               <div class="input-field">
-				<select name="question1">
+				<select name="question1" id="sec_question_one">
 					<script>document.write('<option selected value="0">'+bh_select_a_question+'</option>'+
 					'<option value="1">'+bh_quest1_1+'</option>'+
 					'<option value="2">'+bh_quest1_2+'</option>'+
@@ -128,7 +128,7 @@ function checkpasswd(cf)
 			
 			<div class="row input-row">
               <div class="input-field">
-				<select name="question2">
+				<select name="question2" id="sec_question_two">
 					<script>document.write('<option selected value="0">'+bh_select_a_question+'</option>'+
 					'<option value="1">'+bh_quest2_1+'</option>'+
 					'<option value="2">'+bh_quest2_2+'</option>'+
@@ -149,7 +149,7 @@ function checkpasswd(cf)
 			 </div>
 			</div>
 		    <div class="buttons">
-			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" onclick="return checkpasswd(document.forms[0])">
+			<button class="waves-effect waves-light btn button-nav btn-icon icon-right" id="admin_account_next" onclick="return checkpasswd(document.forms[0])">
 				<span><script>document.write(bh_orbi_next_mark);</script></span><i class="material-icons">navigate_next</i>
 			</button>
 		    </div>

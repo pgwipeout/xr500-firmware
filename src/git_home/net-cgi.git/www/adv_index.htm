@@ -111,7 +111,8 @@ var security_mode_a="<% cfg_get("wla_sectype") %>";
 var dis_lang_crl = "<% cfg_get("Enable_GUIStringTable") %>";
 var device_mode = "<% cfg_get("modem_mode") %>";
 var rae_cur= "<% cfg_get("rae_cur_mode") %>";
-
+var wtfast_login= "<% cfg_get("wtf_login") %>";
+var enable_wtfast= "<% cfg_get("wtfast_endis") %>";
 var back_flag = 0;
 
 if( wds_support_wpa == 1 && gui_region == "Chinese" && (netgear_region == "" || netgear_region.toUpperCase() == "WW"))
@@ -183,7 +184,7 @@ function loadvalue()
 		<% advanced_sub_menu("rae", "sub_back", "rae_rm", "advanced_rae") %>
 		<% advanced_sub_menu("qos", "sub_back", "qos_head", "qos_setup", "qos") %>
 		<% advanced_sub_menu("devname", "sub_back", "edit_devname", "advanced_devname")%>
-		<% advanced_menu_funjsq() %>
+		<!--<dt id="wt_fast" class="sub_back"><a target="formframe" onclick="click_adv_action('wt');"><b><span name="wtfast" id="wt">WTFast Control</span></b></a></dt>-->
 	</dl>
 	</div>
 	

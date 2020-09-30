@@ -35,12 +35,14 @@ if [ "x`grep overlay_volume /proc/mtd`" = "x" -a "x`grep netgear /proc/mtd`" != 
 	fi
 fi
 
+ubi_problem_indicator=0
 mkdir -p /tmp/overlay
 mkdir -p /tmp/mnt
 ubinum=`ubinfo -a|grep overlay_volume -B 5 |grep "Volume ID" |awk '{print $5}' |cut -b 4`
 [ "x$ubinum" = "x" ] && ubinum=0
 mount -t ubifs ubi$ubinum:overlay_volume /tmp/overlay
 if [ $? -ne 0 ]; then
+	ubi_problem_indicator=1
 	ubinize -m 2048 -p 128KiB -o /tmp/ubi.image /etc/netgear.cfg
 	mtdn=`grep netgear /proc/mtd | awk -F ':' '{print $1}' | awk -F 'd' '{print $2}'`
 	ubidetach /dev/ubi_ctrl -m $mtdn
@@ -48,6 +50,9 @@ if [ $? -ne 0 ]; then
 	nandwrite -p /dev/mtd$mtdn /tmp/ubi.image
 	ubiattach /dev/ubi_ctrl -m $mtdn
 	mount -t ubifs ubi$ubinum:overlay_volume /tmp/overlay
+	if [ $? -ne 0 ]; then
+		ubi_problem_indicator=2
+	fi
 fi
 mount -o move /tmp/overlay /overlay 2>&-
 if [ "x`cat /firmware_time`" != "x`cat /overlay/.firmware_time`" ]; then
@@ -71,4 +76,11 @@ echo "- init -"
 
 echo "" > /proc/sys/kernel/hotplug
 	
+if [ $ubi_problem_indicator -eq 2 ]; then
+	touch /tmp/overlay_ubi_problem_solved
+	else if [ $ubi_problem_indicator -eq 1 ]; then
+			touch /tmp/overlay_ubi_problem
+		fi
+fi
+
 exec /sbin/init

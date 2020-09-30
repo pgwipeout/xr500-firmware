@@ -42,7 +42,7 @@ window.onunload = function leavepage(){if(apply_flag == 0) getTop(window).back_f
 <input type="hidden" name="duplicated_num" value=0>
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_lan','reserved')"><B>$reservation_show</B></A>
+	<B>$reservation_show</B>
 	</TD>
 </TR>
 <TR>
@@ -165,7 +165,7 @@ var same_flag=0;
 </TR>
 $bluebar
 <TR>
-	<TD nowrap>$info_mark_ip</TD>
+	<TD nowrap>$info_mark_ip:</TD>
 	<TD nowrap>
 	<script>
 		document.write('<input type="text" name="rsv_ip1" id="rsv_ipaddress1" maxLength="3" size="3" autocomplete="off" onFocus="this.select();" onkeydown="keydown(event,this);"	onKeyPress="return getkey(\'num\',event);" onkeyup="keyup(event,this);" value="'+lanip_array[0]+'">.');
@@ -176,13 +176,13 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$info_mark_mac</TD>
+	<TD nowrap>$info_mark_mac:</TD>
 	<TD nowrap>
 	<input type="text" value="" name="rsv_mac" id="rsv_mac" maxlength="17" size="20" onKeyPress="return getkey('mac',event)">
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$lan_mark_name</TD>
+	<TD nowrap>$lan_mark_name:</TD>
 	<TD nowrap>
 	<input type="text" name="dv_name" id="device_name" maxLength="20" size="16" onKeyPress="return getkey('ssid', event)">
 	</TD>

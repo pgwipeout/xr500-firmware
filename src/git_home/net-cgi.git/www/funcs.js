@@ -466,12 +466,21 @@ function sAlert(str, callback_ok, callback_cancel, dwidth, anc, button_lang){
 	var button=document.createElement("input");//create ok button
 	//setting ok button
 	button.setAttribute("type","button");
-	if(button_lang == "yes/no")
+	if(button_lang == "yes/no"){
 		button.setAttribute("value","$yes_mark");
-	else if(button_lang == "cancel/apply")
+		button.setAttribute("id", "yes_bt");
+		button.setAttribute("name", "yes_bt")
+	}
+	else if(button_lang == "cancel/apply"){
 		button.setAttribute("value","$cancel_mark");
-	else
+		button.setAttribute("id", "cancel_bt2");
+		button.setAttribute("name", "cancel_bt2");
+	}
+	else{
 		button.setAttribute("value","$ok_mark");
+		button.setAttribute("id", "ok_bt");
+		button.setAttribute("name", "ok_bt")
+	}
 	button.style.width="80px";
 	button.style.marginLeft="140px";
 	button.style.marginBottom="10px";
@@ -490,12 +499,21 @@ function sAlert(str, callback_ok, callback_cancel, dwidth, anc, button_lang){
 	var button1=document.createElement("input");//create cancel button
 	//setting cancel button
 	button1.setAttribute("type","button");
-	if(button_lang == "yes/no")
+	if(button_lang == "yes/no"){
 		button1.setAttribute("value","$no_mark");
-	else if(button_lang == "cancel/apply")
+		button.setAttribute("id", "no_bt");
+		button.setAttribute("name", "no_bt")
+	}
+	else if(button_lang == "cancel/apply"){
 		button1.setAttribute("value","$apply_mark");
-	else
+		button.setAttribute("id", "apply_bt2");
+		button.setAttribute("name", "apply_bt2");
+	}
+	else{
 		button1.setAttribute("value","$cancel_mark");
+		button.setAttribute("id", "cancel_bt");
+		button.setAttribute("name", "cancel_bt")
+	}
 	button1.style.width="80px";
 	button1.style.marginLeft="10px";
 	button1.style.marginBottom="10px";

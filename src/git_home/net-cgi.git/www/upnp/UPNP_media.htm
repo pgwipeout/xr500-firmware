@@ -150,9 +150,9 @@ function allow_control_submit(cf)
 	<script>
 	var master="<% cfg_get("http_loginname") %>";
 	if( master == "admin" )
-		document.write('<td><input type="submit" name="allow_control" class="common_key_bt" value="$allow_control" onClick="allow_control_submit(document.forms[0])"></TD>');
+		document.write('<td><input type="submit" name="allow_control" class="common_key_bt" value="$allow_control" id="allow_control" onClick="allow_control_submit(document.forms[0])"></TD>');
 	else
-		document.write('<td><input type="submit" name="allow_control" class="common1_key_bt" value="$allow_control" disabled></TD>');
+		document.write('<td><input type="submit" name="allow_control" class="common1_key_bt" value="$allow_control" id="allow_control" disabled></TD>');
 	</script>
 </TR>
 <TR>
@@ -177,7 +177,7 @@ function allow_control_submit(cf)
 	</div></td><td>
 	<script>
 	if(consolidate_device_name == "1"){
-		document.write('<input class="short_edit_bt" type="button" name="edit" value="$edit_mark" onClick="edit_devicename(dev_name)">');
+		document.write('<input class="short_edit_bt" type="button" name="edit" value="$edit_mark" id="media_edit" onClick="edit_devicename(dev_name)">');
 	}else{
 		if(itunes_open == 0){
 			var medianame=upnp_media_name.replace(": <% cat_file("/module_name") %>", "");

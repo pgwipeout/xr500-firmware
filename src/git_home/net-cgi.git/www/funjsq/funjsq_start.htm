@@ -1,6 +1,7 @@
 <% http_header("style/form.css", "/funcs.js", "/jquery-1.7.2.min.js") %>
 <body onLoad="please_wait(false);">
-<form method="POST" target="formframe">
+<div id="black_over_lay" class="black_overlay"></div>
+	<form method="POST" target="formframe">
 <input type="hidden" name="submit_flag" value="">
 <div class="page_title">游戏加速器</div>
 <div class="funjsq">
@@ -39,5 +40,6 @@ function enable_next()
 <div class="WeChat">
         <img id="WeChatImg" src="/image/WeChat.png" />
 </div>
+<div id="warning_msg" style="width:40%;height:25%;margin:auto;z-index:1002;border-radius:15px; position:fixed;margin-left:25%;top:30%;z-index:1002;background:#120203;display:none;text-align:center;min-width:400px;min-height:195px;"><h2 id="warning_m" style="margin-top:13%;margin-left:13px;margin-right:13px;line-height:23px;"></h2><input type="button" onclick="close_warning()" value="确定" style="right:8%;position:absolute;bottom:9%;"></div>
 </body>
 </html>

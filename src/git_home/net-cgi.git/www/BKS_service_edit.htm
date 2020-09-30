@@ -116,7 +116,7 @@ function loadvalue()
 <input type="hidden" name="iprange_end">
 <input type="hidden" name="only_ip">
 <TR>
-	<TD nowrap>$block_ser_service_type</TD>
+	<TD nowrap>$block_ser_service_type:</TD>
 	<TD nowrap>
 	<select name="service_type" size="1" onchange="chg_by_service(0,document.forms[0]);">
 		<option value="User_Defined">$block_ser_setup_userdefined</option>
@@ -170,7 +170,7 @@ function loadvalue()
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$block_ser_setup_pro</TD>	
+	<TD nowrap>$block_ser_setup_pro:</TD>	
 	<TD nowrap>
 	<select NAME="protocol" size="1" >
 		<option value="TCP">$block_ser_setup_tcp</option>
@@ -180,19 +180,19 @@ function loadvalue()
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$block_ser_start_port</TD>
+	<TD nowrap>$block_ser_start_port:</TD>
 	<TD nowrap>
 	<input type="text" name="portstart" size="7" maxlength="5" onKeyPress="return getkey('num', event)">(1~65535)
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$block_ser_end_port</TD>
+	<TD nowrap>$block_ser_end_port:</TD>
 	<TD nowrap>
 	<input type="text" name="portend" size="7" maxlength="5" onKeyPress="return getkey('num', event)">(1~65535)
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$block_ser_setup_type</TD>
+	<TD nowrap>$block_ser_setup_type:</TD>
 	<TD nowrap>
 	<input type="text" name="userdefined" size="20" maxlength="30">
 	</TD>
@@ -200,7 +200,7 @@ function loadvalue()
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_BKS_service_edit','ip')"><B>$block_ser_setup_filter :</B></A>
+	<B>$block_ser_setup_filter :</B>
 	</TD>
 </TR>
 <TR>

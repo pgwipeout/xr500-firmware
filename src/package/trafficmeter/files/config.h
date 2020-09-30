@@ -19,6 +19,7 @@
 #define TMP_TRAFFIC_LEFT "/tmp/traffic_meter/date_and_volume_left"
 #define TMP_TRAFFIC_STATISTICS "/tmp/traffic_meter/traffic_statistics"
 #define TMP_TRAFFIC_STATUS "/tmp/traffic_meter/traffic_status"
+#define TMP_NTP_UPDATED "/tmp/ntp_updated"
 
 /* support new feature of NTP described in traffic meter spec 1.9 */
 #define NTP_FEATURE

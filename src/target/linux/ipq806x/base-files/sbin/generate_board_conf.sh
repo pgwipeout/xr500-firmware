@@ -10,12 +10,22 @@ model_name_lc="$(echo $model_name |awk '{print tolower($0)}')"
 echo "$model_name" > /tmp/module_name
 echo "$model_name" > /tmp/hardware_version
 
-$CONFIG set netbiosname="$model_name"
-$CONFIG set Device_name="$model_name"
-$CONFIG set wan_hostname="$model_name"
-$CONFIG set upnp_serverName="$model_name"
-$CONFIG set bridge_netbiosname="$model_name"
-$CONFIG set ap_netbiosname="$model_name"
+for name in netbiosname Device_name wan_hostname upnp_serverName bridge_netbiosname ap_netbiosname; do
+		# if it is not XR500 nor XR450, it is definitely be changed by user,
+	    # so we will skip changing, keep it in the changed state
+		if [ "x$($CONFIG get $name)" != "xXR500" -a "x$($CONFIG get $name)" != "xXR450" ]; then
+				continue
+		fi
+				
+		# handle the corner case that an XR500 device is renamed to XR450, if 
+		# it is modified after first boot, we will let user rename it to XR450
+		# also handle corner case that an XR450 device is renamed to XR500
+		if [ "x$($CONFIG get board_region_default)" != "x1" ]; then
+				continue
+		fi
+
+		$CONFIG set $name="$model_name"
+done
 
 # minidlna modelname
 $CONFIG set minidlna_modelname="Windows Media Connect compatible (NETGEAR $model_name)"
@@ -24,7 +34,7 @@ $CONFIG set minidlna_modelname="Windows Media Connect compatible (NETGEAR $model
 $CONFIG set miniupnp_friendlyname="NETGEAR $model_name Wireless Router"
 $CONFIG set miniupnp_modelname="$model_name Nighthawk® Pro Gaming WiFi"
 $CONFIG set miniupnp_modelnumber="$model_name"
-$CONFIG set miniupnp_modelurl="http://www.netgear.com/home/products/wirelessrouters"
+$CONFIG set miniupnp_modelurl="http://www.netgear.com/npg/"
 
 if [ "$model_name" != "XR500" ]; then
 		$CONFIG set miniupnp_pnpx_hwid="VEN_01f2&amp;DEV_0037&amp;REV_01 VEN_01f2&amp;DEV_8000&amp;SUBSYS_01&amp;REV_01 VEN_01f2&amp;DEV_8000&amp;REV_01"

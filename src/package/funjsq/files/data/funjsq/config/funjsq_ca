@@ -8143,7 +8143,7 @@
 -A funjsq 0.0.0.0/8
 -A funjsq 10.0.0.0/8
 -A funjsq 127.0.0.0/8
--A funjsq 172.0.0.0/12
+-A funjsq 172.16.0.0/12
 -A funjsq 192.168.0.0/16
 -A funjsq 224.0.0.0/4
 -A funjsq 240.0.0.0/4

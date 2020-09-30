@@ -77,12 +77,12 @@ function loadvalue()
 		}
 		else
 		{
-			form.pppoe_passwd.outerHTML='<input type="text" name="pppoe_passwd" maxlength="64" size="16" onFocus="this.select();" onKeyPress="return getkey(\'ssid\', event)" value="<% cfg_sed_xss("wan_mulpppoe1_passwd") %>">';
+			form.pppoe_passwd.outerHTML='<input type="text" name="pppoe_passwd" maxlength="64" size="16" onFocus="this.select();" onKeyPress="return getkey(\'ssid\', event)" value="<% cfg_sed_xss("wan_mulpppoe1_passwd") %>" autocomplete="off">';
 		}
 	}
 	else if( get_browser() == "IE" )
 	{
-		form.pppoe_passwd.outerHTML='<input type="password" name="pppoe_passwd" maxlength="64" size="16" style="width: 126px" onFocus="change_mulpppoe_password(this);" onKeyPress="return getkey(\'ssid\', event)" value="<% cfg_sed_xss("wan_mulpppoe1_passwd") %>">';
+		form.pppoe_passwd.outerHTML='<input type="password" name="pppoe_passwd" maxlength="64" size="16" style="width: 126px" onFocus="change_mulpppoe_password(this);" onKeyPress="return getkey(\'ssid\', event)" value="<% cfg_sed_xss("wan_mulpppoe1_passwd") %>" autocomplete="off">';
 	}
 	
 	if( form.pppoe2_password.value == "" )
@@ -93,12 +93,12 @@ function loadvalue()
                 }
                 else
                 {
-                        form.pppoe2_password.outerHTML='<input type="text" name="pppoe2_password" size="16" maxlength="64" onFocus="this.select();"  onKeyPress="return getkey(\'ssid\', event)" value="">';
+                        form.pppoe2_password.outerHTML='<input type="text" name="pppoe2_password" size="16" maxlength="64" onFocus="this.select();"  onKeyPress="return getkey(\'ssid\', event)" value="" autocomplete="off">';
                 }
         }
         else if( get_browser() == "IE" )
         {
-                form.pppoe2_password.outerHTML='<input type="password" name="pppoe2_password" size="16" maxlength="64" style="width: 126px" onFocus="change_mulpppoe_password(this);"  onKeyPress="return getkey(\'ssid\', event)" value="">';
+                form.pppoe2_password.outerHTML='<input type="password" name="pppoe2_password" size="16" maxlength="64" style="width: 126px" onFocus="change_mulpppoe_password(this);"  onKeyPress="return getkey(\'ssid\', event)" value="" autocomplete="off">';
 	}
 	
 	if( old_pppoe_wan_assign == "0")
@@ -265,7 +265,7 @@ function click_jump()
 </TR>
 <tr>
 	<td nowrap><a tabindex=-1 href="javascript:loadhelp('_BAS_mulpppoe','password')"><b><script>document.write(basic_pppoe_passwd)</script></b></a></td>
-	<td nowrap align=right><input type="password" name="pppoe_passwd" maxlength="64" size="16" onFocus="change_mulpppoe_password(this);" onKeyPress="return getkey('ssid', event)" value="<% cfg_sed_xss("wan_mulpppoe1_passwd") %>"></td>
+	<td nowrap align=right><input type="password" name="pppoe_passwd" maxlength="64" size="16" autocomplete="off" onFocus="change_mulpppoe_password(this);" onKeyPress="return getkey('ssid', event)" value="<% cfg_sed_xss("wan_mulpppoe1_passwd") %>"></td>
 </tr>
 <TR>
 	<td nowrap><a tabindex=-1 href="javascript:loadhelp('_BAS_mulpppoe','serv_name')"><B><script>document.write(basic_pppoe_serv_name)</script></b></a></TD>
@@ -368,7 +368,7 @@ function click_jump()
 </TR>
 <tr>
 	<td nowrap><a tabindex=-1 href="javascript:loadhelp('_BAS_mulpppoe','password')"><b><script>document.write(basic_pppoe_passwd)</script></b></a></td>
-	<td nowrap align=right><input type="password" name="pppoe2_password" size="16" maxlength="64" onFocus="change_mulpppoe_password(this);"  onKeyPress="return getkey('ssid', event)" value="">
+	<td nowrap align=right><input type="password" name="pppoe2_password" size="16" maxlength="64" autocomplete="off" onFocus="change_mulpppoe_password(this);"  onKeyPress="return getkey('ssid', event)" value="">
 </tr>
 <TR>
     <td nowrap><B><a tabindex=-1 href="javascript:loadhelp('_BAS_mulpppoe','serv_name')"><script>document.write(basic_pppoe_serv_name)</script></B></a></TD>

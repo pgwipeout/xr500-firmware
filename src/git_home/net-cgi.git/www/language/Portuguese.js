@@ -448,6 +448,7 @@ bh_wl_password_2="Palavra-passe da rede sem fios 2,4 GHz (Chave de rede): "
 bh_wla_ssid_name="Nome da rede sem fios 5 GHz (SSID): "
 bh_wla_password_2="Palavra-passe da rede sem fios 5 GHz (Chave de rede): "
 bh_wl_finish_warning="AVISO: não clique no botão <b>Concluir</b> até voltar a ligar o seu dispositivo ao router."
+ssid_not_allowed_same="O SSID está duplicado, altere-o."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="A NETGEAR recomenda que configure este novo router no modo de ponto de acesso porque não requer quaisquer alterações à configuração do seu gateway."
 bh_ap_suggest_str_2="Se for um utilizador avançado e souber configurar o seu gateway para suportar estas funções avançadas, pode clicar no botão <b>Retroceder</b> e configurar o router NETGEAR no modo de router."

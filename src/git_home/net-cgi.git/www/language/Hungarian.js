@@ -448,6 +448,7 @@ bh_wl_password_2="2,4 GHz-es vezeték nélküli hálózat jelszava (Hálózati k
 bh_wla_ssid_name="5GHz-es vezeték nélküli hálózat neve (SSID):"
 bh_wla_password_2="5GHz-es vezeték nélküli hálózat jelszava (Hálózati kulcs): "
 bh_wl_finish_warning="FIGYELEM: Ne kattintson a <b>Befejezés</b> gombra, míg újra nem csatlakoztatta az eszközt a routerhez."
+ssid_not_allowed_same="Az SSID azonosító már létezik, válasszon másikat."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="A NETGEAR azt javasolja, hogy ezt az új routert hozzáférési pont módban telepítse, mivel így nem szükséges módosítania az átjárón meglévő konfigurációkat."
 bh_ap_suggest_str_2="Ha Ön haladó felhasználó és tudja, hogyan kell konfigurálni az átjárót ezen fejlett funkciók némelyikének támogatására, a <b>Vissza</b> gombra kattintva konfigurálhatja a NETGEAR routert router üzemmódban."

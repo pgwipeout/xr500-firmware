@@ -448,6 +448,7 @@ bh_wl_password_2="Adgangskode til 2,4 GHz trådløst netværk (netværksnøgle):
 bh_wla_ssid_name="Navn på 5 GHz trådløst netværk (SSID):"
 bh_wla_password_2="Adgangskode til 5 GHz trådløst netværk (netværksnøgle): "
 bh_wl_finish_warning="ADVARSEL: Undlad at klikke på knappen <b>Udfør</b>, indtil du har genoprettet forbindelsen fra enheden til routeren."
+ssid_not_allowed_same="SSID'et er duplikeret. Skift til et andet."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR anbefaler, at du konfigurerer denne nye router i adgangspunkttilstand, fordi det ikke kræver nogen ændringer af konfigurationen på din gateway."
 bh_ap_suggest_str_2="Hvis du er avanceret bruger og ved, hvordan du konfigurerer gatewayen til at understøtte nogle af disse avancerede funktioner, kan du klikke på knappen <b>Tilbage</b> og konfigurere NETGEAR-routeren i router-tilstand."

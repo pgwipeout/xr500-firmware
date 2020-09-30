@@ -125,7 +125,7 @@ config IPKG
 	bool "ipkg"
 	default n
 	select MD5SUM
-	#select WGET
+	select WGET
 	help
 	  ipkg is the itsy package management system.
 

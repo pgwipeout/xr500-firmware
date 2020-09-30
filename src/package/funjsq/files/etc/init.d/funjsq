@@ -1,10 +1,12 @@
 #!/bin/sh /etc/rc.common
 
-
 START=62
 
-boot() { 
-	/data/funjsq/bin/funjsq.sh init
+boot() {
+	module_name=`cat module_name`
 
-	/data/funjsq/bin/FYdaemon
+	[ "x$module_name" == "xR7800" ] && {
+		/data/funjsq/bin/funjsq.sh init &
+	}
+
 }

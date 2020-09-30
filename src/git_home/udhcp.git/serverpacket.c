@@ -43,9 +43,39 @@
 #include "dhcpd.h"
 #include "options.h"
 #include "leases.h"
+#include "script.h"
 
 unsigned char g_src_addr[6] = {0};
 u_int32_t latest_addr;
+
+#define NETDUMA_EXTENSIONS
+#ifdef NETDUMA_EXTENSIONS
+
+#define ND_SCRIPT   "/dumaos/apps/system/com.netdumasoftware.neighwatch/dhcp-event.lua"
+
+static void run_daemon_script(const char* event, struct dhcpOfferedAddr *offer){
+  char buffer[1024];
+  char mac[32];
+
+  const char* sip = inet_ntoa( *(struct in_addr*)&offer->yiaddr );
+  snprintf( mac, 32, "%02x:%02x:%02x:%02x:%02x:%02x"
+          , offer->chaddr[0]
+          , offer->chaddr[1]
+          , offer->chaddr[2]
+          , offer->chaddr[3]
+          , offer->chaddr[4]
+          , offer->chaddr[5] );
+
+  snprintf( buffer, 1024, "%s %s '%s' '%s' '%s'", ND_SCRIPT, event, mac,
+                                                        sip, offer->hostname );
+  system( buffer );
+  return;
+}
+#else
+#error "NOT DEFINED"
+#endif
+
+
 
 static int is_guest_client(u_int8_t *chaddr)
 {
@@ -470,16 +500,18 @@ int sendACK(struct dhcpMessage *oldpacket, u_int32_t yiaddr)
 		}
 
 		show_clients_hostname();
+#ifdef NETDUMA_EXTENSIONS
+                run_daemon_script( "add", clientlease );
+#endif
 	}
 #endif
-
 	return 0;
 }
 
 
 int send_inform(struct dhcpMessage *oldpacket)
 {
-	struct dhcpMessage packet;
+      struct dhcpMessage packet;
 	struct option_set *curr;
 
 	init_packet(&packet, oldpacket, DHCPACK);

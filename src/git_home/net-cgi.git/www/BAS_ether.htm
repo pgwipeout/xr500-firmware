@@ -39,6 +39,7 @@ var jp_multiPPPoE="<% cfg_get("jp_multiPPPoE") %>";
 var have_l2tp = (getTop(window).l2tp_flag == 1) ? 1 : 0;
 var consolidate_device_name = parent.consolidate_device_name;
 parent.wan_type = "<% cfg_get("wan_proto") %>";
+var wan_dhcp_option61="<% cfg_get("wan_ether_dhcp_option61") %>";
 
 function change_web_format()
 {
@@ -127,6 +128,7 @@ function loadvalue()
 	                form.TDAddr4.value=dns3_array[3];
 	        }
 	}
+	
 	var ether_get_mac_assign='<% cfg_get("wan_ether_mac_assign") %>';
 	if (ether_get_mac_assign == '0')
 	{
@@ -143,6 +145,7 @@ function loadvalue()
 		form.MACAssign[2].checked = true;
 		setMAC(form,ether_get_this_mac);
 	}
+	form.option61.value=wan_dhcp_option61;
 	goTestApply();
 }
 </script>
@@ -159,6 +162,7 @@ function loadvalue()
 <input type="hidden" name="hid_mtu_value">
 <input type="hidden" name="hid_vpn_detect_flag">
 <input type="hidden" name="hid_enable_vpn" value="1">
+<input type="hidden" name="hid_dhcp_option2">
 <div class="fix_button">
 <TABLE width=100% border=0 cellpadding=0 cellspacing=2>
 <script>
@@ -173,7 +177,8 @@ else
 document.write('<TR><TD nowrap colspan=2 align=center><input class="common1_bt" type="button" name="Test" id="test" value="$test_mark" disabled>&nbsp;&nbsp;<input class="cancel1_bt" type="button" name="Cancel" id="cancel" value="$cancel_mark" disabled>&nbsp;&nbsp;<input class="apply1_bt" type="button" name="Apply" id="apply" value="$apply_mark" disabled></TD></TR>');
 </script>
 </TABLE>
-</div><!--button-->
+</div>
+<!--button-->
 <div id="bas_top">
 <TABLE cellspacing=5 cellPadding=0 width=100% border=0>
 <TR><TD nowrap>
@@ -201,7 +206,7 @@ $bluebar
 <TABLE cellspacing=5 cellPadding=0 width=100% border=0>
 
 <TR>
-	<TD nowrap><A tabindex=-1 href="javascript:loadhelp('_BAS_ether','acname')">$basic_int_acname</A></TD>
+	<TD nowrap>$basic_int_acname:</TD>
 	<TD nowrap >
 	<script>
 	var old_name="<% cfg_sed_xss("wan_hostname") %>";
@@ -218,7 +223,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><A tabindex=-1 href="javascript:loadhelp('_BAS_ether','doname')">$basic_int_doname</A></TD>
+	<TD nowrap>$basic_int_doname:</TD>
 	<TD nowrap >
 	<input type="text" name="domain_name" id="domain_name" size="20" maxlength="60" value="<% cfg_sed_xss("wan_domain"); %>" onKeyPress="return getkey( 'ddns_hostname',event)">
 	</TD>
@@ -226,7 +231,7 @@ $bluebar
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_ether','InternetIP')"><B>$basic_int_intip</B></A>
+	<B>$basic_int_intip</B>
 	</TD>
 </TR>
 <TR>
@@ -240,7 +245,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$lan_mark_ip</TD>
+	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$lan_mark_ip:</TD>
 	<TD nowrap >
 	<input type="text" name="WPethr1" id="wpethr1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="WPethr2" id="wpethr2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -249,7 +254,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$lan_mark_subnet</TD>
+	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$lan_mark_subnet:</TD>
 	<TD nowrap >
 	<input type="text" name="WMask1" id="wmask1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="WMask2" id="wmask2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -258,7 +263,7 @@ $bluebar
 	</TD> 
 </TR>
 <TR>
-	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$lan_mark_gateway</TD>
+	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$lan_mark_gateway:</TD>
 	<TD nowrap >
 	<input type="text" name="WGateway1" id="wgateway1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="WGateway2" id="wgateway2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -269,7 +274,7 @@ $bluebar
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_ether','DNSaddress')"><B>$basic_int_dns</B></A>
+	<B>$basic_int_dns</B>
 	</TD>
 </TR>
 <TR>
@@ -283,7 +288,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_primary_dns</TD>
+	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_primary_dns:</TD>
 	<TD nowrap >
 	<input type="text" name="DAddr1" id="daddr1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="DAddr2" id="daddr2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -292,7 +297,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_second_dns</TD>
+	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_second_dns:</TD>
 	<TD nowrap >
 	<input type="text" name="PDAddr1" id="pdaddr1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="PDAddr2" id="pdaddr2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -301,7 +306,7 @@ $bluebar
 	</TD>
 </TR>
 <TR id=third_dns style="display:none">
-        <TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_third_dns</TD>
+        <TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_third_dns:</TD>
         <TD nowrap >
         <input type="text" name="TDAddr1" id="tdaddr1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
         <input type="text" name="TDAddr2" id="tdaddr2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -327,14 +332,25 @@ $bluebar
 </TR>
 <TR>
 	<TD nowrap>
-	<input type="radio" name="MACAssign" id="mac_assign_define" value="2" onClick="setMAC(document.forms[0], ether_get_this_mac)"><label for="mac_assign_define">$basic_int_this_mac</label>
+	<input type="radio" name="MACAssign" id="mac_assign_define" value="2" onClick="setMAC(document.forms[0], ether_get_this_mac)"><label for="mac_assign_define">$basic_int_this_mac:</label>
 	</TD>
 	<TD nowrap >
 	<input type="text" value="" name="Spoofmac" id="spoof_mac" maxlength="17" size="20" onKeyPress="return getkey('mac',event)">
 	</TD>
 </TR>
 $bluebar
+<TR>
+	<TD nowrap colspan=2>
+	<B>DHCP Option</B>
+	</TD>
+</TR>
+<TR>
+	<TD nowrap ><b>Client Identifier String (option 61):</b></TD>
+	<TD nowrap><input type="text" name="option61" id="option_61" maxlength=64 size=64></TD>	
+	</TD>
+</TR>
 </TABLE>
+
 </div> <!-- main -->
 <% help_box("0","_BAS_ether") %>
 </FORM>

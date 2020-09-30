@@ -448,6 +448,7 @@ bh_wl_password_2="2,4 GHz:n langattoman verkon salasana (verkkoavain): "
 bh_wla_ssid_name="5 GHz:n langattoman verkon nimi (SSID): "
 bh_wla_password_2="5 GHz:n langattoman verkon salasana (verkkoavain): "
 bh_wl_finish_warning="VAROITUS: älä valitse <b>Valmis</b>-painiketta, ennen kuin yhdistät laitteen uudelleen reitittimeen."
+ssid_not_allowed_same="SSID toistuu. Määritä jokin toinen SSID."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR suosittelee uuden reitittimen määrittämistä tukiasematilassa, koska silloin yhdyskäytävän asetuksia ei tarvitse muuttaa."
 bh_ap_suggest_str_2="Jos olet kokenut käyttäjä ja tiedät, miten yhdyskäytävä määritetään käyttämään näitä lisätoimintoja, napsauta <b>Edellinen</b>-painiketta ja määritä NETGEAR-reititin reititintilassa."

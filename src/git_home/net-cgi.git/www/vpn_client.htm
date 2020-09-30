@@ -431,9 +431,9 @@ function check_space(name){
 <script>
 var master="<% cfg_get("http_loginname") %>";
 if( master == "admin" )
-        document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel_bt" type="button" name="Cancel" value="$cancel_mark" onClick="location.href=\'vpn_client.htm\'">&nbsp;&nbsp;<input class="apply_bt" type="submit" name="Apply" value="$apply_mark" onClick="return checkvpn(document.forms[0]);"></TD></TR>');
+        document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel_bt" type="button" name="Cancel" value="$cancel_mark" id="cancel" onClick="location.href=\'vpn_client.htm\'">&nbsp;&nbsp;<input class="apply_bt" type="submit" name="Apply" id="apply" value="$apply_mark" onClick="return checkvpn(document.forms[0]);"></TD></TR>');
 else
-        document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel1_bt" type="button" name="Cancel" value="$cancel_mark" disabled>&nbsp;&nbsp;<input class="apply1_bt" type="submit" name="Apply" value="$apply_mark" disabled></TD></TR>');
+        document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel1_bt" type="button" name="Cancel" id="cancel" value="$cancel_mark" disabled>&nbsp;&nbsp;<input class="apply1_bt" type="submit" name="Apply" id="apply" value="$apply_mark" disabled></TD></TR>');
 </script>
 </TABLE>
 </div>
@@ -481,11 +481,11 @@ $bluebar
 <TR ><TD nowrap colspan=2>
 	<div class="vpn_set">
 		<div class="vpn_title">$vpn_server</div>
-		<div class="vpn_input"><select name="vpn_server" onchange="change_service()"></select></div>
+		<div class="vpn_input"><select name="vpn_server" id="vpn_server" onchange="change_service()"></select></div>
 	</div>
          <div class="vpn_set">
                 <div class="vpn_title">$vpn_protocol</div>
-                <div class="vpn_input"><select name="vpn_protocol">
+                <div class="vpn_input"><select name="vpn_protocol" id="vpn_protocol">
                   <option value="TCP">TCP</option>
                   <option value="UDP" selected="selected">UDP</option>
                 </select></div>
@@ -493,33 +493,33 @@ $bluebar
 
 	<div class="vpn_set">
 		<div class="vpn_title">$country_3g</div>
-		<div class="vpn_input"><select name="vpn_country" onchange="change_country()" ></select></div>
+		<div class="vpn_input"><select name="vpn_country" id="vpn_country" onchange="change_country()" ></select></div>
 		<input type="hidden" name="vpn_country_text" value="<% cfg_sed_xss("vpn_client_ovpn_cfg_country_text") %>">
 	</div>
 	<div class="vpn_set">
 		<div class="vpn_title">$city</div>
-		<div class="vpn_input"><select name="vpn_city"></select></div>
+		<div class="vpn_input"><select name="vpn_city" id="vpn_city"></select></div>
 	</div>
 	<div class="vpn_set">
 		<div class="vpn_title">$username</div>
-		<div class="vpn_input"><input type="text" name="user" value="<% cfg_sed_xss("vpn_client_username") %>"></div>
+		<div class="vpn_input"><input type="text" name="user" id="user" value="<% cfg_sed_xss("vpn_client_username") %>"></div>
 	</div>
 	<div class="vpn_set">
 		<div class="vpn_title">$ddns_passwd</div>
-		<div class="vpn_input"><input type="text" name="password" ></div>
+		<div class="vpn_input"><input type="text" name="password" id="password"></div>
 	</div>		
 </TD></TR>
 <TR id="connect_line"><TD nowrap colspan=2>
-	<input class="apply_bt top20" type="submit" name="connect" value="$connect_mark" onClick="return check_connect(document.forms[0]);">
+	<input class="apply_bt top20" type="submit" name="connect" value="$connect_mark" id="connect" onClick="return check_connect(document.forms[0]);">
 </TD></TR>
-<TR><TD nowrap colspan=2><div class="top20"><a onclick="creat_account()" style="color:#49d4da" >$create_an_account</a></div></TD></TR>
+<TR><TD nowrap colspan=2><div class="top20"><a onclick="creat_account()" style="color:#49d4da" id="hylink_lic">$create_an_account</a></div></TD></TR>
 <TR id="connect_status"><TD nowrap colspan=2><div class="top20">
 <div class="vpn_status"><div class="vpn_status_name">Your IP:</div><div id="localip" class="vpn_status_value"><script>if(vpn_status.localip) document.write(vpn_status.localip);</script></div></div>
 <div class="vpn_status"><div class="vpn_status_name">Public IP:</div><div id="publicip" class="vpn_status_value"><script>if(vpn_status.publicip) document.write(vpn_status.publicip);</script></div></div>
 <div class="vpn_status"><div class="vpn_status_name">Country:</div><div id="country" class="vpn_status_value"><script>if(vpn_status.country) document.write(vpn_status.country);</script></div></div>
 <div class="vpn_status"><div class="vpn_status_name">City:</div><div  id="city" class="vpn_status_value"><script>if(vpn_status.city) document.write(vpn_status.city);</script></div></div>
 </div></TD></TR>
-<TR><TD nowrap colspan=2><div class="top20"><a onclick="show_logs()">$show_logs</a></div></TD></TR>
+<TR><TD nowrap colspan=2><div class="top20"><a id="hylink_link" onclick="show_logs()">$show_logs</a></div></TD></TR>
 <TR><TD nowrap colspan=2><div class="top20"><a id="helpcenter" target="_blank" href="https://support.ipvanish.com/">$help_center</a></div></TD></TR>
 
 $bluebar

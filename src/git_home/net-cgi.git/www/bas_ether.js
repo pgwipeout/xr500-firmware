@@ -497,6 +497,10 @@ function check_ether(cf,check)
 		parent.wan_type = "dhcp";
 	else
 		parent.wan_type = "static";
+	var option61=cf.option61.value;
+	if(option61.length>64)
+		return false;
+	cf.hid_dhcp_option2.value=option61;
 	cf.submit();
 	return true;
 }

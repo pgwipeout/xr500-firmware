@@ -1,0 +1,50 @@
+From 18d846bc3308cccebab25e33741e74723944c11a Mon Sep 17 00:00:00 2001
+From: Pengyu Zhou <pengyu.zhou@dniserver.dnish.net>
+Date: Tue, 5 Jun 2018 11:46:52 -0400
+Subject: [PATCH] Fixed Bug 88117 - [XR-404][Openvpn]openvpn connect success log ip
+ display 0.0.0.0
+
+Root cause:
+openvpn server binds to ipv6 address by default configuration, when
+ipv4 client connects to server, in server you will see client's address
+is ipv6 address mapped from ipv4.
+
+Solution:
+Extract ipv4 address from the ipv6 one if openvpn server binds to ipv6
+address and client's IP is ipv6 address mapped from ipv4.
+
+Tested:
+XR500
+
+Signed-off-by: Pengyu Zhou <pengyu.zhou@dniserver.dnish.net>
+---
+ src/openvpn/push.c |   13 ++++++++++++-
+ 1 files changed, 12 insertions(+), 1 deletions(-)
+
+diff --git a/src/openvpn/push.c b/src/openvpn/push.c
+index 33c71f9..e907663 100644
+--- a/src/openvpn/push.c
++++ b/src/openvpn/push.c
+@@ -458,7 +458,18 @@ send_push_reply(struct context *c, struct push_list *per_client_push_list)
+     const int safe_cap = BCAP(&buf) - extra;
+     bool push_sent = false;
+ 
+-    syslog(4, "[OpenVPN, connection successfully] from remote IP address: %s", inet_ntoa(c->c2.to_link_addr->dest.addr.in4.sin_addr));
++    // to fix bug 88117, XR-404, if the connection is INET6, then try 
++    // to get ipv4 address from ipv4mapped ipv6 address
++    if ( (c->c2.to_link_addr->dest.addr.sa.sa_family == AF_INET6) &&
++        IN6_IS_ADDR_V4MAPPED(&(c->c2.to_link_addr->dest.addr.in6.sin6_addr)))
++    {
++        syslog(4, "[OpenVPN, connection successfully] from remote IP address: %s",
++            inet_ntoa(*(struct in_addr*)(c->c2.to_link_addr->dest.addr.in6.sin6_addr.s6_addr+12)) );
++    }
++    else {// the original method
++        syslog(4, "[OpenVPN, connection successfully] from remote IP address: %s",
++            inet_ntoa(c->c2.to_link_addr->dest.addr.in4.sin_addr));
++    }
+ 
+     buf_printf(&buf, "%s", push_reply_cmd);
+ 
+-- 
+1.7.4.1
+

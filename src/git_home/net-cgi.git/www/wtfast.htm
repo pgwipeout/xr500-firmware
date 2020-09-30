@@ -1,0 +1,247 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>WTFast Reference Implementation</title>
+	<script src="/funcs.js"></script>
+	<link rel="stylesheet" href="style/form.css">
+	<script language=javascript type=text/javascript src=jquery-1.7.2.min.js></script>
+	<script src="wtfast.js"></script>
+	<link rel="stylesheet" type="text/css" href="wtfast.css">
+</head>
+
+<body>
+<script>
+<% refresh_timestamp("apply_wtfast_succ") %>
+<% save_timestamp("apply_wtfast_succ","wtfast_logout","apply_wtfast") %>
+
+var ts="<% cfg_get("apply_wtfast_succ") %>";
+var de_str=<% device_string() %>;
+var wt_email="<% cfg_get("wtf_username") %>";
+var wt_passwd="<% cfg_get("wtf_passwd") %>";
+var wt_endis="<% cfg_get("wtfast_endis") %>";
+var wt_login="<% cfg_get("wtf_login") %>";
+var wt_mac;
+var mac_name="<% cfg_get("wtf_mac_name") %>";
+
+window.onload=function(){
+	
+	if(wt_login==1)
+		document.getElementById("successForm").style.display="";	
+	else
+		document.getElementById("loginForm").style.display="";
+}
+
+function mac_addr_add()
+{
+	wt_mac="<% echo_file("/tmp/wtfast_deviceMAC") %>";
+	var obj=document.getElementById("devicemac1");
+	//var mac_array=wt_mac.split(';');
+	var mac_array=wt_mac.split(',');
+       for(var i=0;i<(mac_array.length-1);i++)
+	   {
+            obj.options.add(new Option(mac_array[i],i));
+       }
+}
+
+function mac_config(mac){
+	var cf=document.forms[1];
+	var mac_tmp_array=wt_mac.split(',');
+	var mac_config_name="<% cfg_get("wtf_mac_name") %>";
+	var config_array=mac_config_name.split(',');
+	if(config_array.length>1)
+	{
+		for(var i=0;i<(config_array.length-1);i++)
+		{
+			if(config_array[i].indexOf(mac)>0)
+				break;
+			if(i==config_array.length-2)
+			{
+				for(var k=0;k<(mac_tmp_array.length-1);k++)
+				{
+					if(mac_tmp_array[k].indexOf(mac)>0)
+					{
+						mac_config_name+=mac_tmp_array[k]+",";
+						cf.wtfast_mac_name.value=mac_config_name;
+					}
+				}	
+			}
+		}
+	}else{
+		for(var k=0;k<(mac_tmp_array.length-1);k++)
+		{
+			if(mac_tmp_array[k].indexOf(mac)>0)
+			{
+				mac_config_name=mac_tmp_array[k]+",";
+				cf.wtfast_mac_name.value=mac_config_name;
+			}
+		}
+	}
+		
+}
+
+function mac_match(mac)
+{
+
+	var mac_name="<% cfg_get("wtf_mac_name") %>";
+
+	var mac_arr=mac_name.split(',');
+	wt_mac="<% echo_file("/tmp/wtfast_deviceMAC") %>";
+	var mac_tmp_array=wt_mac.split(',');
+	for(var i=0;i<(mac_arr.length-1);i++)
+	{
+		if(mac_arr[i].indexOf(mac)>0)
+		{
+			return mac_arr[i].replace('=',' ');
+		}
+	}
+		for(var k=0;k<(mac_tmp_array.length-1);k++)
+				{
+					if(mac_tmp_array[k].indexOf(mac)>0)
+					{
+						return mac_tmp_array[k].replace('=',' ');
+					}
+				}
+		
+}
+
+function mac_addr_delete()
+{
+	var obj=document.getElementById("devicemac1");
+	obj.options.length=0;
+}
+
+ function ajaxGetDevice()
+{
+	var file="/wtfast_devicestring.txt";
+	var xmlHttp = createXMLHttpRequest();
+	var result;
+	xmlHttp.onreadystatechange=function()
+	{
+		var cf=document.forms[0];
+		if(xmlHttp.readyState==4 && xmlHttp.status==200)
+		{
+			result=JSON.parse(xmlHttp.responseText);
+			ts=result.timestamp;
+			//alert(ts);
+		}
+	}
+	xmlHttp.open("GET", file, true);
+	xmlHttp.send();
+	
+    //alert result.devicestring;
+}
+</script>
+<div id="disabler"></div>
+<div class="page_title">WTFast Control</div>
+<form id="loginForm" style="display:none">
+<input type=hidden name=submit_flag value="apply_wtfast" />
+<div id="main" class="main_top_button">
+<input type="hidden" name="enable_wtfast" >
+<input type="hidden" name="wtfast_login" >
+<input type="hidden" name="wtfast_session_hash">
+<input type="hidden" name="wtfast_max_clients">
+<input type="hidden" name="wtfast_days_left">
+<input type="hidden" name="wtfast_account_type">
+<input type="hidden" name="wtfast_game_list">
+<input type="hidden" name="wtfast_server_list">
+<TABLE cellspacing=5 cellPadding=0 width=50% border=0>
+
+
+<TR style="height:40px"><TD nowrap><b>Game Boost Login</b></TD></TR>
+<tr id="valid_user" style="display:none;color:yellow;" ><td>Invalid Username or Password</td></tr>
+<TR ><TD nowrap colspan=2>                       <!--这里以下的css js还没改-->
+<div class="vpn_set">
+<div class="vpn_title">Email Address</div>
+<div class="vpn_input"><input type="text" name="email_addr" id="username"></div>
+</div></td><td>
+<div class="vpn_set" >
+<div class="vpn_title">Password</div>
+<div class="vpn_input"><input type="password" name="password" id="password" autocomplete="off"></div>
+</div>	
+</td></tr>
+<TR id="connect_line"><TD nowrap colspan=2>
+<input class="apply_bt top20" type="button" name="connect" value="Login" id="login" style="margin-top:12px"><span id="message"></span>
+</TD></TR>
+<tr><td><a href>Create A Free Account</a></td></tr>
+</table>
+
+</div>
+</form>
+
+
+<form id="successForm" style="display:none">
+
+
+
+<input type=hidden name=submit_flag value="apply_wtfast_succ" />
+<input type="hidden" name="enable_wtfast">
+
+<input type="hidden" name="wtfast_login">
+<input type="hidden" name="devicestring">
+<input type="hidden" name="wtfast_session_hash">
+<input type="hidden" name="wtfast_max_clients">
+<input type="hidden" name="wtfast_days_left">
+<input type="hidden" name="wtfast_account_type">
+<input type="hidden" name="wtfast_game_list">
+<input type="hidden" name="wtfast_server_list">
+<input type="hidden" name="wtfast_mac_name">
+<TABLE cellspacing=5 cellPadding=0 width=100% border=0>
+
+<TR><TD nowrap><b>Game Boost Information</b></TD></TR>
+
+	</table>
+	
+	
+	<div  id="enable_wt_success">
+
+	<div class="account" style="overflow:scroll;overflow-y:hidden"><span style="margin-left:5px">Account</span><span style="color:red;float:right;margin-right:10px;margin-top:5px;font-size:16px;cursor:pointer;" id="logout"><b>LOGOUT<b></span><div id="wtfusername" class="span_ac"></div><br></div>
+	<div class="account1" style="overflow:scroll;overflow-y:hidden"><span style="margin-left:5px">Account Type</span><br><span id="wtfaccounttype" class="span_ac"></span><br></div>
+	<div class="account1"><span style="margin-left:5px">Maximum Computers</span><br><span id="wtfmaxdevices" class="span_ac"></span><span id="upgrade_device" style="font-size:16px;color:red;cursor:pointer;">Upgrade</span><br></div>
+	<div class="account1"><span style="margin-left:5px">Ended Date</span><br><span id="wtfendeddate" class="span_ac"></span><br></div>
+<table cellspacing=5 cellPadding=0 width=95% border=0>
+		<TR><TD nowrap><b>Game Boost Rules List</b></TD></TR>
+		</table>
+	<table cellspacing=5 cellPadding=0 width=95% border=0>
+			<tr>
+				<td>Enable</td>
+				<td>Clients MAC Address</td>
+				<td>Games</td>
+				<td>Server</td>
+				<td id="newdevice" style="color:red;cursor:pointer;"><b>Add Service</b></td>
+				
+			</tr>
+		
+		<tbody id="wtfdevicelist"></tbody>
+	</table><br>
+	<!--<input type="button" id="newdevice" class="apply_bt" value="Add Device">
+	<input type="button" id="logout" class="cancel_bt" value="Logout">-->
+	
+</div>
+<div id="deviceeditor" style="background-color:black">
+	<h2>Devices</h2>
+
+	MAC Address: <input id="devicemac" type="text" disabled ><select id ="devicemac1" style="display:none;">
+	<script>/*var mac_array=wt_mac.split(',');
+		for(var i=0;i<(mac_array.length-1);i++){
+			
+			document.write("<option>"+mac_array[i]+"</option>");
+		}*/
+	</script>
+	</select><br>
+	<input id="deviceenabled" type="checkbox"><label for="deviceenabled"> Enabled<br>
+	<input id="deviceauto" type="checkbox"><label for="deviceauto"> Auto Select Best Path<br>
+	<div id="devicenodeselectors">
+		Node 1: <select id="devicenode1"></select><br>
+		Node 2: <select id="devicenode2"></select><br>
+	</div>
+	Game ID: <select id="devicegameid"></select><br><br>
+	<input type="button" id="devicesave" class="apply_bt" value="Save">
+	<input type="button" id="deviceupdate" class="apply_bt" value="Update">
+	<input type="button" id="devicecancel" class="cancel_bt" value="Cancel">
+</div>
+
+</form>
+
+
+</body>
+</html>

@@ -448,6 +448,7 @@ bh_wl_password_2="2.4GHz 무선 네트워크 암호(네트워크 키): "
 bh_wla_ssid_name="5GHz 무선 네트워크 이름(SSID): "
 bh_wla_password_2="5GHz 무선 네트워크 암호(네트워크 키): "
 bh_wl_finish_warning="경고: 장치가 라우터에 다시 연결될 때까지 <b>마침</b> 버튼을 클릭하지 마십시오."
+ssid_not_allowed_same="SSID가 중복되었습니다. 다른 SSID로 변경하십시오."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="게이트웨이의 구성을 변경할 필요가 없으므로 NETGEAR에서는 이 새 라우터를 액세스 포인트 모드로 설정하기를 권장합니다."
 bh_ap_suggest_str_2="고급 사용자이며 이들 고급 기능의 일부를 지원하도록 게이트웨이를 설정하는 방법을 알고 있는 경우 <b>뒤로</b> 버튼을 클릭하고 NETGEAR 라우터를 라우터 모드에서 구성할 수 있습니다."

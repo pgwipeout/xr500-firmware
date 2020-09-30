@@ -1,0 +1,383 @@
+{
+	"0":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"开启加速",
+		"EN":	"Open acceleration"
+	},
+	"1":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"加速成功",
+		"EN":	"Accelerated successfully"
+	},
+	"2":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"2",
+		"EN":	"1"
+	},
+	"3":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"3",
+		"EN":	"1"
+	},
+	"4":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"3",
+		"EN":	"1"
+	},
+	"5":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"3",
+		"EN":	"1"
+	},
+	"6":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"服务启动失败，请重新开启插件",
+		"EN":	"Failed to start services,please try again"
+	},
+	"7":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"开启中",
+		"EN":	"Loading"
+	},
+	"8":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"操作异常，请重新开启插件",
+		"EN":	"Bad Operation,please try again"
+	},
+	"9":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"后台程序升级成功，请重新开启插件",
+		"EN":	"Program updated succeed,please restart plugin"
+	},
+	"10":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"服务已断线，请重新开启插件",
+		"EN":	"Services are interrupted,please restart plugin"
+	},
+	"1100":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"短信发送成功",
+		"EN":	"Messages Sending Compeleted"
+	},
+	"1101":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"账号已存在，请直接登录",
+		"EN":	"The Account is existed,please Login directly"
+	},
+	"1102":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"您的手机号输入有误，请重新输入",
+		"EN":	"The phone number has errors,please check up"
+	},
+	"1103":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"验证码发送次数过多，请一天后再试，或者联系在线客服",
+		"EN":	"The verify messages sent too many times in a day,please try on another day Or contact online customer service"
+	},
+	"1104":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"注册成功",
+		"EN":	"Signed up successfully"
+	},
+	"1105":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"注册失败，注册账号已存在",
+		"EN":	"Failed to sign up,The account is existed"
+	},
+	"1106":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"注册失败，不是合法的手机号码",
+		"EN":	"Failed to sign up,The phone number is illegal"
+	},
+	"1107":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"未发送短信验证码",
+		"EN":	"The message did not sended"
+	},
+	"1108":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"验证码已过期，请获取新的验证码",
+		"EN":	"Verify Code is expired,please request a new Code"
+	},
+	"1109":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"请输入正确的验证码",
+		"EN":	"The Verify Code is error,please check up"
+	},
+	"1200":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"登录成功",
+		"EN":	"Login successfully"
+	},
+	"1201":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"账号不存在",
+		"EN":	"The account is not existed"
+	},
+	"1202":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"不是合法的手机号码，请重新输入",
+		"EN":	"The phone number is illegal,please check up"
+	},
+	"1203":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"密码错误，请重新输入",
+		"EN":	"The password error,please input again"
+	},
+	"1204":	{
+		"Display":	"0",
+		"DisplayMode":	"Popup",
+		"ZH":	"账号未登录",
+		"EN":	"user doesn't login now"
+	},
+	"1300":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"验证码发送成功",
+		"EN":	"The Verify Code sending Compeleted"
+	},
+	"1301":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"账号不存在，请先注册账号",
+		"EN":	"The account is not exist,please sign up first"
+	},
+	"1302":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"您的手机号输入有误，请重新输入",
+		"EN":	"The phone number error,please input again"
+	},
+	"1303":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"验证码发送次数过多，请一天后再试，或者联系在线客服",
+		"EN":	"The verify messages sent too many times in a day,please try on another day Or contact online customer service"
+	},
+	"1304":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"密码修改成功",
+		"EN":	"Password is modified successfully"
+	},
+	"1305":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"账号不存在，请先注册手机号",
+		"EN":	"The account is not exist,please sign up first"
+	},
+	"1306":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"修改失败，不是合法的手机号码",
+		"EN":	"Failed to modify,is not a leagal number"
+	},
+	"1307":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"未发送短信验证码",
+		"EN":	"The message did not sended"
+	},
+	"1308":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"验证码已过期，请获取新的验证码",
+		"EN":	"Verify Code is expired,please request a new Code"
+	},
+	"1309":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"请输入正确的验证码",
+		"EN":	"Please input the correct verify code"
+	},
+	"1400":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"账号不存在，请先注册手机号",
+		"EN":	"The account is not exist,please sign up first"
+	},
+	"1401":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"无此套餐，请返回重新选择",
+		"EN":	"The selected package is not existed,please select again"
+	},
+	"1402":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"此套餐无法购买，请返回重新选择",
+		"EN":	"Failed to purchase the package,please return and select again"
+	},
+	"1403":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"支付成功",
+		"EN":	"Purchased successfully"
+	},
+	"1404":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"支付失败，请重新尝试",
+		"EN":	"Failed to purchase,please try again"
+	},
+	"1500":	{
+		"Display":	"0",
+		"DisplayMode":	"Popup",
+		"ZH":	"账号正常",
+		"EN":	"Account status normal"
+	},
+	"1501":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"您的密码已经被变更，请重新登录",
+		"EN":	"Your password has been changed,please login again"
+	},
+	"1502":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"会员过期，请续费",
+		"EN":	"The subscription is expired,please recharge"
+	},
+	"1601":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器维护中，预计10分钟，请等待",
+		"EN":	"The servers are now down for maintenance, and we anticipate it to 10 mins"
+	},
+	"1602":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器维护中，预计半小时，请等待",
+		"EN":	"The servers are now down for maintenance, and we anticipate it to 30 mins"
+	},
+	"1603":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器维护中，预计1小时，请等待",
+		"EN":	"The servers are now down for maintenance, and we anticipate it to 1 hour"
+	},
+	"1604":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器维护中，预计2小时，请等待",
+		"EN":	"The servers are now down for maintenance, and we anticipate it to 2 hours"
+	},
+	"1605":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器维护中，预计4小时，请等待",
+		"EN":	"The servers are now down for maintenance, and we anticipate it to 4 hours"
+	},
+	"1606":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器维护中，预计5小时，请等待",
+		"EN":	"The servers are now down for maintenance, and we anticipate it to 5 hour"
+	},
+	"1607":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器维护中，预计6小时，请等待",
+		"EN":	"The servers are now down for maintenance, and we anticipate it to 6 hour"
+	},
+	"1608":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器维护中，预计7小时，请等待",
+		"EN":	"The servers are now down for maintenance, and we anticipate it to 7 hour"
+	},
+	"1609":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器维护中，预计8小时，请等待",
+		"EN":	"The servers are now down for maintenance, and we anticipate it to 8 hour"
+	},
+	"3001":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	},
+	"3002":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	},
+	"3003":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	},
+	"3004":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	},
+	"3005":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	},
+	"3006":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	},
+	"3007":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	},
+	"3008":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	},
+	"3009":	{
+		"Display":	"1",
+		"DisplayMode":	"Text",
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	},
+	"default":	{
+		"Display":	"1",
+		"DisplayMode":	"Popup",
+		"ZH":	"服务器响应错误，请联系在线客服",
+		"EN":	"The servers respone error, please contact online customer service"
+	}
+
+}

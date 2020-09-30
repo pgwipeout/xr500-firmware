@@ -72,7 +72,7 @@ MAKE_FLAGS := \
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
-		CFLAGS="$(TARGET_CFLAGS)" \
+		CFLAGS="$(TARGET_CFLAGS) -DNO_INOTIFY" \
 		LDFLAGS="-L$(STAGING_DIR)/usr/lib -L$(STAGING_DIR)/lib -lconfig" \
 		BINDIR="/usr/sbin" MANDIR="/usr/man" \
 		all

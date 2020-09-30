@@ -1,17 +1,8 @@
-<% http_header("style/form.css", "/funcs.js") %>
+<% http_header("style/form.css", "/funcs.js","style/formframe_wait.css") %>
 
 <BODY onLoad="loadhelp('_upgrade');" bgcolor=#ffffff>
 <FORM>
 	<center>
-	<DIV id=show_upgrade style="display:none">
-		<font size=2>
-		<script>
-			document.write(getText(parent.bh_upgrade_str_1, "$upgrade_str_1") + "3 " + getText(parent.bh_upgrade_str_2, "$upgrade_str_2"));
-		</script>
-		</font><br>
-		<input type=text name=progress class=prgbar width=600 height=70><br><br>
-		<img src=/upload.gif width=200 height=70 border=0>
-	</DIV>
 	</center>
 </FORM>
 </BODY>
@@ -41,7 +32,7 @@ function updateProgress()
 	else if (charcount < maxchars)
 	{
 		charcount++;
-		cf.progress.value = makeStr(charcount,pchar);
+		//cf.progress.value = makeStr(charcount,pchar);
 		setTimeout("updateProgress()",delay_time);
 	}
 	else
@@ -70,7 +61,7 @@ function updateInfo()
 	}
 	else if (upg_status >= 1000 && upg_status < 2000)
 	{
-		document.getElementById("show_upgrade").style.display="";
+		//document.getElementById("show_upgrade").style.display="";
 		if (upg_status == 1100)
 			document.location.href="/pls_wait.html";
 		else
@@ -79,10 +70,12 @@ function updateInfo()
 	else if (upg_status != "")
 	{
 	//bug when upgrade from web site,the UI will show blank for a while,so add please wait message
-		document.write("<TR><TD colspan=2><BR> ");
-		document.write("<img src=liteblue.gif width=100%% height=12></TD></TR> ");
-		document.write("<TR><TD><BR><BR>"+getText(parent.bh_plz_wait_moment, "$wizard_pls_wait")+"<BR><BR></TD></TR> ");
-		document.write("<TR><TD colspan=2><img src=liteblue.gif width=100% height=12></TD></TR> ");
+		document.write('<div id="formframe_wait_div">');
+		document.write('<div>$wizard_pls_wait');
+		document.write('<div class="loader">');
+		document.write('<svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">');
+		document.write('<circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>');
+		document.write('</svg></div></div></div>');
 
 		setTimeout("refreshnexttime()",3000);
 	}

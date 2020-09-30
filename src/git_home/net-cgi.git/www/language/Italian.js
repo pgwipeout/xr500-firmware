@@ -448,6 +448,7 @@ bh_wl_password_2="Password di rete wireless (chiave di rete) da 2,4 GHz: "
 bh_wla_ssid_name="Nome di rete wireless (SSID) da 5GHz: "
 bh_wla_password_2="Password di rete wireless (chiave di rete) da 5GHz: "
 bh_wl_finish_warning="AVVISO: non fare clic sul pulsante <b>Fine</b> finché il dispositivo non è stato ricollegato al router."
+ssid_not_allowed_same="L'SSID esiste già. Modificarlo."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR consiglia di impostare il nuovo router in modalità access point poiché questa modalità non richiede modifiche alla configurazione del gateway."
 bh_ap_suggest_str_2="Nel caso di un utente avanzato in grado di configurare il gateway in modo da supportare alcune delle funzioni avanzate, fare clic sul pulsante<b> Indietro</b> e configurare il router NETGEAR nella modalità router."

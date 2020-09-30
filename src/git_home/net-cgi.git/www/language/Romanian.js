@@ -448,6 +448,7 @@ bh_wl_password_2="Parolă de reţea wireless de 2,4 GHz (Cheie de reţea): "
 bh_wla_ssid_name="Nume de reţea wireless de 5 GHz (SSID): "
 bh_wla_password_2="Parolă de reţea wireless de 5 GHz (Cheie de reţea): "
 bh_wl_finish_warning="AVERTISMENT: Nu faceţi clic pe butonul <b>Finalizare</b> decât după reconectarea dispozitivului dvs. la router."
+ssid_not_allowed_same="SSID-ul este duplicat, utilizaţi un altul."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR recomandă configurarea acestui nou router în modul punct de acces, deoarece nu necesită modificări de configuraţie la gateway-ul dvs."
 bh_ap_suggest_str_2="Dacă sunteţi un utilizator cu experienţă şi cunoaşteţi modul de configurare al gateway-ului astfel încât să suporte unele dintre aceste funcţii avansate, puteţi face clic pe butonul <b><b>Înapoi</b></b> şi puteţi configura routerul NETGEAR în modul router."

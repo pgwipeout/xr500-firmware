@@ -50,6 +50,7 @@
 #include "serverpacket.h"
 #include "pidfile.h"
 
+#define NETDUMA_EXTENSIONS
 
 /* globals */
 struct dhcpOfferedAddr *leases;
@@ -85,12 +86,21 @@ static void signal_handler(int sig)
 
 void show_clients_hostname(void)
 {
+#ifdef NETDUMA_EXTENSIONS
+        FILE *fp,*dl;
+#else
 	FILE *fp;
+#endif
 	unsigned int i;
 	struct dhcpOfferedAddr *lease;
 
 	if ((fp = fopen(HOSTNAME_SHOWFILE, "w")) == NULL)
 		return;
+
+#ifdef NETDUMA_EXTENSIONS
+        dl = fopen( "/tmp/dhcp.leases", "w" );
+#endif
+
 
 	for (i = 0; i < server_config.max_leases; i++) {
 		lease = &(leases[i]);
@@ -106,9 +116,30 @@ void show_clients_hostname(void)
 
 		fprintf(fp, "%u.%u.%u.%u %s\n", NIPQUAD(lease->yiaddr),
 				lease->hostname);
+
+#ifdef NETDUMA_EXTENSIONS
+                if( dl ){
+                  fprintf( dl, "%u %02x:%02x:%02x:%02x:%02x:%02x %u.%u.%u.%u %s\n"
+                    , lease->expires
+                    , lease->chaddr[0]
+                    , lease->chaddr[1]
+                    , lease->chaddr[2]
+                    , lease->chaddr[3]
+                    , lease->chaddr[4]
+                    , lease->chaddr[5]
+                    , NIPQUAD(lease->yiaddr)
+                    , lease->hostname );
+                }
+
+#endif
 	}
 
 	fclose(fp);
+
+#ifdef NETDUMA_EXTENSIONS
+        if( dl )
+          fclose(dl);
+#endif
 }
 
 #endif

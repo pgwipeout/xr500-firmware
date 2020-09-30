@@ -4,6 +4,7 @@ TMP_UMOUNT_TABLE=/tmp/umounting_table_fgd456
 TMP_DEVICE_NAME=/tmp/mounting_divice_name
 TMP_DATA_XYZ=/tmp/proc_partition_dev
 DISK_FIND_TABLE=/tmp/find_disk_abcxzy
+DISK_FIND_TABLE_OLD=/tmp/find_disk_abcxzy_old
 UPDATE_NAME=/tmp/update_name
 
 dev_inproc(){
@@ -44,6 +45,10 @@ print_log()
         fi
 
 	sata_disk_name=`/bin/config get sata_diskname`
+	
+	if [ ! -f $DISK_FIND_TABLE ]; then
+	    DISK_FIND_TABLE=$DISK_FIND_TABLE_OLD
+	fi
 
         device_name=`cat $DISK_FIND_TABLE | grep $1 | awk -F* '{print $2}'`
 	volume_name=`cat $DISK_FIND_TABLE | grep $1 | awk -F* '{{{i=NF-3; a="*";while(i!=0) {printf $(NF-i); if(i!=1) printf a; i--}}}}'`

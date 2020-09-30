@@ -69,12 +69,12 @@ function loadvalue()
 		}
 		else 
 		{
-			form.l2tp_passwd.outerHTML = '<input type="text" name="l2tp_passwd" id="l2tp_passwd" maxlength="60" size="16" onFocus="this.select();change_l2tp_password(this);" onKeyPress="return getkey(\'ssid\', event)">';
+			form.l2tp_passwd.outerHTML = '<input type="text" name="l2tp_passwd" id="l2tp_passwd" maxlength="60" size="16" onFocus="this.select();change_l2tp_password(this);" onKeyPress="return getkey(\'ssid\', event)" autocomplete="off">';
 		}
 	}
 	else if( get_browser() == "IE" )
 	{
-		form.l2tp_passwd.outerHTML = '<input type="password" name="l2tp_passwd" id="l2tp_passwd" maxlength="60" size="16" style="width: 131px" onFocus="change_l2tp_password(this);" onKeyPress="return getkey(\'ssid\', event)">';
+		form.l2tp_passwd.outerHTML = '<input type="password" name="l2tp_passwd" id="l2tp_passwd" maxlength="60" size="16" style="width: 131px" onFocus="change_l2tp_password(this);" onKeyPress="return getkey(\'ssid\', event)" autocomplete="off">';
 	}
 
 	init_passwd();
@@ -228,7 +228,7 @@ document.write('<TR><TD nowrap colspan=2 align=center><input class="common1_bt" 
 <div id="bas_top">
 <TABLE cellspacing=5 cellPadding=0 width=100% border=0>
 <TR><TD nowrap>
-<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','question')"><B>$basic_top_info</B></A>
+<B>$basic_top_info</B>
 </TD></TR>
 <TR>
         <TD nowrap>
@@ -247,7 +247,7 @@ $bluebar
 <TABLE cellspacing=5 cellPadding=0 width=100% border=0>
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','isp')"><B>$basic_intserv_provider</B></A>
+	<B>$basic_intserv_provider:</B>
 	</TD>
 	<TD nowrap>
 	<select name="login_type" id="login_type" onChange="change_serv(document.forms[0])">
@@ -264,7 +264,7 @@ $bluebar
 $bluebar
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','login')"><B>$basic_pppoe_login</B></A>
+	<B>$basic_pppoe_login:</B>
 	</TD>
 	<TD nowrap >
 	<input type="text" name="l2tp_username" id="l2tp_username" maxLength="60" size="16" onKeyPress="return getkey('ssid', event)" value="<% cfg_sed_xss("wan_l2tp_username") %>">
@@ -272,14 +272,14 @@ $bluebar
 </TR>
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','password')"><B>$basic_pppoe_passwd</B></A>
+	<B>$basic_pppoe_passwd:</B>
 	</TD>
 	<TD nowrap >
-	<input type="password" name="l2tp_passwd" id="l2tp_passwd" maxlength="60" size="16" onFocus="change_l2tp_password(this);" onKeyPress="return getkey('ssid', event)">
+	<input type="password" name="l2tp_passwd" id="l2tp_passwd" maxlength="60" size="16" onFocus="change_l2tp_password(this);" onKeyPress="return getkey('ssid', event)" autocomplete="off">
 	</TD>
 </TR>
 <TR> 
-	<TD><A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','conn_mode')"><B>$basic_int_connection_mode</B></A></TD> 
+	<TD><B>$basic_int_connection_mode:</B></TD> 
 	<TD >
 	<select name="l2tp_dod" id="l2tp_dod" onchange="show_idleout(document.forms[0],this.value)"> 
 		<option value="0">$basic_mode_always</option>
@@ -290,7 +290,7 @@ $bluebar
 </TR>
 <TR>
 	<TD>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','idletime')">$basic_pppoe_idle</A>
+		$basic_pppoe_idle:
 	</TD>
 	<TD nowrap >
 	<input type="text" name="l2tp_idletime" id="l2tp_idletime" maxLength="5" size="16" value="<% idle_time("wan_l2tp_idle_time") %>" onKeyPress="return getkey('num', event)">
@@ -298,7 +298,7 @@ $bluebar
 </TR>
 <TR id=auto_conn_play style="display:none">
 	<td colspan="2">
-	<input type="checkbox" name="auto_conn_24hr" value="" id="auto_conn_24hr_ch"><label for="auto_conn_24hr_ch">$bsaic_settings_auto_internet_conn</label>
+	<input type="checkbox" name="auto_conn_24hr" value="" id="auto_conn_24hr_ch"><label for="auto_conn_24hr_ch">$bsaic_settings_auto_internet_conn:</label>
 	<select class="divselect" name="auto_conn_time">
                <option value="1" selected>00:00</option>
                <option value="2">00:30</option>
@@ -354,7 +354,7 @@ $bluebar
 $bluebar
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','myip')"><B>$basic_pptp_myip</B></A>
+	<B>$basic_pptp_myip:</B>
 	</TD>
 	<TD nowrap ><!--bug 22411:when manually input IP,don't click the mouse,the subnet mask can be used -->
 	<input type="text" name="myip_1" id="myip1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onChange="myip_update('bas');" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);myip_update('bas');" >.
@@ -366,7 +366,7 @@ $bluebar
 </TR>
 <TR id=l2tp_sub> 
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','myip')"><B>$lan_mark_subnet</B></A>
+	<B>$lan_mark_subnet:</B>
 	</TD><TD nowrap >
         <input type="text" name="mymask_1" id="mymask1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event)" onkeyup="keyup(event,this);">.
         <input type="text" name="mymask_2" id="mymask2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event)" onkeyup="keyup(event,this);">.
@@ -376,7 +376,7 @@ $bluebar
 </TR>
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','serverip')"><B>$basic_pptp_servip</B></A>
+	<B>$basic_pptp_servip:</B>
 	</TD>
 	<TD nowrap ><!--bug 20279-->
 	<input type="text" size="33" name="l2tp_serv_ip" id="l2tp_serv_ip" maxlength="255" onFocus="this.select();" onblur="l2tp_servip_update();" onKeyPress="return getkey('ddns_hostname', event)" onkeyup="l2tp_servip_update();" value="<% cfg_sed_xss("wan_l2tp_server_ip") %>">
@@ -384,7 +384,7 @@ $bluebar
 </TR>
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','gateway')"><B>$basic_int_gateway</B></A>
+	<B>$basic_int_gateway:</B>
 	</TD>
 	<TD nowrap >
 	<input type="text" name="mygw_1" id="mygw1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -397,7 +397,7 @@ $bluebar
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','DNSaddress')"><B>$basic_int_dns</B></A>
+	<B>$basic_int_dns</B>
 	</TD>
 </TR>
 <TR>
@@ -411,7 +411,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_primary_dns</TD>
+	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_primary_dns:</TD>
 	<TD nowrap >
 	<input type="text" name="DAddr1" id="primary_dns_address1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="DAddr2" id="primary_dns_address2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -420,7 +420,7 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_second_dns</TD>
+	<TD nowrap><img src=/spacer.gif width=20 height=12 border=0>$basic_int_second_dns:</TD>
 	<TD nowrap>
 	<input type="text" name="PDAddr1" id="second_dns_address1" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="PDAddr2" id="second_dns_address2" size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);">.
@@ -431,7 +431,7 @@ $bluebar
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_BAS_pptp','localaddress')"><B>$basic_int_mac</B></A>
+	<B>$basic_int_mac</B>
 	</TD>
 </TR>
 <TR>
@@ -446,7 +446,7 @@ $bluebar
 </TR>
 <TR>
 	<TD nowrap>
-	<input type="radio" name="MACAssign" id="mac_assign_define" value="2" onClick="setMAC(document.forms[0], l2tp_get_this_mac)"><label for="mac_assign_define">$basic_int_this_mac</label>
+	<input type="radio" name="MACAssign" id="mac_assign_define" value="2" onClick="setMAC(document.forms[0], l2tp_get_this_mac)"><label for="mac_assign_define">$basic_int_this_mac:</label>
 	</TD>
 	<TD nowrap >
 	<input type="text" value="" name="Spoofmac" id="spoof_mac" maxlength="17" size="20" onKeyPress="return getkey('mac',event)">

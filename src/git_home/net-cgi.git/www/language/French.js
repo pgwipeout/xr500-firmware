@@ -448,6 +448,7 @@ bh_wl_password_2="Mot de passe (clé réseau) du réseau sans fil 2,4 GHz : "
 bh_wla_ssid_name="Nom (SSID) du réseau sans fil 5 GHz : "
 bh_wla_password_2="Mot de passe (clé réseau) du réseau sans fil 5 GHz : "
 bh_wl_finish_warning="AVERTISSEMENT : ne cliquez pas sur le bouton <b>Terminer</b> tant que votre appareil n'est pas reconnecté au routeur."
+ssid_not_allowed_same="SSID dupliqué, veuillez en choisir un autre."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR vous recommande de configurer ce nouveau routeur en mode Point d'accès, car dans ce mode, il n'y a aucune modification à apporter à la configuration de votre passerelle."
 bh_ap_suggest_str_2="Si vous disposez des connaissances nécessaires et que vous savez comment configurer votre passerelle pour prendre en charge certaines de ces fonctions avancées, vous pouvez cliquer sur le bouton <b>Retour</b> et configurer le routeur NETGEAR en mode Routeur."

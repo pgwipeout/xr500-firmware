@@ -96,7 +96,7 @@ function loadvalue()
 <TABLE cellspacing=5 cellPadding=0 width=100% border=0>
 <TR>
         <TD nowrap>
-        <A tabindex=-1 href="javascript:loadhelp('_IPv6_tunnel','internet')"><B>$ipv6_internet_con_type</B></A>
+        <B>$ipv6_internet_con_type:</B>
         </TD>
         <TD nowrap >
         <select name="login_type" onChange="change_ipv6(document.forms[0].login_type.value)">
@@ -108,7 +108,7 @@ $bluebar
 	<TD nowrap><B>$ipv6_6rd_conf</B></TD>
 </TR>
 <TR>
-	<TD nowrap>$ipv6_6rd_prefix</TD>
+	<TD nowrap>$ipv6_6rd_prefix:</TD>
 	<TD nowrap>
 	<input type="text" name="ipv6_6rd_pre"  size="3" autocomplete="off" maxlength="4" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkeya(event);" onkeyup="keyup_n(event,this,4);" >:
 	<input type="text" name="ipv6_6rd_pre"  size="3" autocomplete="off" maxlength="4" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkeya(event);" onkeyup="keyup_n(event,this,4);" >:
@@ -117,11 +117,11 @@ $bluebar
 	</td>
 </TR>
 <TR>
-	<TD nowrap>$ipv6_6rd_pre_len</TD>
+	<TD nowrap>$ipv6_6rd_pre_len:</TD>
 	<td nowrap><input type="text" name="ipv6_pre_len"  size="2" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup_n(event,this,3);" value='<% cfg_get("Ipv6rdPlen") %>' ></td>
 </TR>
 <TR>
-	<TD nowrap>$ipv6_6rd_relay</TD>
+	<TD nowrap>$ipv6_6rd_relay:</TD>
 	<td nowrap>
 	<input type="text" name="relay_addr"  size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
 	<input type="text" name="relay_addr"  size="3" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup(event,this);" >.
@@ -130,7 +130,7 @@ $bluebar
 	</td>
 </TR>
 <TR>
-	<TD nowrap>$ipv6_6rd_mask_len</TD>
+	<TD nowrap>$ipv6_6rd_mask_len:</TD>
 	<td nowrap><input type="text" name="ipv6_mask_len"  size="2" autocomplete="off" maxlength="3" onFocus="this.select();" onkeydown="keydown(event,this);" onKeyPress="return getkey('num',event);" onkeyup="keyup_n(event,this,3);" value='<% cfg_get("Ipv6rdv4Mask") %>'></td>
 </TR>
 $bluebar
@@ -138,14 +138,14 @@ $bluebar
 <% ipv6_display_dns() %>
 
 <TR>
-        <TD nowrap><A tabindex=-1 href="javascript:loadhelp('_IPv6_tunnel','lan_ipaddr')"><B>$lan_mark_head</B></A></TD>
+        <TD nowrap><B>$lan_mark_head</B></TD>
 </TR>
 <TR>
-        <TD nowrap><A tabindex=-1 href="javascript:loadhelp('_IPv6_tunnel','lan_ipaddr')"><B>$ipv6_lan_address</B></A></TD>
+        <TD nowrap><B>$ipv6_lan_address</B></TD>
 </TR>
 <script>ipv6_write_ip(ipv6_lan_ip);</script>
 <TR>
-        <TD nowrap><A tabindex=-1 href="javascript:loadhelp('_IPv6_tunnel','lan_ip_assign')">$ipv6_ip_assign</A></TD>
+        <TD nowrap>$ipv6_ip_assign</TD>
 </TR>
 <TR>
 	<TD nowrap colspan=2><input type="radio" name="IpAssign" id="ipassign_dhcp" value="dhcp"><label for="ipassign_dhcp">$ipv6_dhcp_server</label></TD>
@@ -157,7 +157,7 @@ $bluebar
         <TD nowrap colspan=2>
         <BR>
         <input type="checkbox" name="useInterfaceId" id="useInterfaceId" value="" onClick="set_interface();">
-	<label for="useInterfaceId"><A tabindex=-1 href="javascript:loadhelp('_IPv6_auto','interface_id')">$ipv6_interface</A></label>
+	<label for="useInterfaceId">$ipv6_interface</label>
         </TD>
 </TR>
 <TR>
@@ -171,7 +171,7 @@ $bluebar
 $bluebar
 <TR>
         <TD nowrap>
-        <A tabindex=-1 href="javascript:loadhelp('_IPv6_tunnel','nat')"><B>$ipv6_filtering</B></A>
+        <B>$ipv6_filtering:</B>
         </TD>
         <TD nowrap >
         <input type="radio" name="IPv6Filtering" value="Secured" id="IPv6Filtering_source"><label for="IPv6Filtering_source">$adva_wansetup_nat_secured</label>&nbsp;

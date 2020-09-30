@@ -1,0 +1,13 @@
+diff --git a/iwlib.c b/iwlib.c
+index 11e44ef..6268cc8 100644
+--- a/iwlib.c
++++ b/iwlib.c
+@@ -650,7 +650,7 @@ iw_get_priv_info(int		skfd,
+       else
+ 	maxpriv *= 2;
+     }
+-  while(maxpriv < 1000);
++  while(maxpriv < 4000);
+ 
+   /* Cleanup */
+   if(priv)

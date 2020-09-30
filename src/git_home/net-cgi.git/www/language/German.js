@@ -448,6 +448,7 @@ bh_wl_password_2="2,4 GHz-WLAN-Netzwerkpasswort (Netzwerkschlüssel):"
 bh_wla_ssid_name="5 GHz-WLAN-Netzwerkname (SSID):"
 bh_wla_password_2="5 GHz-WLAN-Netzwerkpasswort (Netzwerkschlüssel):"
 bh_wl_finish_warning="WARNUNG: Klicken Sie nicht auf die Taste <b>Fertig stellen</b>, bis Sie Ihr Gerät wieder mit dem Router verbinden."
+ssid_not_allowed_same="Dieser Netzwerkname (SSID) existiert bereits. Wählen Sie bitte einen anderen."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR empfiehlt, dass Sie diesen neuen Router im Access Point-Modus einrichten, da dies keine Änderungen der Konfiguration auf dem Gateway erfordert."
 bh_ap_suggest_str_2="Wenn Sie ein erfahrener Benutzer sind und wissen, wie Sie Ihr Gateway konfigurieren, damit es einige dieser erweiterten Funktionen unterstützt, können Sie auf die Schaltfläche <b>Zurück</b> klicken und den NETGEAR-Router im Router-Modus konfigurieren."

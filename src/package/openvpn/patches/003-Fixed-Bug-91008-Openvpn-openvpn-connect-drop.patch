@@ -1,0 +1,45 @@
+--- a/src/openvpn/forward.c	2018-07-31 04:06:36.940503048 -0400
++++ b/src/openvpn/forward.c	2018-08-02 11:38:25.630479192 -0400
+@@ -569,9 +569,19 @@
+ 
+     /* restart if ping not received */
+     check_ping_restart(c);
+-    if(c->sig->signal_received == SIGUSR1)
+-	    /* for udp connection drop */
+-	    syslog(4, "[OpenVPN, connection drop] from remote IP address: %s", inet_ntoa(c->c2.to_link_addr->dest.addr.in4.sin_addr));
++    if(c->sig->signal_received == SIGUSR1) {
++        /* for udp connection drop */
++        if ( (c->c2.to_link_addr->dest.addr.sa.sa_family == AF_INET6) &&
++            IN6_IS_ADDR_V4MAPPED(&(c->c2.to_link_addr->dest.addr.in6.sin6_addr)))
++        {
++            syslog(4, "[OpenVPN, connection drop] from remote IP address: %s",
++                inet_ntoa(*(struct in_addr*)(c->c2.to_link_addr->dest.addr.in6.sin6_addr.s6_addr+12)) );
++        }
++        else {// the original method
++            syslog(4, "[OpenVPN, connection drop] from remote IP address: %s",
++                inet_ntoa(c->c2.to_link_addr->dest.addr.in4.sin_addr));
++        }
++    }
+     if (c->sig->signal_received)
+     {
+         return;
+@@ -736,8 +746,17 @@
+ 
+     if (socket_connection_reset(c->c2.link_socket, status))
+     {
+-	  /* for tcp connection drop */ 
+-	  syslog(4, "[OpenVPN, connection drop] from remote IP address: %s", inet_ntoa(c->c2.to_link_addr->dest.addr.in4.sin_addr));
++        /* for tcp connection drop */ 
++        if ( (c->c2.to_link_addr->dest.addr.sa.sa_family == AF_INET6) &&
++            IN6_IS_ADDR_V4MAPPED(&(c->c2.to_link_addr->dest.addr.in6.sin6_addr)))
++        {
++            syslog(4, "[OpenVPN, connection drop] from remote IP address: %s",
++                inet_ntoa(*(struct in_addr*)(c->c2.to_link_addr->dest.addr.in6.sin6_addr.s6_addr+12)) );
++        }
++        else {// the original method
++            syslog(4, "[OpenVPN, connection drop] from remote IP address: %s",
++                inet_ntoa(c->c2.to_link_addr->dest.addr.in4.sin_addr));
++        }
+ #if PORT_SHARE
+         if (port_share && socket_foreign_protocol_detected(c->c2.link_socket))
+         {

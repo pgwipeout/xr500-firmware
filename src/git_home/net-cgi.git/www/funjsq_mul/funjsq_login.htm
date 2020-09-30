@@ -1,0 +1,164 @@
+<% http_header("style/form.css", "/jquery-1.7.2.min.js", "style/formframe_wait.css","/funcs.js", "/funjsq.js") %>
+<body onLoad="loadvalue(); please_wait(false);">
+<div id="black_over_lay" class="black_overlay">
+</div>
+<script>
+<% refresh_timestamp("funjsq_login") %>
+<% save_timestamp("funjsq_login","funjsq_forget","funjsq_register","forget_get_verify","register_get_verify") %>
+var ts = "<% cfg_get("funjsq_login") %>";
+var forget_or_register = "<% cfg_get("forget_or_register") %>";
+var funjsq_no_need_login = "<% cfg_get("funjsq_no_need_login") %>";
+</script>
+<div id="contain_back" style="background-color:#250406;width:820px;height:400px;margin-left:8%;border:5px solid #6A0B10;border-radius:15px;float:left;">
+<div style="background: rgba(0,0,0,0) url('../image/login.png') no-repeat scroll;width:435px;height:90%;float:left;background-size:90% 100%;margin-top:3px;margin-left:3px;"></div>
+<form id="loginForm" method="POST" action="/admin.cgi?/funjsq_select.htm" target=formframe>
+<input type=hidden name=submit_flag value="funjsq_login" />
+<input type="hidden" name="hidden_funjsq_username" />
+<input type="hidden" name="hidden_funjsq_password" />
+<div class="funjsq" style="width:362px;">
+<div class="icon_account" style="float:left;"></div>
+<h1 style="margin-top:36px;">简单两步完成加速</h1>
+<h3 style="clear:both;margin-left:45px;">第1步 ———————— 登录账号</h3>
+<div class="" id="">
+<TABLE cellspacing=5 cellPadding=3 width=100% border=0 class="funjsq_tab">
+<TR>
+        <TD nowrap>
+        <input type="text" name="funjsq_username" id="loginName" maxLength="64" size="16" value="" autocomplete="off" placeholder="输入您的帆游账号...">
+        </TD>
+</TR>
+<TR>
+        <TD nowrap>
+        <input type="password" name="funjsq_password" id="loginPwd" maxlength="64" size="16" autocomplete="off" placeholder="输入您的帆游密码...">
+        </TD>
+</TR>
+<TR>
+	<TD nowrap>
+	<input class="apply_bt" type="button" name="Apply" id="loginBt" value="登录">
+	</TD>
+</TR>
+<TR>
+	<TD nowrap><span id="forgetBt">忘记密码 &gt;&gt;</span><span> 还没有帆游账号？</span><span id="registerBt">点击注册 &gt;&gt;</span>
+	</TD>
+</TR>
+</TABLE>
+</div>
+</div>
+
+
+
+</form>
+<form id="forgetForm" method="POST" action="/admin.cgi?/funjsq_login.htm" target=formframe>
+<input type=hidden name=submit_flag value="funjsq_forget" />
+<input type="hidden" name="hidden_funjsq_username" />
+<input type="hidden" name="hidden_funjsq_verify" />
+<input type="hidden" name="hidden_funjsq_password" />
+<div class="funjsq" style="width:362px;">
+<div class="icon_account" style="float:left;"></div>
+<h1 style="margin-top:36px">简单两步完成加速</h1>
+<h3 style="margin-left:220px;clear:both">忘记密码</h3>
+<div class="" id="">
+<TABLE cellspacing=5 width=30% border=0 class="funjsq_tab_new">
+<TR>
+        <TD nowrap>手机号</TD>
+        <TD nowrap colspan="2">
+                <input type="text" name="funjsq_username" id="forgetName" maxLength="64" size="26" autocomplete="off" value="" placeholder="输入您的手机号码">
+        </TD>
+	<TD></TD>
+</TR>
+<TR>
+        <TD nowrap>密码</TD>
+        <TD nowrap colspan="2">
+        <input type="password" name="funjsq_password" id="forgetPwd" autocomplete="off" maxlength="32" size="26" placeholder="请输入6-32位数字和字母组合">
+        </TD>
+	<TD></TD>
+</TR>
+<TR>
+        <TD nowrap>验证码</TD>
+        <TD nowrap>
+                <input type="text" name="funjsq_verify" id="forgetVry" maxLength="64" size="13" autocomplete="off" value="" placeholder="请输入短
+信验证码">
+        </TD>
+        <TD nowrap>
+                <input class="funjsq_bt" type="button" name="Apply" id="forgetVerifyBt" value="获取验证码" onclick="$$.get_verify('1','forget');">
+        </TD>
+</TR>
+</TABLE>
+<div style="margin:10px 94px;">
+        <input class="funjsq_bt" type="button" name="Apply" id="forgetApplyBt" value="确认提交" onclick="$$.forget_register_apply('1','forget');">
+        <input class="funjsq_bt" type="button" name="Apply" id="forgetBackBt" value="返回">
+</div>
+</div>
+</div>
+
+</form>
+<form id="registerForm" method="POST" action="/admin.cgi?/funjsq_login.htm" target=formframe>
+<input type=hidden name=submit_flag value="funjsq_register" />
+<input type="hidden" name="hidden_funjsq_username" />
+<input type="hidden" name="hidden_funjsq_verify" />
+<input type="hidden" name="hidden_funjsq_password" />
+<div class="funjsq" style="width:362px;">
+<div class="icon_account" style="float:left;"></div>
+<h1 style="margin-top:36px">简单两步完成加速</h1>
+<h3 style="margin-left:220px;clear:both;">注册账号</h3>
+<div class="" id="">
+<TABLE cellspacing=5 width=30% border=0 class="funjsq_tab_new">
+<TR>
+        <TD nowrap>手机号</TD>
+        <TD nowrap colspan="2">
+                <input type="text" name="funjsq_username" id="registerName" maxLength="64" size="26" value="" autocomplete="off" placeholder="输入您的手机号码">
+        </TD>
+	<TD></TD>
+</TR>
+<TR>
+        <TD nowrap>密码</TD>
+        <TD nowrap colspan="2">
+        <input type="password" name="funjsq_password" id="registerPwd" maxlength="32" size="26" autocomplete="off" placeholder="请输入6-32位数字和字母组合">
+        </TD>
+	<TD></TD>
+</TR>
+<TR>
+        <TD nowrap>验证码</TD>
+        <TD nowrap>
+                <input type="text" name="funjsq_verify" id="registerVry" maxLength="64" size="13" value="" placeholder="请输入
+短信验证码">
+        </TD>
+        <TD nowrap>
+                <input class="funjsq_bt" type="button" name="Apply" id="registerVerifyBt" value="获取验证码" onclick="$$.get_verify('2','register');">
+        </TD>
+</TR>
+
+	</TABLE>
+<div style="margin:10px 94px;">
+        <input class="funjsq_bt" type="button" name="Apply" id="" value="确认提交" onclick="$$.forget_register_apply('2','register');">
+        <input class="funjsq_bt" type="button" name="Apply" id="registerBackBt" value="返回">
+</div>
+</div>
+</div>
+
+
+
+</form>
+</div>
+<div id="service_question" style="margin-left:1px;">
+<div class="question" onClick="window.open('https://static.meiqia.com/dist/standalone.html?_=t&eid=48087');"><img class="funjsq_new_image" style="position:absolute;margin-top:10px;" src="/image/question.png" /></div>
+<div class="service" onClick="window.open('https://static.meiqia.com/dist/standalone.html?_=t&eid=48087');"><img class="funjsq_new_image" style="position:absolute;margin-top:107px;" src="/image/service.png" /></div>
+<div class="WeChat">
+        <img class="funjsq_new_image" style="position:absolute;margin-top:205px;" src="/image/WeChat.png" />
+</div>
+</div>
+<div id="formframe_wait_div" style="display:none;">
+<div>$wizard_pls_wait
+<div class="loader">
+<svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+<circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+</svg></div></div></div>
+<script language="javascript" type="text/javascript">
+function loadvalue()
+{
+	document.forms[1].style.display="none";
+	document.forms[2].style.display="none";
+}
+
+</script>
+</body>
+</html>

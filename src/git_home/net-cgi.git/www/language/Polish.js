@@ -448,6 +448,7 @@ bh_wl_password_2="Hasło sieci bezprzewodowej w paśmie 2,4 Ghz (klucz sieciowy)
 bh_wla_ssid_name="Nazwa sieci bezprzewodowej w paśmie 5GHz (identyfikator SSID): "
 bh_wla_password_2="Hasło sieci bezprzewodowej w paśmie 5 Ghz (klucz sieciowy): "
 bh_wl_finish_warning="UWAGA: Nie klikaj przycisku <b>Zakończ</b> przed ponownym połączeniem urządzenia do routera."
+ssid_not_allowed_same="Nazwa SSID już istnieje, wybierz inną nazwę."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="Firma NETGEAR zaleca przestawienie nowego routera w tryb punktu dostępowego, ponieważ nie wymaga on wprowadzania jakichkolwiek zmian w konfiguracji urządzenia bramy."
 bh_ap_suggest_str_2="Jeśli jesteś zaawansowanym użytkownikiem i wiesz, jak skonfigurować urządzenie bramy do obsługi tych zaawansowanych funkcji, możesz kliknąć przycisk <b>Wstecz</b> i przestawić urządzenie NETGEAR w tryb routera."

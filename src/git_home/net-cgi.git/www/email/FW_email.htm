@@ -169,7 +169,7 @@ function loadvalue()
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_FW_email','receive')"><B>$email_sent_logs</B></A>
+	<B>$email_sent_logs</B>
 	</TD>
 </TR>
 <% email_ssl() %>
@@ -179,13 +179,13 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$ddns_username</TD>
+	<TD nowrap>$ddns_username:</TD>
 	<TD nowrap >
 	<input type="text" class="input_width" name="auth_user" id="auth_user" value="<% cfg_sed_xss("email_username") %>" size="24" maxlength="50" onKeyPress="return getkey('ssid', event)">
 	</TD>
 </TR>
 <TR>	
-	<TD nowrap>$ddns_passwd</TD>
+	<TD nowrap>$ddns_passwd:</TD>
 	<TD nowrap >
 	<input type="password" class="input_width" name="auth_pwd" id="auth_pwd" value="<% cfg_sed_xss("email_password") %>" size="24" maxlength="50" onKeyPress="return getkey('ssid', event)">
 	</TD>

@@ -132,7 +132,7 @@ function loadvalue()
 </script>
 <TR>
 	<TD nowrap>
-	<A tabindex=-1 href="javascript:loadhelp('_FW_schedule','blocksch')"><B>$schedule_days:</B></A>
+	<B>$schedule_days:</B>
 	</TD>
 </TR>
 <TR>
@@ -178,7 +178,7 @@ function loadvalue()
 $bluebar
 <TR>
 	<TD nowrap colspan=2>
-	<A tabindex=-1 href="javascript:loadhelp('_FW_schedule','blocksch')"><B>$schedule_time:</B></A>$schedule_24hour
+	<B>$schedule_time:</B>$schedule_24hour
 	</TD>
 </TR>
 <TR>
@@ -187,14 +187,14 @@ $bluebar
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$schedule_start</TD>
+	<TD nowrap>$schedule_start:</TD>
 	<TD nowrap>
 	<input maxLength=2 type="text" id="start_hour" name=start_hour size=3 onKeyPress="return getkey('num', event)">$schedule_hour
 	<input maxLength=2 type="text" id="start_minute" name=start_minute size=3 onKeyPress="return getkey('num', event)">$schedule_min
 	</TD>
 </TR>
 <TR>
-	<TD nowrap>$schedule_end</TD>
+	<TD nowrap>$schedule_end:</TD>
 	<TD nowrap>
 	<input maxLength=2 type="text" id="end_hour" name=end_hour size=3 onKeyPress="return getkey('num', event)">$schedule_hour
 	<input maxLength=2 type="text" id="end_minute" name=end_minute size=3 onKeyPress="return getkey('num', event)">$schedule_min
@@ -203,7 +203,7 @@ $bluebar
 $bluebar
 <TR>
         <TD nowrap colspan=2>
-        <A tabindex=-1 href="javascript:loadhelp('_FW_schedule','timezone')"><B>$email_timezone</B></a>
+        <B>$email_timezone:</B>
         </TD>
 </TR>
 <TR>

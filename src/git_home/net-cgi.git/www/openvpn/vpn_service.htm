@@ -118,7 +118,7 @@ else
 	</TD>
 </TR>
 $bluebar
-<TR><TD nowrap><a href="javascript:loadhelp('_openvpn','package_download')" tabindex="-1"><b>$package_download</b></a></TD></TR>
+<TR><TD nowrap><b>$package_download</b></TD></TR>
 
 <TR><TD nowrap>
 	<input class='window_bt' type='submit' name="window" value='$window_mark' onClick='return checkdownload(document.forms[0], 1)'>&nbsp;&nbsp;
@@ -128,7 +128,7 @@ $bluebar
 </TR>
 $bluebar
 
-<TR><TD nowrap><a href="javascript:loadhelp('_openvpn','ovpn_instruction')" tabindex="-1"><b>$ovpn_instruction</b></a></TD></TR>
+<TR><TD nowrap><b>$ovpn_instruction</b></TD></TR>
 
 <TR><TD>
 	<a class="black_a" href="vpn_windows_instruction.htm" target="_blank">$windows_link</a>&nbsp;&nbsp;&nbsp;<a class="black_a" href="vpn_mac_instruction.htm" target="_blank">MacOSX</a>&nbsp;&nbsp;&nbsp;
@@ -136,33 +136,33 @@ $bluebar
 </TR>
 $bluebar
 
-<TR><TD nowrap><a href="javascript:loadhelp('_openvpn','adv_config')" tabindex="-1"><b>$adv_config</b></a></TD></TR>
+<TR><TD nowrap><b>$adv_config</b></TD></TR>
 <TR>
-	<TD><a href="javascript:loadhelp('_openvpn','tun_mode_type')" tabindex="-1">$tun_mode_type</a>&nbsp;&nbsp;&nbsp;
+	<TD>$tun_mode_type:&nbsp;&nbsp;&nbsp;
 	<input type="radio" name="tun_vpn_type" value="udp" id="tun_vpn_type_r"><label for="tun_vpn_type_r">UDP</label>&nbsp;&nbsp;
 	<input type="radio" name="tun_vpn_type" value="tcp" id="tun_vpn_type_ra"><label for="tun_vpn_type_ra">TCP</label>
 	</TD>
 	
 </TR>
 <TR>
-       <TD ><a href="javascript:loadhelp('_openvpn','tun_mode_port')" tabindex="-1">$tun_mode_port</a>&nbsp;&nbsp;&nbsp;
+       <TD >$tun_mode_port:&nbsp;&nbsp;&nbsp;
 	<input type="text" maxLength=5 size=6 name="tun_vpn_port" onFocus="this.select();" onKeyPress="return getkey('num', event)" style="ime-mode:disabled;" ondrop="return false;" ondragenter="return false;" onpaste="return false;" >
 	</TD>
 </TR>
 <TR>
-	<TD><a href="javascript:loadhelp('_openvpn','tap_mode_type')" tabindex="-1">$tap_mode_type</a>&nbsp;&nbsp;&nbsp;
+	<TD>$tap_mode_type:&nbsp;&nbsp;&nbsp;
 	<input type="radio" name="vpn_type" value="udp" id="vpn_type_rr"><label for="vpn_type_rr">UDP</label>&nbsp;&nbsp;
 	<input type="radio" name="vpn_type" value="tcp" id="vpn_type_rd"><label for="vpn_type_rd">TCP</label>
 	</TD>
 	
 </TR>
 <TR>
-       <TD ><a href="javascript:loadhelp('_openvpn','tap_mode_port')" tabindex="-1">$tap_mode_port</a>&nbsp;&nbsp;&nbsp;
+       <TD >$tap_mode_port:&nbsp;&nbsp;&nbsp;
 	<input type="text" maxLength=5 size=6 name="vpn_port" onFocus="this.select();" onKeyPress="return getkey('num', event)" style="ime-mode:disabled;" ondrop="return false;" ondragenter="return false;" onpaste="return false;" >
 	</TD>
 </TR>
 <TR>
-        <TD nowrap ><a href="javascript:loadhelp('_openvpn','vpn_connect')" tabindex="-1">$vpn_connect</a>&nbsp;&nbsp;&nbsp;
+        <TD nowrap >$vpn_connect:&nbsp;&nbsp;&nbsp;
 	<input type="radio" name="vpn_access" value="auto" id="vpn_access_1"><label for="vpn_access_1">$auto</label>&nbsp;&nbsp;
         <input type="radio" name="vpn_access" value="all" id="vpn_access_2"><label for="vpn_access_2">$inter_home_network</label>&nbsp;&nbsp;
         <input type="radio" name="vpn_access" value="home" id="vpn_access_3"><label for="vpn_access_3">$home_network</label>&nbsp;&nbsp;

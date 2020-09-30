@@ -1706,6 +1706,7 @@ wifischedule_qcawifi()
     local hw_btn_state="$2"
     local band="$3"
     local newstate="$4"
+    local is_guest="$5"
 
     find_qcawifi_phy "$device" || return 1
 
@@ -1713,6 +1714,9 @@ wifischedule_qcawifi()
     config_get vifs "$device" vifs
     for vif in $vifs; do
         config_get ifname "$vif" ifname
+	if [ "$is_guest" = "1" ]; then
+	   [ "$ifname" = "ath0" -o "$ifname" = "ath1" ] && continue # only want to set guest network vap
+	fi
         if [ "$newstate" = "on" -a "$hw_btn_state" = "on" ]; then
             isup=`ifconfig $ifname | grep UP`
             [ -n "$isup" ] && continue
@@ -1760,6 +1764,7 @@ wifischedule_qcawifi()
         fi
     done
 
+    [ "$is_guest" = "1" ] && return
     # update wlan uptime file
     config_get ifname "$vif" ifname
     isup=`ifconfig $ifname | grep UP`
@@ -2234,17 +2239,6 @@ post_qcawifi() {
                 wlanconfig ath1 vendorie add len 11 oui 00146c pcap_data 0801020110000000 ftype_map 18
                 wlanconfig ath0 vendorie add len 11 oui 00146c pcap_data 0801020110000000 ftype_map 18
             fi
-            # export record from /tmp/mdns_record and format it to /tmp/mdns_result_tmp
-			{
-				pidlist=`ps | grep 'mdnsrecord' | cut -b1-5`
-				for j in $pidlist
-				do
-					kill -9 $j
-				done
-				/usr/sbin/mdnsrecord &
-			}
-			pidlist=`ps | grep 'hyt_result_maintain' | cut -b1-5`
-			[ "x$pidlist" != "x" ] || /usr/share/udhcpd/hyt_result_maintain &
 
 		;;
 	esac

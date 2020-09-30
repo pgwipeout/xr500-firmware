@@ -448,6 +448,7 @@ bh_wl_password_2="Lösenord till det trådlösa 2,4 GHz-nätverket (nätverksny
 bh_wla_ssid_name="Namn på det trådlösa 5GHz-nätverket (SSID):"
 bh_wla_password_2="Lösenord till det trådlösa 5GHz-nätverket (nätverksnyckel): "
 bh_wl_finish_warning="VARNING! Klicka inte på knappen <b>Slutför</b> förrän du återansluter enheten till routern."
+ssid_not_allowed_same="Angivet SSID är en dubblett, ange ett annat SSID."
 //BRS_ap_detect_01_ap_01.html
 bh_ap_suggest_str_1="NETGEAR rekommenderar att du konfigurerar den nya routern i accesspunktläge, eftersom du då slipper konfigurera om din gateway."
 bh_ap_suggest_str_2="Är du en avancerad användare med kunskap om hur man konfigurerar en gateway för vissa av de här avancerade funktionerna kan du klicka på knappen<b>Tillbaka</b> och konfigurera NETGEAR-routern i routerläget."

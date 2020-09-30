@@ -244,7 +244,10 @@ ifeq ($(GREEN_DOWNLOAD),1)
   opt_folders+=green_download
 endif
 ifeq ($(HAVE_FUNJSQ),1)
-  opt_folders+=funjsq
+	opt_folders+=funjsq
+endif
+ifeq ($(HAVE_FUNJSQ_MUL),1)
+	opt_folders+=funjsq_mul
 endif
 ifeq ($(AP_MODE_DETECTION),1)
   opt_folders+=browser_hijack_ap
