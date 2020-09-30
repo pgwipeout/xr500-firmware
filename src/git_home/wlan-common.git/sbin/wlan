@@ -363,6 +363,13 @@ wifi_schedule() {
 		for driver in ${DRIVERS}; do (
 			if eval "type off_led_${driver}" 2>/dev/null >/dev/null; then
 				eval "off_led_${driver} $_tmp_radio_num $_tmp_security_type $_tmp_radio_type $_tmp_led_blinking_setting $_tmp_wlg_guest_onoff $_tmp_wla_guest_onoff" || echo "$driver: off led failed"
+				timeout=15
+				while [ $timeout -gt 0 ]; do
+				[ $(ifconfig | grep -c "ath1") = 0 ] && iwpriv wifi1 gpio_output 17 1 && break
+				[ $(ifconfig | grep -c "ath0") = 0 ] && iwpriv wifi0 gpio_output 17 1 && break
+				sleep 1
+				timeout=$(( $timeout - 1 ))
+				done
 			else
 				echo "$driver: Interface type not supported"
 			fi

@@ -217,7 +217,7 @@
 		});
 
 		$$('#registerBt').click(function() {
-		$$.alertBox("新会员注册成功后，您将获得24小时的免费使用权。为确保您充分体验该服务，建议您在开始游戏前再注册账号");
+		$$.alertBox("新会员注册成功后，您将获得一个月的免费使用权。为确保您充分体验该服务，建议您在开始游戏前再注册账号");
 		$$('#loginForm').css('display','none');
 		$$('#registerForm').css('display','block');
 		$$('#forgetForm').css('display','none');

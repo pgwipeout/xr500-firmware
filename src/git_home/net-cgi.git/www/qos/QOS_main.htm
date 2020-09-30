@@ -295,7 +295,7 @@ $bluebar
         <option value="Kbps">$qos_Kbps</option>
         <option value="Mbps">$qos_Mbps</option>
 	</select>&nbsp;
-	<font id="speedtest_link">$qos_speed_link </font>
+	<span id="speedtest_link">$qos_speed_link </span>
 	<input type="submit" name="speedtest_bt" class="speedtest_bt" id="speedtest_bt" value="Speedtest" style="display:none" onclick="return check_ookla_speedtest(document.forms[0])">&nbsp;
 	<img src=/image/poweredbyookla.png id="ookla_img" style="display:none">
 	</TD>
@@ -309,7 +309,7 @@ $check_internet
 <TR id="check_speed_result" style="display:none">
 <TD>$spacebar
 <script>
-	document.write("<b><font color='#9D98FF'>"+"$get_speed"+" "+ookla_result+"</font></b>");
+	document.write("<b><span style='color:#9D98FF'>"+"$get_speed"+" "+ookla_result+"</span></b>");
 </script></TD>
 </TR>
 <TR>

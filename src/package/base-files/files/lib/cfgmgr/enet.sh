@@ -235,15 +235,25 @@ i_mask() # $1: 1 / 2 / 3 / 4
 sw_configvlan_iptv() # $1: iptv_mask
 {
 	local i mask=$(($1 & 0xf))
-	local ports1="6" ports2="0 5"
+	local ports1="6" ports2="0 5" ports3="5t"
+	local iptv_vlan_enable=$($CONFIG get iptv_vlan_enable)
+	local iptv_vlan=$($CONFIG get iptv_vlan)
 
 	for i in 1 2 3 4; do
-		[ $(( $(i_mask $i) & $mask )) -eq 0 ] && ports1="$ports1 $i" || ports2="$ports2 $i"
+		if [ $(( $(i_mask $i) & $mask )) -eq 0 ]; then
+			ports1="$ports1 $i"
+		elif [ x"$iptv_vlan_enable" = x"1" ]; then
+			ports3="$ports3 ${i}t"
+		else
+			ports2="$ports2 $i"
+		fi
 	done
 
 	sw_printconf_add_switch > $swconf
 	sw_printconf_add_vlan "switch0" "1" "1" "$ports1" >> $swconf
 	sw_printconf_add_vlan "switch0" "2" "2" "$ports2" >> $swconf
+	[ x"$iptv_vlan_enable" = x"1" ] \
+		&& sw_printconf_add_vlan "switch0" "$iptv_vlan" "$iptv_vlan" "$ports3" >> $swconf
 
 	$swconfig dev switch0 load $swconf
 }

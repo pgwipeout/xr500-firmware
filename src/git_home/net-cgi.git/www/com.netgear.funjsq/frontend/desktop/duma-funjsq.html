@@ -1,0 +1,32 @@
+<link rel="import" href="/custom-elements/duma-panels/duma-panel.html?v=<%= dumaos_version %>&lang=<%= lang %>&theme=<%= current_theme %>&themeVersion=<%= current_theme_version %>">
+<link rel="import" href="/libs/jquery.html?v=<%= dumaos_version %>&lang=<%= lang %>&theme=<%= current_theme %>&themeVersion=<%= current_theme_version %>">
+<link rel="import" href="/css/duma-styles.html?v=<%= dumaos_version %>&lang=<%= lang %>&theme=<%= current_theme %>&themeVersion=<%= current_theme_version %>">
+
+<style is="custom-style" include="duma-styles">
+#funjsq {
+        height: 100%;
+        width: 100%;
+        border: none;
+        display: block;
+        box-sizing: border-box;
+        padding-bottom: 16px;
+      }
+</style>
+<duma-panel
+	header="Funjsq"
+	show-pin
+	show-help>
+	<div help-content>
+		<p>1. 帆游加速器专注PS4、Nintendo Switch、Xbox、Windows加速，一键开启即可享受优质游戏网络，无需选择游戏区服与节点，游戏设备开机即可享受加速。千款热门联机游戏畅快玩，与全球玩家痛快竞技，用优质专线保障游戏不卡顿。</p>
+		<p>2. 加速优势：提升网络NAT类型、匹配快、低延迟、无卡顿、不掉线。</p>
+		<p>3. 支持平台：PS4、Nintendo Switch、Xbox、Windows。</p>
+		<p>4. 支持网络：电信、移动、联通、长城宽带、华数、鹏博士等。</p>
+		<p>5. 加速节点：日本、香港、美国、欧洲、韩国等。</p>
+		<p>6. 支持游戏：请参考“加速节点”中所描述的国家或地区,请确保您所使用的加速节点符合逻辑与被游戏所在的服务器良好兼容。</p>
+ </div>
+
+ <div main>
+ <iframe id="funjsq"></iframe>
+ </div>
+</duma-panel>
+<script src="/apps/com.netgear.funjsq/desktop/funjsq.js?v=<%= dumaos_version %>&lang=<%= lang %>&theme=<%= current_theme %>&themeVersion=<%= current_theme_version %>"></script>

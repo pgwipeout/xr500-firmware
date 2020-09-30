@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -62,7 +62,7 @@ function display_upg_fail(msg)
 
 function loadvalue()
 {
-	if(wan_status == 0 || ftp_status == 0)
+	if(wan_status == 0)
 	{
 		display_upg_fail(bh_auto_fail_no_internet);
 	}

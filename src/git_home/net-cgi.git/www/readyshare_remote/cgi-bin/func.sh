@@ -58,7 +58,7 @@ EOF
 print_menu_header()
 {
     echo '<HTML><HEAD><TITLE>WNR2000</TITLE>'
-    echo "<META http-equiv=content-type content='text/html;charset=UTF-8'>"
+    echo "<META charset='utf-8'>"
     echo '<META content="MSHTML 6.00.2800.1141" name=GENERATOR>'
     echo "<script language=javascript type=text/javascript src='/languages-en.js'></script>"
 }
@@ -78,7 +78,7 @@ cat <<EOF
 <Meta http-equiv="Pragma" Content="no-cache">
 <META HTTP-equiv="Cache-Control" content="no-cache">
 <Meta http-equiv="Expires" Content="0">
-<META http-equiv='Content-Type' content='text/html; charset=$(print_charset)'>
+<META charset=$(print_charset)>
 EOF
 print_language_js
 cat <<EOF
@@ -103,7 +103,7 @@ cat <<EOF
 <Meta http-equiv="Pragma" Content="no-cache">
 <META HTTP-equiv="Cache-Control" content="no-cache">
 <Meta http-equiv="Expires" Content="0">
-<META http-equiv='Content-Type' content='text/html; charset=$(print_charset)'>
+<META charset=$(print_charset)>
 EOF
 print_language_js
 cat <<EOF

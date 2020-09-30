@@ -67,7 +67,7 @@ start() {
 	insmod /lib/ufsd/ufsd.ko
 
 	# disable wifi under factory_mode
-	[ "x$(/bin/config get factory_mode)" = "x1" ] && /bin/config set wl_hw_btn_state="off"
+	[ "x$(/bin/config get factory_mode)" = "x1" -a "x$(/bin/config get cal)" != "x0" ] && /bin/config set wl_hw_btn_state="off"
 
 	# indicate the system first boot for first log
 	/bin/config set syslog_up_first=0
@@ -90,7 +90,7 @@ start() {
 	[ -x /sbin/hotplug2 ] && /sbin/hotplug2 --override --persistent \
 			--set-rules-file /etc/hotplug2.rules \
 			--set-coldplug-cmd /sbin/udevtrigger \
-			--max-children 4 >/dev/null 2>&1 &
+			--max-children 10 >/dev/null 2>&1 &
 
 	# create /dev/root if it doesn't exist
 	[ -e /dev/root -o -h /dev/root ] || {

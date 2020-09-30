@@ -52,7 +52,9 @@ print_log()
 
         device_name=`cat $DISK_FIND_TABLE | grep $1 | awk -F* '{print $2}'`
 	volume_name=`cat $DISK_FIND_TABLE | grep $1 | awk -F* '{{{i=NF-3; a="*";while(i!=0) {printf $(NF-i); if(i!=1) printf a; i--}}}}'`
-
+	if [ "$volume_name" = "" ]; then
+		continue
+	else
 	if [ "x$sata_disk_name" = "x$1" ]; then
 		logger "[External disk detached] The External disk $deivce_name($volume_name) is removed from the router"
 		return
@@ -67,6 +69,7 @@ print_log()
 	fi
 	logger "[USB device detached] The USB storage device $1($volume_name) is removed from the router"
 	return
+	fi
 }
 
 

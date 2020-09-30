@@ -8,10 +8,14 @@
 <TABLE width=100% border=0 cellpadding=0 cellspacing=2>
 <TR>
 	<script>
-	var multi_wan_type="<% cfg_get("multi_wan_type") %>";		
-	var master="<% cfg_get("http_loginname") %>";
-	var internet_type="<% cfg_get("internet_type") %>";
-	var internet_ppp_type="<% cfg_get("internet_ppp_type") %>";
+		var multi_wan_type="<% cfg_get("multi_wan_type") %>";	
+		if(parent.vlan_free_flag==1){
+			var get_enable_vlan_id="<% cfg_get("iptv_vlan_enable") %>";
+			var get_vlan_id_input="<% cfg_get("iptv_vlan") %>";
+		}	
+		var master="<% cfg_get("http_loginname") %>";
+		var internet_type="<% cfg_get("internet_type") %>";
+		var internet_ppp_type="<% cfg_get("internet_ppp_type") %>";
 	if (multi_wan_type=="3g" || master == "guest" || (parent.enable_vlan_pppoe_support == 0 && internet_type == "0" && internet_ppp_type == "0"))
 		document.write('<TD nowrap colspan=2 align=center> <input class="cancel1_bt" type="button" name="Cancel" id="cancel" value="$cancel_mark" disabled>&nbsp;&nbsp;<input class="apply1_bt" type="submit" name="Apply" id="apply" value="$apply_mark" disabled></TD>');
 	else
@@ -125,6 +129,12 @@ function loadvalue()
 		setDisabled("true", cf.Add, cf.Delete);
 	}
 	click_enable_vlan(cf);
+
+	if(parent.vlan_free_flag==1){
+		if(get_enable_vlan_id == "1")
+		cf.enable_vlan_id.checked = true;
+		cf.vlan_id_input.value = get_vlan_id_input;
+	}
 }
 
 function click_enable_vlan(cf)
@@ -181,6 +191,7 @@ function change_vlan_type(cf)
 <input type="hidden" name="hid_inter_lan4" value="0" />
 <input type="hidden" name="hid_inter_wireless1" value="0" />
 <input type="hidden" name="hid_inter_wireless2" value="0" />
+<input type="hidden" name="hid_vlan_id_input" value="0" />
 
 <TR>
 	<TD nowrap colspan=4><input type="checkbox" id="vlan_iptv_enable" name="vlan_iptv_enable" onClick="click_enable_vlan(document.forms[0]);"><label for="vlan_iptv_enable"><B>$enable_vlan_iptv</B></label></TD>
@@ -221,6 +232,12 @@ function change_vlan_type(cf)
 			<input type="checkbox" id="iptv_ports_13" name="iptv_ports_13"><label for="iptv_ports_13">Guest-5G</label>
 		</TD>
 	</tr>
+	<script>
+
+		       if(parent.vlan_free_flag==1)
+			   {
+		               document.write('<tr><td colspan=3 style="padding-left:20px;"><input type="checkbox" id="enable_vlan_id" name="enable_vlan_id"><label for="enable_vlan_id">Enable VLAN ID </label><input type="text" name="vlan_id_input" id="vlan_id_input" style="width:60px;" onclange="clearNoNum(this)" oninput="clearNoNum(this)" maxlength="4">(if required; range: 1~4094)<td></tr>');}
+			</script>
 </table>
 </div>
 <div id="by_vlan" style="display:none">

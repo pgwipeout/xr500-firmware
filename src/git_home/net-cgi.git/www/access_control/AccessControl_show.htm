@@ -293,9 +293,9 @@ function loadvalue()
 
 					document.write("<td nowrap align=center><input type='checkbox' name='checkbox_index"+(i+1)+"'  id='checkbox_index"+(i+1)+"' value='"+each_info[2]+"' onClick='toggle_edit();'><label for='checkbox_index"+(i+1)+"'></label></td>");
 					if(each_info[0] == "Allowed")
-						document.write("<td nowrap><font color=green>$acc_allow</font></td>")
+						document.write("<td nowrap><span style=\"color:green;\">$acc_allow</span></td>")
 					else
-						document.write("<td nowrap><font color=red>$acc_block</font></td>")
+						document.write("<td nowrap><span style=\"color:red;\">$acc_block</span></td>")
 					document.write("<td nowrap>"+str_name.replace(/\s/g, '&nbsp;')+"</td>")
 					document.write("<td nowrap>"+each_info[1]+"</td>")
 					document.write("<td nowrap>"+each_info[2]+"</td>")

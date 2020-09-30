@@ -1,8 +1,16 @@
 Index: haserl-0.9.35/src/h_lua.c
 ===================================================================
 --- haserl-0.9.35.orig/src/h_lua.c	2015-02-15 22:16:35.000000000 +0000
-+++ haserl-0.9.35/src/h_lua.c	2018-01-31 13:01:33.394875979 +0000
-@@ -44,7 +44,22 @@
++++ haserl-0.9.35/src/h_lua.c	2018-10-25 17:09:17.465902386 +0100
+@@ -33,6 +33,7 @@
+ #include <fcntl.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <errno.h>
+ 
+ #include <lua.h>
+ #include <lauxlib.h>
+@@ -44,7 +45,22 @@
  #include "h_script.h"
  #include "haserl.h"
  
@@ -25,7 +33,7 @@ Index: haserl-0.9.35/src/h_lua.c
  
  /* attempts to open a file, tokenize and then process it as a haserl script */
  int
-@@ -83,17 +98,173 @@
+@@ -83,17 +99,331 @@
    buffer_add (buf, str, strlen (str));
  }
  
@@ -61,6 +69,7 @@ Index: haserl-0.9.35/src/h_lua.c
 +}
 +#endif
 +
++#if 0
 +static void get_current_lang( char* buffer, size_t bsize )
 +{
 +  size_t n;
@@ -83,7 +92,53 @@ Index: haserl-0.9.35/src/h_lua.c
 +
 +  fclose( fp );
 +}
++#endif
 +
++static void get_config_value( const char *key, char* buffer,
++                                    size_t bsize, const char *defaultval )
++{
++  size_t n;
++  ssize_t read;
++  char *line = NULL;
++  FILE *fp;
++  char cmd[256];
++  int status;
++
++  status = snprintf( cmd, 256, "config get %s", key );
++  if( status < 0 || status >= bsize )
++    die_with_message( NULL, NULL, "conig key '%s' failed with %d", key, status );
++
++  fp = popen( cmd, "r" );
++  if( !fp ){
++    if( defaultval )
++      goto fail_with_default;
++
++    die_with_message( NULL, NULL, "Could not open pipe '%s'", cmd );
++  }
++
++  read = getline( &line, &n, fp );
++  if( read != -1 ){
++    strncpy( buffer, line, bsize );
++    buffer[ read - 1 ] = '\0';    /* cut newline */
++    free( line );
++  } else {
++    if( defaultval )
++      goto fail_with_default;
++
++    die_with_message( NULL, NULL, "Failed to readline from '%s'", cmd );
++  }
++
++  return;
++
++fail_with_default:
++  if( defaultval )
++    strncpy( buffer, defaultval, bsize );
++
++  if( fp )
++    fclose( fp );
++}
++
++#if 0
 +/*
 +* GET.lang determines lang, defaults to English.
 +*/
@@ -143,6 +198,115 @@ Index: haserl-0.9.35/src/h_lua.c
 +    lua_pop( L, 1 );
 +  }
 +}
++#endif
++
++/*
++* DumaOS has tables that are rerferenced by every page, such as i18n and
++* themes. We automatically load them before processing each request.
++*/
++static void load_global_table(lua_State *L,
++                    const char *getparam, const char *defaultparam,
++                    const char *pathformat, const char *globalvar,
++                    const char *indexvar ){
++  char buffer[PATH_MAX];
++  const char *key;
++
++  /* Determine which global table to load e.g. English if i18n */
++  lua_getglobal( L, "GET" );
++  lua_getfield( L, -1, getparam );
++  if( lua_isstring( L, -1 ) ){
++    key = lua_tostring( L, -1 );
++    if( strstr( key, "." ) || strstr( key, "/" ) ){
++      lua_pop( L, 2 );
++      die_with_message( NULL, NULL, "Invalid global table key '%s'", key );
++    }
++
++    /*key global assignment value - see next statement */
++    lua_pushvalue( L, -1 );
++  } else {
++    key = defaultparam;
++    lua_pushstring( L, key );
++  }
++
++  /* set get parameter as global useful for cache reasons */
++  lua_setglobal( L, indexvar ? indexvar : getparam );
++
++  /* generate path for load table from */
++  snprintf( buffer, PATH_MAX, pathformat, key );
++
++  /* only pop after with finished using key pointer */
++  lua_pop( L, 2 );
++
++  if( !access( buffer, F_OK ) ){
++    if( luaL_loadfile( L, buffer ) == LUA_ERRFILE )
++      return;
++
++    lua_call( L, 0, 1 );
++    lua_setglobal( L, globalvar );
++  } else {
++    //die_with_message( NULL, NULL, "Failed to load global table '%s'", buffer );
++  }
++}
++
++static void load_lang_table(lua_State *L){
++  char default_lang[256];
++  char path_format[PATH_MAX];
++  int s;
++
++  #define LANG_FORMAT "/www/language/dumaos/%%s/%s.luac"
++
++  get_config_value( "GUI_Region", default_lang, sizeof( default_lang ), "English" );
++
++  s = snprintf( path_format, sizeof( path_format ), LANG_FORMAT, g_filename );
++  if( s >= sizeof( path_format ) ){
++    die_with_message( NULL, NULL, "Path too long for '%s'", g_filename );
++  }
++
++  load_global_table( L, "lang", default_lang, path_format, "i18n", NULL );
++}
++
++static void load_theme_table(lua_State *L){
++  char default_val[256];
++
++  /* laod theme table */
++  #define THEME_FORMAT "/dumaos/themes/cloud/%s/theme.luac"
++  get_config_value( "DumaOS_Theme", default_val, sizeof( default_val ), "default" );
++  load_global_table( L, "theme", default_val, THEME_FORMAT, "theme", "current_theme" );
++
++  /* load theme version */
++  get_config_value( "DumaOS_Theme_Version", default_val, sizeof( default_val ), NULL );
++  lua_pushstring( L, default_val );
++  lua_setglobal( L, "current_theme_version" );
++}
++
++static void load_dumaos_version(lua_State *L){
++  FILE *f;
++  char *line;
++  size_t len;
++  ssize_t read;
++
++  f = fopen("/www/data/shorthash","r");
++  if( !f )
++    goto fail;
++
++  line = NULL;
++  if( ( read = getline( &line, &len, f ) ) < 0 )
++    goto fail_and_close;
++
++  if( line[read-1] == '\n' )
++    line[read-1] = '\0';
++
++  lua_pushstring( L, line );
++  lua_setglobal( L, "dumaos_version" );
++
++  free( line );
++  fclose( f );
++  return;
++fail_and_close:
++  fclose( f );
++fail:
++  die_with_message( NULL, NULL, "Failed to load DumaOS version because '%s'", strerror( errno ) );
++}
 +
 +/*
 +* By design all content is effectively cached indefintely unless explicitly
@@ -182,8 +346,10 @@ Index: haserl-0.9.35/src/h_lua.c
 +  load_library( lua_vm, "json", "json" );
 +#endif
 +
-+  /* load translation */
++  /* load global tables */
++  load_theme_table( lua_vm );
 +  load_lang_table( lua_vm );
++  load_dumaos_version( lua_vm );
 +
 +  /* force the string to be null terminated */
    buffer_add (script, "\0", 1);
@@ -204,7 +370,7 @@ Index: haserl-0.9.35/src/h_lua.c
 Index: haserl-0.9.35/src/haserl.c
 ===================================================================
 --- haserl-0.9.35.orig/src/haserl.c	2015-03-11 18:56:52.000000000 +0000
-+++ haserl-0.9.35/src/haserl.c	2018-01-31 13:01:03.746875976 +0000
++++ haserl-0.9.35/src/haserl.c	2018-10-25 17:09:08.677902362 +0100
 @@ -89,7 +89,7 @@
  #endif
  
@@ -226,7 +392,7 @@ Index: haserl-0.9.35/src/haserl.c
 Index: haserl-0.9.35/src/h_script.c
 ===================================================================
 --- haserl-0.9.35.orig/src/h_script.c	2015-02-15 22:16:48.000000000 +0000
-+++ haserl-0.9.35/src/h_script.c	2018-01-31 13:01:23.178875964 +0000
++++ haserl-0.9.35/src/h_script.c	2018-10-25 17:09:08.677902362 +0100
 @@ -132,6 +132,13 @@
        (scriptbuf->curpos)++;
      }

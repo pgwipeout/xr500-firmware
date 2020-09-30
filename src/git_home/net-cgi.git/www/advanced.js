@@ -269,8 +269,6 @@ function enabledItemsClass()
 	}
 	if(wan_type == "static")
 		document.getElementById("conn_status").className = "middle_grey";
-	if(netgear_region=="PR"&&gui_region=="Chinese")
-                document.getElementById("vpn_client").className = "middle_grey";	
 
 	if(enabled_wps == 0)
 		document.getElementById("adv_wps").className = "middle_grey";
@@ -357,8 +355,6 @@ function click_adv_action(id)
 		if(wan_type =="static" && id == "conn_status" )
 			id = "NOTACTIVE";	
 		
-		if(netgear_region=="PR"&&gui_region=="Chinese"&&id=="vpn_client")
-			id = "NOTACTIVE";	
 		if( id == "adv_home" )
                 {
 			menu_color_change('adv_home');

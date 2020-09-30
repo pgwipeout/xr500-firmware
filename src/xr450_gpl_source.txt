@@ -58,6 +58,11 @@ User application
         http://packages.debian.org/bc
         GPL
         Source Code
+[bind]
+	bind-9.11.2-P1.tar.gz
+	https://ftp.isc/bind
+	GPL
+	Source Code
 [dni-libmtd]
         dni-libmtd
         DNI

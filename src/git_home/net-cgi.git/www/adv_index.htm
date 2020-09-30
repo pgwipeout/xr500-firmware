@@ -155,8 +155,6 @@ function loadvalue()
 		goto_formframe("BAS_basic.htm");
 		menu_color_change('internet');
 	}
-	if(netgear_region=="PR")
-		document.getElementById("vpn_client").style.display="none";
 }
 
 </script>
@@ -237,7 +235,7 @@ function loadvalue()
 		
 		<% advanced_sub_menu("dns", "sub_back", "ddns_head", "advanced_ddns", "dns") %>
 		<% advanced_sub_menu("vpn", "sub_back", "vpn_head", "Advanced_vpnservice")%>
-		<dt id="vpn_client" class="sub_back"><a  target="formframe" onclick="click_adv_action('vpn_client');"><b><span name="advanced_vpnclient" id="advanced_vpnclient">$vpn_client</span></b></a></dt>
+		<!--<dt id="vpn_client" class="sub_back"><a  target="formframe" onclick="click_adv_action('vpn_client');"><b><span name="advanced_vpnclient" id="advanced_vpnclient">$vpn_client</span></b></a></dt>-->
 		<% advanced_sub_menu("pptp_vpn", "sub_back", "pptp_vpn_head", "advanced_pptpvpn")%>
 		<% advanced_sub_menu("static", "sub_back", "static_router_head", "advanced_static", "static") %>
 		<% advanced_sub_menu("remote", "sub_back", "remote_head", "advanced_remote", "remote") %>

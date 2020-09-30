@@ -1,0 +1,10 @@
+{
+  "package" : "com.netgear.funjsq",
+  "version" : "0.0.1",
+  "foreground" : true,
+  "system": true,
+  "name": "title",
+  "icon": "/apps/com.netgear.funjsq/shared/funjsq.svg",
+  "bind" : [],
+  "methods" : []
+}

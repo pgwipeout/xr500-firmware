@@ -20,15 +20,15 @@ print_log()
 
 	sata_disk_name=`/bin/config get sata_diskname`
 
-	local time_out_cnt=200
-	while [ ! -f $DISK_FIND_TABLE -a $time_out_cnt -gt 0 ]; do
-		sleep 1
-		time_out_cnt=$(( $time_out_cnt -1 ))
-	done
 	
         device_name=`cat $DISK_FIND_TABLE | grep $1 | awk -F* '{print $2}'`
 	volume_name=`cat $DISK_FIND_TABLE | grep $1 | awk -F* '{{{i=NF-3; a="*";while(i!=0) {printf $(NF-i); if(i!=1) printf a; i--}}}}'`
-
+	local time_out_cnt=500
+	while [ "$volume_name" = "" -a $time_out_cnt -gt 0 ];do
+		sleep 1
+		volume_name=`cat $DISK_FIND_TABLE | grep $1 | awk -F* '{{{i=NF-3; a="*";while(i!=0) {printf $(NF-i); if(i!=1) printf a; i--}}}}'`
+		 time_out_cnt=$(( $time_out_cnt -1 ))
+	done
 	if [ "x$sata_disk_name" = "x$1" ]; then
 		logger "[External disk attached] The External disk attached $device_name($volume_name) is attached to the router"
                 return

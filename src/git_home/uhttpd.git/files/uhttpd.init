@@ -128,12 +128,14 @@ start() {
 	#mkdir /tmp/www
 	#cp -rf /usr/www/* /tmp/www
 
-	rm -rf /dumaos/apps/system/com.netdumasoftware.funjsq
+	rm -rf /dumaos/apps/usr/com.netdumasoftware.hybridvpn
+	rm -rf /dumaos/apps/system/com.netgear.funjsq
 
 	region=$(/sbin/artmtd -r region | grep REGION | awk '{print $2}')
 
+	[ x"${region}" = x"PR" ] || ln -s /dumaos/apps/extra/com.netdumasoftware.hybridvpn /dumaos/apps/usr/
 	if [ x$(/bin/config get GUI_Region) = x"Chinese" -a x"${region}" = x"PR" ]; then
-		ln -s /www/com.netdumasoftware.funjsq /dumaos/apps/system/com.netdumasoftware.funjsq
+		ln -s /www/com.netgear.funjsq /dumaos/apps/system/com.netgear.funjsq
 	fi
 	/www/cgi-bin/uhttpd.sh start
 	inetd

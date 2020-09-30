@@ -1,6 +1,6 @@
 <HTML><HEAD>
 <TITLE> Router Password Recovery</TITLE>
-<META http-equiv=content-type content='text/html; charset=UTF-8'>
+<META charset="utf-8">
 <LINK rel="stylesheet" href="/style/form.css">
 <STYLE type="text/css">
 TR{ FONT-FAMILY: Arial;}

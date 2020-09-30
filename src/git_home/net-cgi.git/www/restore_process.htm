@@ -1,6 +1,6 @@
 <HTML><HEAD>
 <LINK rel="stylesheet" type="text/css" href="style/hijack_style.css">
-<TITLE>NETGEAR Router WNDR3700 </TITLE><META http-equiv=content-type content='text/html; charset=UTF-8'>
+<TITLE>NETGEAR Router WNDR3700 </TITLE><meta charset="utf-8">
 <META content="MSHTML 6.00.2800.1141" name=GENERATOR>
 <script language=javascript type=text/javascript src=/funcs.js></script>
 <style>
@@ -30,8 +30,8 @@ if (restore_status == "0" || restore_status == "1")
 var ts="<% cfg_get("reboot") %>"
 </script>
 <div id="h1_head" style="display:none"><H1>$failure_head</H1></div>
-<div id="msg" align="center"><BR><BR><B>$wizard_pls_wait</B></div>
-<div id="wait" class="waiting_img_div" align="center"><img src="image/wait30.gif" /></div>
+<div id="msg" style="text-align:center"><BR><BR><B>$wizard_pls_wait</B></div>
+<div id="wait" class="waiting_img_div" style="text-align:center"><img src="image/wait30.gif" /></div>
 <div id="auto_return"></div>
 
 <input type=hidden name=submit_flag value="reboot">
@@ -68,11 +68,11 @@ function show_error()
 {
 	document.getElementById("h1_head").style.display="";
 	getObj("msg").innerHTML="<TABLE width=100%>" +
-				"<TR><TD align=center><B>$restore_select_correct</B><BR><BR></TD></TR>" +
+				"<TR><TD style=\"text-align:center\"><B>$restore_select_correct</B><BR><BR></TD></TR>" +
 				"</TABLE>";
 	getObj("wait").innerHTML="";
 	getObj("auto_return").innerHTML="";
-	getObj("auto_return").innerHTML="<center>$few_second<BR><BR></center>";
+	getObj("auto_return").innerHTML="<div style=\"text-align:center\">$few_second<BR><BR></div>";
 }
 
 function show_wait()

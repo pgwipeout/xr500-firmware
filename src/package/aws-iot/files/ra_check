@@ -212,7 +212,8 @@ main ()
 	check_process_conflict
 
 	count=3
-	[ "$(cat ${RAE_DIR}/status)" = "1" ] && count=1000000
+    # fix download constandly when download fails
+	#[ "$(cat ${RAE_DIR}/status)" = "1" ] && count=1000000
 
 	check_and_update_rae
 }

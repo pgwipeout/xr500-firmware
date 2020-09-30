@@ -26,7 +26,7 @@ function loadvalue()
 	
 	<a tabindex=-1 href="javascript:loadhelp('_upgrade','check')"><b>$upgrade_new_version</b></a>
 	<br><br>
-	<center>
+	<div style="text-align:center;">
 	<script>
 	var master="<% cfg_get("http_loginname") %>";
 	if( master == "admin" )
@@ -35,7 +35,7 @@ function loadvalue()
 		document.write('<input class="common1_bt" type="submit" name="check" disabled>');
 	</script>
 	
-	</center>
+	</div>
 
 </div>
 </FORM>

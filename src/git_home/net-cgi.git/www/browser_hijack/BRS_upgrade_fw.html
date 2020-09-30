@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -8,7 +8,7 @@
 </head>
 <body onload="loadvalue();">
 <% form_submit("func", "BRS_upgrade_download_image.html", "download_image")%>
-<% save_timestamp("download_image", "hijack_save_time", "hijack_register_router") %>
+<% save_timestamp("download_image", "hijack_save_time", "hijack_register_router", "download_language_image") %>
 <script>
 <% check_version() %>
 </script>
@@ -26,11 +26,13 @@
 		  <div class="row">
 			<p id=cur_firm style="text-align:center;"><B><script>document.write(bh_current_firmware);</script>:</B><span style="margin-left:10px;"><% cat_file("/firmware_version") %><% get_firmware_region("single_blank", "ww_blank") %></span></p>
 			<p id=new_firm style="text-align:center;display:none;"><b><script>document.write(bh_new_firmware);</script>:</B><span style="margin-left:10px;"><% cat_file("/tmp/auto_version") %></span></p>
+			<p id=cur_lang style="text-align:center;"><B><script>document.write(bh_current_language);</script>:</B><span style="margin-left:10px;"><% get_language_version() %></span></p>
+			<p id=new_lang style="text-align:center;display:none;"><b><script>document.write(bh_new_language);</script>:</B><span style="margin-left:10px;"><% cat_file("/tmp/lang_version") %></span></p>
 		</div>
 
 	     </div>
 			<div class="buttons">
-				<button class="waves-effect waves-light btn button-nav"  id="update_btn" style="display:none;">
+				<button class="waves-effect waves-light btn button-nav"  id="update_btn" onclick="clickUp()" style="display:none;">
 					<span><script>document.write(bh_update);</script></span>
 				</button>
 				<script>
@@ -59,6 +61,10 @@
 				document.getElementById("new_firm").style.display = "";
 				document.getElementById("update_msg").style.display="";
 				document.getElementById("title_msg").style.display="";
+				if(updateLanguage == 1)
+					document.getElementById("new_lang").style.display = "";
+				else
+					document.getElementById("new_lang").style.display = "none";
 			}
 			else
 			{
@@ -77,9 +83,24 @@
 			document.getElementById("update_msg").innerHTML = bh_auto_fail_no_internet;
 			document.getElementById("title_msg").innerHTML = bh_no_new_version;
 			document.getElementById("new_firm").style.display = "none";
+			document.getElementById("new_lang").style.display = "none";
 		}
 	}
-	
+
+function clickUp()
+{
+	var cf=document.forms[0];
+	if ( updateLanguage == 1 && updateFirmware == 1 && updateGreen == 0 ){
+		cf.submit_flag.value="download_language_image";
+		cf.submit();
+	}else
+	{
+		cf.submit_flag.value="download_image";
+		cf.submit();
+	}
+
+}
+
 function toInternet()
 {
 	var cf = document.forms[0];

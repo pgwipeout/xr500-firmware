@@ -11,7 +11,7 @@ FILES += basic_home_asp.o menu_asp.o adv_index_asp.o
 FILES += sw_soap.o sw_devconfig.o sw_devinfo.o sw_wanip.o \
 	sw_wanethlink.o sw_lanconfig.o sw_wlanconfig.o \
 	sw_parentalctl.o sw_auth.o\
-	sw_time.o sw_agent.o sw_base64.o sw_wepkey.o
+	sw_time.o sw_agent.o sw_base64.o sw_wepkey.o sw_devconfig_access.o
 FILES += hnap_agent.o hnap_general.o hnap_router.o hnap_soap.o hnap_wireless.o
 FILES += hijack_action.o hijack_apply.o hijack_asp.o
 FILES += pagetag_asp.o forwarding_apply.o triggering_apply.o block_service_apply.o
@@ -28,6 +28,8 @@ FILES += vpn_apply.o vpn_asp.o
 FILES += wless_schedule_apply.o wless_schedule_asp.o wless_schedule_action.o
 FILES += devmode_apply.o
 FILES += rest_main.o rest_management.o rest_multilanguage.c rest_json.o message.o dni_util.o
+FILES += funjsq_apply.o
+FILES += wtfast_apply.o
 
 CFLAGS += -DHOST_NAME=$(HOST_NAME)
 CFLAGS += -DNET_IFNAME=$(NET_IFNAME)
@@ -75,6 +77,8 @@ CFLAGS += -DHAVE_OPENVPN=$(HAVE_OPENVPN)
 CFLAGS += -DHAVE_BT_IGMP=$(HAVE_BT_IGMP)
 CFLAGS += -DENABLE_VLAN_PPPOE_SUPPORT=$(ENABLE_VLAN_PPPOE_SUPPORT)
 CFLAGS += -DDFS_RADAR_DETECT=$(DFS_RADAR_DETECT)
+CFLAGS += -DVERSION_FIRST_1_CHECK=$(VERSION_FIRST_1_CHECK)
+CFLAGS += -DHAVE_NETDUMA_ACCESS_CONTROL=$(HAVE_NETDUMA_ACCESS_CONTROL)
 ifeq ($(TNC_REQUEST), 1)
 CFLAGS += -DTNC_REQUEST=1
 else
@@ -184,6 +188,12 @@ endif
 ifeq ($(HAVE_BIGPOND), 1)
 CFLAGS += -DHAVE_BIGPOND
 endif
+ifeq ($(HAVE_FUNJSQ), 1)
+CFLAGS += -DHAVE_FUNJSQ
+endif
+ifeq ($(HAVE_FUNJSQ_MUL), 1)
+CFLAGS += -DHAVE_FUNJSQ_MUL
+endif
 ifeq ($(HAVE_WIRELESS_AN), 1)
 CFLAGS += -DHAVE_WIRELESS_AN
  ifeq ($(HAVE_WIRELESS_AC), 1)
@@ -220,7 +230,7 @@ FILES += plc_devs.o plc_devs_action.o plc_devs_apply.o plc_devs_asp.o
 CFLAGS += -DHAVE_PLC
 endif
 ifeq ($(HAVE_ACCESS_CONTROL), 1)
-FILES += access_control_apply.o access_control_devices_asp.o sw_devconfig_access.o
+FILES += access_control_apply.o access_control_devices_asp.o
 CFLAGS += -DHAVE_ACCESS_CONTROL
 endif
 ifeq ($(ACCESS_CONTROL_SCHEDULE), 1)
@@ -306,6 +316,9 @@ CFLAGS += -DDFS_JAPAN
 endif
 ifeq ($(DFS_RUSSIA), 1)
 CFLAGS += -DDFS_RUSSIA
+endif
+ifeq ($(DFS_KOREA), 1)
+CFLAGS += -DDFS_KOREA
 endif
 ifeq ($(MODE_IS_300_OR_150), 1)
 CFLAGS += -DMODE_IS_300_OR_150
@@ -493,6 +506,10 @@ ifeq ($(SOAP_SECURITY), 1)
 CFLAGS += -DSOAP_SECURITY
 endif
 
+ifeq ($(HAVE_ISP_FREE), 1)
+	CFLAGS += -DHAVE_ISP_FREE
+endif
+
 
 CFLAGS += -DUSE_MTD_UTIL=$(USE_MTD_UTIL)
 CFLAGS += -DADV_COEXISTENCE=$(ADV_COEXISTENCE)
@@ -508,7 +525,7 @@ CFLAGS += -Wall -Wunused -g -O2 -std=gnu99
 LDFLAGS += -L$(STAGING_DIR)/usr/lib/libiconv/lib
 
 .PHONY: all install clean
-all : net-cgi usb_cfg inetd detplc remote_smb_conf remote_user_conf remote_share_conf readycloud_unregister
+all : net-cgi usb_cfg inetd detplc remote_smb_conf remote_user_conf remote_share_conf readycloud_unregister check_lang
 
 net-cgi : $(FILES)
 	$(CC) $(CFLAGS) $^ -o $@ $(EXTRA_LDFLAGS) $(LDFLAGS) -lconfig -lpthread -liconv -ljson-c -lcurl
@@ -520,19 +537,23 @@ usb_cfg : usbdisk.o usb_cfg.o print.o
 inetd : http_scan.o
 	$(CC) $(CFLAGS) $^ -o $@ $(EXTRA_LDFLAGS) $(LDFLAGS)
 
-remote_smb_conf remote_user_conf remote_share_conf readycloud_unregister: usbdisk.o remote_smb_conf.o print.o
+remote_smb_conf remote_user_conf remote_share_conf readycloud_unregister: usbdisk.o remote_smb_conf.o print.o dni_util.o
 	$(CC) $(CFLAGS) $^ -o $@ $(EXTRA_LDFLAGS) $(LDFLAGS) -lconfig -liconv
 
 detplc: plc_devs_detect.o
 	$(CC) $(CFLAGS) $^ -o $@ $(EXTRA_LDFLAGS) $(LDFLAGS) -lconfig
+
+check_lang: print.o check_lang.o dni_util.o
+	$(CC) $(CFLAGS) $^ -o $@ $(EXTRA_LDFLAGS) $(LDFLAGS) -lconfig -lssl -lcrypto
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c $<
 
 install:
 	$(INSTALL_DIR)	$(INS_BIN_DIR)
-	$(INSTALL_BIN)  net-cgi         $(INS_BIN_DIR)
+	$(INSTALL_BIN)	net-cgi		$(INS_BIN_DIR)
 	$(INSTALL_BIN)	inetd		$(INS_BIN_DIR)
+	$(INSTALL_BIN)  check_lang      $(INS_BIN_DIR)
 ifeq ($(HAVE_USB_STORAGE),1)
 	$(INSTALL_BIN)	usb_cfg		$(INS_BIN_DIR)
 endif
@@ -548,4 +569,4 @@ endif
 
 clean:
 	rm -f *.o 
-	rm -f net-cgi usb_cfg inetd detplc remote_smb_conf remote_user_conf remote_share_conf readycloud_unregister
+	rm -f net-cgi usb_cfg inetd detplc remote_smb_conf remote_user_conf remote_share_conf readycloud_unregister check_lang

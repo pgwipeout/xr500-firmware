@@ -428,6 +428,17 @@ function click_apply(cf)
 			cf.hid_vlan_type.value="0";
 			cf.submit_flag.value="apply_iptv_edit";
 		}
+		if(parent.vlan_free_flag==1){
+			clearNoNum(document.getElementById("vlan_id_input"));
+			if(document.getElementById("enable_vlan_id").checked) {
+				var vlan_id_num = parseInt(document.getElementById("vlan_id_input").value);
+				if(isNaN(vlan_id_num) || vlan_id_num < 1 || vlan_id_num > 4094) {
+					alert("Invalid vlan id, it should be digital and under range of 1~4094");
+					return false;
+				}
+				cf.hid_vlan_id_input.value = "1";
+			}
+		}
 	}
 	else
 	{
@@ -435,4 +446,21 @@ function click_apply(cf)
 		cf.submit_flag.value="disable_vlan_iptv";
 	}
 	return true;
+}
+
+function clearNoNum(ele) {
+	return ele.value = ele.value.replace(/[^\d]/g, "");
+}
+
+function uncheckWlanOption(ele) {
+	if(ele.checked) {
+		document.getElementById("iptv_ports_10").checked = false;
+		document.getElementById("iptv_ports_11").checked = false;
+	}
+}
+
+function uncheckVlanIDOption(ele) {
+	if(ele.checked) {
+		document.getElementById("enable_vlan_id").checked = false;
+	}
 }

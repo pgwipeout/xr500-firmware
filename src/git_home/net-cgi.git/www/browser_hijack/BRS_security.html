@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
 <head>
 <% new_hijack_flow_head() %>
@@ -32,7 +32,14 @@ function checkpasswd(cf)
 		alert(bh_pwd_no_match);
 		return false;	
 	}
-
+	for(i=0;i<cf.sysNewPasswd.value.length;i++)
+	{
+		if(isValidChar_space(cf.sysNewPasswd.value.charCodeAt(i))==false)
+		{
+			alert(bh_password_error);
+			return false;
+		}
+	}
 	cf.hidden_enable_recovery.value="1";
 	if( cf.question1.value == "0" || cf.question2.value == "0")
 	{
@@ -92,6 +99,7 @@ function checkpasswd(cf)
 					<label for="username"><script>document.write(bh_username);</script></label>
 				</div>
 				<div class="input-field col m6">
+					<input type="password" style="display:none;">
 					<input type="password" placeholder="password" autocomplete="off" size="20" name="sysNewPasswd" id="sys_new_passwd" onFocus="this.select();" class="validate"/>
 					<label for="sys_new_passwd"><script>document.write(bh_new_password);</script></label>
 				</div>

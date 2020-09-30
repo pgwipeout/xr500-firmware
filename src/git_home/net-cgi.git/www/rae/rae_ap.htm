@@ -30,7 +30,7 @@ input[type=text]{
 	<script>
 		var master="<% cfg_get("http_loginname") %>";
 		if( master=="admin" )
-			document.write('<input class="new_cancel_bt ui-corner-all" type="reset" name="Cancel" value="$cancel_mark" onClick="location.href=\'rae_main.htm\';"><input class="new_apply_bt ui-corner-all" type="submit" name="Apply" value="$apply_mark" onClick="check_ap();return false;">');
+			document.write('<input class="new_cancel_bt ui-corner-all" type="reset" name="Cancel" id="cancel" value="$cancel_mark" onClick="location.href=\'rae_main.htm\';"><input class="new_apply_bt ui-corner-all" type="submit" name="Apply" id="apply" value="$apply_mark" onClick="check_ap();return false;">');
 		else
 			document.write('<input class="new_greycancel_bt ui-corner-all" type="reset" name="Cancel" value="$cancel_mark" disabled><input class="new_greyapply_bt ui-corner-all" type="submit" name="Apply" value="$apply_mark" disabled>');
 	</script>
@@ -431,7 +431,7 @@ document.write(dev_name);
 </TR>
 <script>
 if (wl_sectype == 1)
-	document.write('<TR><TD nowrap colspan=3>NULL</TD></TR>');
+	document.write('<TR><TD nowrap colspan=3>$sec_off</TD></TR>');
 else if (wl_sectype == 2) {  //wep
 	if(key_no == 1)
 		document.write('<TR><TD nowrap colspan=3>key1:'+key1+'</TD></TR>');
@@ -458,7 +458,7 @@ else if (wl_sectype == 6)
 </TR>
 <script>
 if (wla_sectype == 1)
-	document.write('<TR><TD nowrap colspan=3>NULL</TD></TR>');
+	document.write('<TR><TD nowrap colspan=3>$sec_off</TD></TR>');
 else if (wla_sectype == 4)
 	document.write('<TR><TD nowrap colspan=3>'+wla_password1+'</TD></TR>');
 else if (wla_sectype == 5)

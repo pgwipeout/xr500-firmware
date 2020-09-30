@@ -102,8 +102,12 @@ start_stage0() # $1: boot/start
 
 	# Set Hairpin mode on br0:ethlan
 	brctl hairpin $BR_IF $LAN_IF on
-
- 	[ "$1" = "boot" ] && /data/funjsq/bin/funjsq.sh init &
+	region=$(/sbin/artmtd -r region | grep REGION | awk '{print $2}')
+ 
+        # only PR sku will start the funjsq process
+        if [ "$1" = "boot" -a x"${region}" = x"PR" ]; then
+                /data/funjsq/bin/funjsq.sh init &
+        fi
 	start_dhcpd   
 	check_wlanboot
 

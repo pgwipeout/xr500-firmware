@@ -1,6 +1,5 @@
 <% http_header("style/form.css", "/funcs.js", "language/English.js") %>
 <% body_header("_remote_share", "RMT_invite.htm", "readycloud_register") %>
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <div id="black_over_lay" class="black_overlay">
 </div>
 <div class="page_title">$remote_share_head</div>
@@ -212,7 +211,7 @@ function hide_text(cf) {
 	        <td colspan="2">
 	            <p><b>$resister_user
 					<script>
-						document.write(" <font id='registered-user'>" + account + "</font>");
+						document.write(" <span id='registered-user'>" + account + "</span>");
 					</script>
 				</b></p>
 	            <p>$access_storage_method</p>

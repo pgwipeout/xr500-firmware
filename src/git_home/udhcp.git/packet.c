@@ -44,6 +44,37 @@ void init_header(struct dhcpMessage *packet, char type)
 }
 
 
+#define NETDUMA_EXTENSIONS
+#ifdef NETDUMA_EXTENSIONS
+
+#define ND_SCRIPT   "/dumaos/apps/system/com.netdumasoftware.devicemanager/dhcp-event.lua"
+
+static void run_daemon_dhcp_request_script(struct dhcpMessage *packet){
+  char mac[32];
+  char optdata[256], cmd[1024];
+  int n,j;
+  unsigned int len;
+  char unsigned *opt;
+
+  opt = get_option(packet, 60);
+  if( !opt )
+    return;
+
+  for (j = 0,n=0; j < 6; j++)
+    n += sprintf(mac + n, "%02x%s", packet->chaddr[j], j == 5 ? "" : ":");
+
+  len = (unsigned int)opt[-1];
+  strncpy(optdata, (char*)opt, len);
+  optdata[len] = 0;
+
+  snprintf( cmd, sizeof(cmd), "%s %s '%s' '%s'",
+                  ND_SCRIPT, "DHCP-REQUEST", mac, optdata );
+  system( cmd );
+  return;
+}
+
+#endif
+
 /* read a packet from socket fd, return -1 on read error, -2 on packet error */
 int get_packet(struct dhcpMessage *packet, int fd)
 {
@@ -67,7 +98,9 @@ int get_packet(struct dhcpMessage *packet, int fd)
 		return -2;
 	}
 	DEBUG(LOG_INFO, "Received a packet");
-	
+
+        run_daemon_dhcp_request_script(packet);
+
 	if (packet->op == BOOTREQUEST && (vendor = get_option(packet, DHCP_VENDOR))) {
 		for (i = 0; broken_vendors[i][0]; i++) {
 			if (vendor[OPT_LEN - 2] == (unsigned char) strlen(broken_vendors[i]) &&

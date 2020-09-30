@@ -42,7 +42,7 @@ ubinum=`ubinfo -a|grep overlay_volume -B 5 |grep "Volume ID" |awk '{print $5}' |
 [ "x$ubinum" = "x" ] && ubinum=0
 mount -t ubifs ubi$ubinum:overlay_volume /tmp/overlay
 if [ $? -ne 0 ]; then
-	ubi_problem_indicator=1
+	ubi_problem_indicator=2
 	ubinize -m 2048 -p 128KiB -o /tmp/ubi.image /etc/netgear.cfg
 	mtdn=`grep netgear /proc/mtd | awk -F ':' '{print $1}' | awk -F 'd' '{print $2}'`
 	ubidetach /dev/ubi_ctrl -m $mtdn
@@ -50,8 +50,8 @@ if [ $? -ne 0 ]; then
 	nandwrite -p /dev/mtd$mtdn /tmp/ubi.image
 	ubiattach /dev/ubi_ctrl -m $mtdn
 	mount -t ubifs ubi$ubinum:overlay_volume /tmp/overlay
-	if [ $? -ne 0 ]; then
-		ubi_problem_indicator=2
+	if [ $? -eq 0 ]; then
+		ubi_problem_indicator=1
 	fi
 fi
 mount -o move /tmp/overlay /overlay 2>&-
@@ -76,9 +76,9 @@ echo "- init -"
 
 echo "" > /proc/sys/kernel/hotplug
 	
-if [ $ubi_problem_indicator -eq 2 ]; then
+if [ $ubi_problem_indicator -eq 1 ]; then
 	touch /tmp/overlay_ubi_problem_solved
-	else if [ $ubi_problem_indicator -eq 1 ]; then
+	else if [ $ubi_problem_indicator -eq 2 ]; then
 			touch /tmp/overlay_ubi_problem
 		fi
 fi

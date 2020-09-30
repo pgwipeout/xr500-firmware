@@ -490,7 +490,8 @@ static void uh_dispatch_request(
 		"/json/",
 		"/libs/",
 		"/css",
-		"/custom-elements/"
+		"/custom-elements/",
+		"/themes/"
 	};
 
 
@@ -788,7 +789,7 @@ static void uh_mainloop(struct config *conf, fd_set serv_fds, int max_fd)
 							cur_fd);
 						uh_cleanup_client( cur_fd );
 					} else {
-						if( g_dispatched >= 3 ){
+						if( g_dispatched >= 7 ){
 							while( waitpid(-1,NULL,0) <= 0 );
 							g_dispatched--;
 

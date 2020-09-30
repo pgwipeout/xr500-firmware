@@ -1435,14 +1435,19 @@ function check_wlan_guest(type)
 		alert("$ssid_null");
 		return false;
 	}
-        if(ssid == wl_ssid || ssid == wla_ssid)
-        {
-                alert("$ssid_not_allowed_same");
-                return false;
-        }
+	if(ssid == ssid_an)
+	{
+		alert("$ssid_not_allowed_same");
+		return false;
+	}
+	if(ssid == wl_ssid || ssid == wla_ssid)
+	{
+		alert("$ssid_not_allowed_same");
+		return false;
+	}
 	if(ssid_an == wl_ssid || ssid_an == wla_ssid)
-        {
-                alert("$ssid_not_allowed_same");
+	{
+		alert("$ssid_not_allowed_same");
                 return false;
         }
 	for(i=0;i<ssid.length;i++)
@@ -2164,13 +2169,15 @@ function sync_user_input(origin) {
 function toggle_an_edit() {
 	var cf = document.forms[0];
 	var flag = !!cf.enable_smart_connect.checked;
+	var passphrase_ans= document.getElementsByName("passphrase_an");
 	cf.ssid_an.disabled = flag;
 	cf.ssid_bc_an.disabled = flag;
 	for(var i=0; i<cf.security_type_an.length; i++) {
 		cf.security_type_an[i].disabled = flag;
 	}
-	if(!!cf.passphrase_an)
-		cf.passphrase_an.disabled = flag;
+	
+	for(var i=0; i<passphrase_ans.length; i++)
+		passphrase_ans[i].disabled = flag;
 
 	var radius_ids = ["wpae_mode", "radius_ipaddress1", "radius_ipaddress2", "radius_ipaddress3", "radius_ipaddress4", "radius_port", "radius_secret"];
 	for(var i=0; i<radius_ids.length; i++) {

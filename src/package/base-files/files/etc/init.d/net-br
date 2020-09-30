@@ -87,7 +87,7 @@ start0() # $1: boot/start
 
 	ifconfig ethlan up
 	ifconfig ethwan up
-	ifconfig br0 up
+	ifconfig br0 up && /dumaos/hotplug.sh iface br0 up
 
 	/etc/init.d/wlan-common start &
 
@@ -139,7 +139,7 @@ stop()
 	killall zcip
 	killall -SIGUSR2 udhcpc; killall udhcpc; killall udhcpc; sleep 1
 
-	ifconfig br0 down
+	ifconfig br0 down && /dumaos/hotplug.sh iface br0 down
 	ifconfig ethwan down
 	ifconfig ethlan down
 }

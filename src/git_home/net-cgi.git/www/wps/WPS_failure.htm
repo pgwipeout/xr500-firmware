@@ -46,32 +46,32 @@ function go2url()
 <script>
 if (wps_status == 4)         //client's PIN is not correct
 {
-	document.write("<TR><TD align=center><font color=#ff0000><B id=\"message\">$wps_clientPinWrong</B></font></TD></TR>");
+	document.write("<TR><TD align=center><span style=\"color:#ff0000\"><B id=\"message\">$wps_clientPinWrong</B></span></TD></TR>");
 	document.write("<TR><TD align=center><B>$wps_failAdd</B></TD></TR>");
 }
 else if (wps_status == 0)    // timeout
 {
-	document.write('<TR><TD align=center><font color=#ff0000><B id="message">$wps_add_failure_text1</B></font></TD></TR>');
+	document.write('<TR><TD align=center><span style=\"color:#ff0000\"><B id="message">$wps_add_failure_text1</B></span></TD></TR>');
 	document.write("<TR><TD align=center><B>$wps_add_failure_text2"+T_minutes+" $wps_add_failure_min $wps_add_failure_chk</B></TD></TR>");
 }
 else if (wps_status == 5)    // user push cancel button
 {
-	document.write('<TR><TD align=center><font color=#ff0000><B id="message">$wps_cancelByuser</B></font></TD></TR>');
+	document.write('<TR><TD align=center><span style=\"color:#ff0000\"><B id="message">$wps_cancelByuser</B></span></TD></TR>');
 	document.write("<TR><TD align=center><B>$wps_failAdd</B></TD></TR>");
 }
 else if(wps_status == 6)
 {
-	document.write('<TR><TD align=center><font color=#ff0000><B id="message">$wps_add_failure_text3</B></font></TD></TR>');
+	document.write('<TR><TD align=center><span style=\"color:#ff0000\"><B id="message">$wps_add_failure_text3</B></span></TD></TR>');
 	document.write("<TR><TD align=center><B>$wps_failAdd</B></TD></TR>");
 }
 else
 {
-	document.write('<TR><TD align=center><font color=#ff0000><B id="message">$wps_add_failure_text1</B></font></TD></TR>');
+	document.write('<TR><TD align=center><span style=\"color:#ff0000\"><B id="message">$wps_add_failure_text1</B></span></TD></TR>');
 	document.write("<TR><TD align=center><B>$wps_add_failure_text2"+T_minutes+" $wps_add_failure_min $wps_add_failure_chk</B></TD></TR>");
 }
 //if ((parent.wps_endis_configured == 1 && wps_status == 1)||(parent.wps_an_endis_configured == 1 && wps_status == 1 ))
 if ( (( parent.wps_endis_configured == 1 && wps_now_configured == 5 ) || ( parent.wps_an_endis_configured == 1 && wps_an_now_configured == 5 )) && wps_status == 1 )
-	document.write('<TR><TD align=center><font color=#ff0000>$wps_note_WL_change</font></TD></TR>');	
+	document.write('<TR><TD align=center><span style=\"color:#ff0000\">$wps_note_WL_change</span></TD></TR>');	
 </script>
 </TABLE>
 
