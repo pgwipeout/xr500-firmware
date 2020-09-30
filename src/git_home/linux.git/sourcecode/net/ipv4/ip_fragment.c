@@ -56,8 +56,6 @@
 
 static int sysctl_ipfrag_overlap_drop = 0;
 static int sysctl_ipfrag_max_dist __read_mostly = 64;
-static int sysctl_ipfrag_protect_jolt2 = 0;
-static int sysctl_ipfrag_protect_ping_of_death = 0;
 
 struct ipfrag_skb_cb
 {
@@ -300,11 +298,14 @@ static inline struct ipq *ip_find(struct net *net, struct iphdr *iph, u32 user)
 	hash = ipqhashfn(iph->id, iph->saddr, iph->daddr, iph->protocol);
 
 	q = inet_frag_find(&net->ipv4.frags, &ip4_frags, &arg, hash);
-	if (IS_ERR_OR_NULL(q)) {
-		inet_frag_maybe_warn_overflow(q, pr_fmt());
-		return NULL;
-	}
+	if (q == NULL)
+		goto out_nomem;
+
 	return container_of(q, struct ipq, q);
+
+out_nomem:
+	LIMIT_NETDEBUG(KERN_ERR pr_fmt("ip_frag_create: no memory left !\n"));
+	return NULL;
 }
 
 /* Is the fragment too far ahead to be part of ipq? */
@@ -392,19 +393,6 @@ static int ip_frag_queue(struct ipq *qp, struct sk_buff *skb)
 	/* Determine the position of this fragment. */
 	end = offset + skb->len - ihl;
 	err = -EINVAL;
-	if (sysctl_ipfrag_protect_jolt2 == 1) {
-                /*
-                 * offset == 0 : if incomming fragment is first fragment.
-                 * qp->q.last_in & INET_FRAG_FIRST_IN: if qp received first fragment before.
-                 * After qp received offset 0 fragment, received another
-                 * offset 0 fragment ,call it Jolt2 DoS Attack(SQA's testing)
-                 */
-                if ((offset == 0) && (qp->q.last_in & INET_FRAG_FIRST_IN)) {
-                        printk
-                            ("[DoS Attack: Jolt2] from source: %u.%u.%u.%u,\n"
-                             , NIPQUAD(qp->saddr));
-                }
-        }
 
 	/* Is this the final fragment? */
 	if ((flags & IP_MF) == 0) {
@@ -537,16 +525,8 @@ found:
 		qp->q.last_in |= INET_FRAG_FIRST_IN;
 
 	if (qp->q.last_in == (INET_FRAG_FIRST_IN | INET_FRAG_LAST_IN) &&
-	    qp->q.meat == qp->q.len) {
-		unsigned long orefdst = skb->_skb_refdst;
-
-		skb->_skb_refdst = 0UL;
-		err = ip_frag_reasm(qp, prev, dev);
-		skb->_skb_refdst = orefdst;
-		return err;
-	}
-
-	skb_dst_drop(skb);
+	    qp->q.meat == qp->q.len)
+		return ip_frag_reasm(qp, prev, dev);
 
 	write_lock(&ip4_frags.lock);
 	list_move_tail(&qp->q.lru_list, &qp->q.net->lru_list);
@@ -675,7 +655,7 @@ out_nomem:
 	err = -ENOMEM;
 	goto out_fail;
 out_oversize:
-	if (net_ratelimit() && sysctl_ipfrag_protect_ping_of_death == 1)
+	if (net_ratelimit())
 		pr_info("Oversized IP packet from %pI4\n", &qp->saddr);
 		printk("[DoS Attack: Ping of Death] from source: %pI4,\n",
 			&qp->saddr);
@@ -718,27 +698,28 @@ EXPORT_SYMBOL(ip_defrag);
 
 struct sk_buff *ip_check_defrag(struct sk_buff *skb, u32 user)
 {
-	struct iphdr iph;
+	const struct iphdr *iph;
 	u32 len;
 
 	if (skb->protocol != htons(ETH_P_IP))
 		return skb;
 
-	if (!skb_copy_bits(skb, 0, &iph, sizeof(iph)))
+	if (!pskb_may_pull(skb, sizeof(struct iphdr)))
 		return skb;
 
-	if (iph.ihl < 5 || iph.version != 4)
+	iph = ip_hdr(skb);
+	if (iph->ihl < 5 || iph->version != 4)
+		return skb;
+	if (!pskb_may_pull(skb, iph->ihl*4))
+		return skb;
+	iph = ip_hdr(skb);
+	len = ntohs(iph->tot_len);
+	if (skb->len < len || len < (iph->ihl * 4))
 		return skb;
 
-	len = ntohs(iph.tot_len);
-	if (skb->len < len || len < (iph.ihl * 4))
-		return skb;
-
-	if (ip_is_fragment(&iph)) {
+	if (ip_is_fragment(ip_hdr(skb))) {
 		skb = skb_share_check(skb, GFP_ATOMIC);
 		if (skb) {
-			if (!pskb_may_pull(skb, iph.ihl*4))
-				return skb;
 			if (pskb_trim_rcsum(skb, len))
 				return skb;
 			memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
@@ -802,20 +783,6 @@ static struct ctl_table ip4_frags_ctl_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec
 	},
-        {
-                .procname       = "ipfrag_protect_jolt2",
-                .data           = &sysctl_ipfrag_protect_jolt2,
-                .maxlen         = sizeof(int),
-                .mode           = 0644,
-                .proc_handler   = proc_dointvec
-        },
-	{
-                .procname       = "ipfrag_protect_ping_of_death",
-                .data           = &sysctl_ipfrag_protect_ping_of_death,
-                .maxlen         = sizeof(int),
-                .mode           = 0644,
-                .proc_handler   = proc_dointvec
-        },
 	{ }
 };
 

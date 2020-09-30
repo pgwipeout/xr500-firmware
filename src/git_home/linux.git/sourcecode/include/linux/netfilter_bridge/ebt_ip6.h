@@ -21,11 +21,10 @@
 #define EBT_IP6_SPORT 0x10
 #define EBT_IP6_DPORT 0x20
 #define EBT_IP6_ICMP6 0x40
-#define EBT_IP6_DNS_HIJACK 0x80
 
 #define EBT_IP6_MASK (EBT_IP6_SOURCE | EBT_IP6_DEST | EBT_IP6_TCLASS |\
 		      EBT_IP6_PROTO | EBT_IP6_SPORT | EBT_IP6_DPORT | \
-		      EBT_IP6_ICMP6 | EBT_IP6_DNS_HIJACK)
+		      EBT_IP6_ICMP6)
 #define EBT_IP6_MATCH "ip6"
 
 /* the same values are used for the invflags */
@@ -34,10 +33,9 @@ struct ebt_ip6_info {
 	struct in6_addr daddr;
 	struct in6_addr smsk;
 	struct in6_addr dmsk;
-	uint32_t  bitmask;
 	__u8  tclass;
 	__u8  protocol;
-//	__u8  bitmask;
+	__u8  bitmask;
 	__u8  invflags;
 	union {
 		__u16 sport[2];
@@ -47,7 +45,6 @@ struct ebt_ip6_info {
 		__u16 dport[2];
 		__u8 icmpv6_code[2];
 	};
-	uint32_t dns_hijack;
 };
 
 #endif

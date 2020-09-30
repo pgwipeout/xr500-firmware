@@ -49,7 +49,6 @@
 
 #include <linux/usb/ch9.h>
 #include <linux/usb/gadget.h>
-#include <linux/usb/otg.h>
 
 #include "core.h"
 #include "gadget.h"
@@ -239,11 +238,8 @@ void dwc3_gadget_giveback(struct dwc3_ep *dep, struct dwc3_request *req,
 	if (req->request.status == -EINPROGRESS)
 		req->request.status = status;
 
-	if (dwc->ep0_bounced && dep->number == 0)
-		dwc->ep0_bounced = false;
-	else
-		usb_gadget_unmap_request(&dwc->gadget, &req->request,
-				req->direction);
+	usb_gadget_unmap_request(&dwc->gadget, &req->request,
+			req->direction);
 
 	dev_dbg(dwc->dev, "request %p from %s completed %d/%d ===> %d\n",
 			req, dep->name, req->request.actual,
@@ -317,7 +313,7 @@ int dwc3_send_gadget_ep_cmd(struct dwc3 *dwc, unsigned ep,
 	} while (1);
 }
 
-dma_addr_t dwc3_trb_dma_offset(struct dwc3_ep *dep,
+static dma_addr_t dwc3_trb_dma_offset(struct dwc3_ep *dep,
 		struct dwc3_trb *trb)
 {
 	u32		offset = (char *) trb - (char *) dep->trb_pool;
@@ -531,10 +527,6 @@ static int __dwc3_gadget_ep_disable(struct dwc3_ep *dep)
 	u32			reg;
 
 	dwc3_remove_requests(dwc, dep);
-
-	/* make sure HW endpoint isn't stalled */
-	if (dep->flags & DWC3_EP_STALL)
-		__dwc3_gadget_ep_set_halt(dep, 0);
 
 	reg = dwc3_readl(dwc->regs, DWC3_DALEPENA);
 	reg &= ~DWC3_DALEPENA_EP(dep->number);
@@ -1106,6 +1098,9 @@ int __dwc3_gadget_ep_set_halt(struct dwc3_ep *dep, int value)
 		else
 			dep->flags |= DWC3_EP_STALL;
 	} else {
+		if (dep->flags & DWC3_EP_WEDGE)
+			return 0;
+
 		ret = dwc3_send_gadget_ep_cmd(dwc, dep->number,
 			DWC3_DEPCMD_CLEARSTALL, &params);
 		if (ret)
@@ -1113,7 +1108,7 @@ int __dwc3_gadget_ep_set_halt(struct dwc3_ep *dep, int value)
 					value ? "set" : "clear",
 					dep->name);
 		else
-			dep->flags &= ~(DWC3_EP_STALL | DWC3_EP_WEDGE);
+			dep->flags &= ~DWC3_EP_STALL;
 	}
 
 	return ret;
@@ -1331,59 +1326,7 @@ static int dwc3_gadget_pullup(struct usb_gadget *g, int is_on)
 	is_on = !!is_on;
 
 	spin_lock_irqsave(&dwc->lock, flags);
-
-	dwc->softconnect = is_on;
-
-	if ((dwc->dotg && !dwc->vbus_active) ||
-		!dwc->gadget_driver) {
-
-		spin_unlock_irqrestore(&dwc->lock, flags);
-
-		/*
-		 * Need to wait for vbus_session(on) from otg driver or to
-		 * the udc_start.
-		 */
-		return 0;
-	}
-
 	dwc3_gadget_run_stop(dwc, is_on);
-
-	spin_unlock_irqrestore(&dwc->lock, flags);
-
-	return 0;
-}
-
-static int dwc3_gadget_vbus_session(struct usb_gadget *_gadget, int is_active)
-{
-	struct dwc3 *dwc = gadget_to_dwc(_gadget);
-	unsigned long flags;
-
-	if (!dwc->dotg)
-		return -EPERM;
-
-	is_active = !!is_active;
-
-	spin_lock_irqsave(&dwc->lock, flags);
-
-	/* Mark that the vbus was powered */
-	dwc->vbus_active = is_active;
-
-	/*
-	 * Check if upper level usb_gadget_driver was already registerd with
-	 * this udc controller driver (if dwc3_gadget_start was called)
-	 */
-	if (dwc->gadget_driver && dwc->softconnect) {
-		if (dwc->vbus_active) {
-			/*
-			 * Both vbus was activated by otg and pullup was
-			 * signaled by the gadget driver.
-			 */
-			dwc3_gadget_run_stop(dwc, 1);
-		} else {
-			dwc3_gadget_run_stop(dwc, 0);
-		}
-	}
-
 	spin_unlock_irqrestore(&dwc->lock, flags);
 
 	return 0;
@@ -1447,7 +1390,6 @@ err1:
 	__dwc3_gadget_ep_disable(dwc->eps[0]);
 
 err0:
-	dwc->gadget_driver = NULL;
 	spin_unlock_irqrestore(&dwc->lock, flags);
 
 	return ret;
@@ -1475,7 +1417,6 @@ static const struct usb_gadget_ops dwc3_gadget_ops = {
 	.get_frame		= dwc3_gadget_get_frame,
 	.wakeup			= dwc3_gadget_wakeup,
 	.set_selfpowered	= dwc3_gadget_set_selfpowered,
-	.vbus_session		= dwc3_gadget_vbus_session,
 	.pullup			= dwc3_gadget_pullup,
 	.udc_start		= dwc3_gadget_start,
 	.udc_stop		= dwc3_gadget_stop,
@@ -1509,7 +1450,6 @@ static int __devinit dwc3_gadget_init_endpoints(struct dwc3 *dwc)
 
 		if (epnum == 0 || epnum == 1) {
 			dep->endpoint.maxpacket = 512;
-			dep->endpoint.maxburst = 1;
 			dep->endpoint.ops = &dwc3_gadget_ep0_ops;
 			if (!epnum)
 				dwc->gadget.ep0 = &dep->endpoint;
@@ -1541,19 +1481,10 @@ static void dwc3_gadget_free_endpoints(struct dwc3 *dwc)
 
 	for (epnum = 0; epnum < DWC3_ENDPOINTS_NUM; epnum++) {
 		dep = dwc->eps[epnum];
-		/*
-		 * Physical endpoints 0 and 1 are special; they form the
-		 * bi-directional USB endpoint 0.
-		 *
-		 * For those two physical endpoints, we don't allocate a TRB
-		 * pool nor do we add them the endpoints list. Due to that, we
-		 * shouldn't do these two operations otherwise we would end up
-		 * with all sorts of bugs when removing dwc3.ko.
-		 */
-		if (epnum != 0 && epnum != 1) {
-			dwc3_free_trb_pool(dep);
+		dwc3_free_trb_pool(dep);
+
+		if (epnum != 0 && epnum != 1)
 			list_del(&dep->endpoint.ep_list);
-		}
 
 		kfree(dep);
 	}
@@ -1843,7 +1774,6 @@ static void dwc3_stop_active_transfer(struct dwc3 *dwc, u32 epnum)
 		ret = dwc3_send_gadget_ep_cmd(dwc, dep->number, cmd, &params);
 		WARN_ON_ONCE(ret);
 		dep->res_trans_idx = 0;
-		dep->flags &= ~DWC3_EP_BUSY;
 	}
 }
 
@@ -2223,33 +2153,6 @@ static void dwc3_gadget_interrupt(struct dwc3 *dwc,
 		break;
 	case DWC3_DEVICE_EVENT_OVERFLOW:
 		dev_vdbg(dwc->dev, "Overflow\n");
-		/*
-		 * Controllers prior to 2.30a revision has a bug where
-		 * Overflow Event may overwrite an unacknowledged event
-		 * in the event buffer.  The severity of the issue depends
-		 * on the overwritten event type.  Add a warning message
-		 * saying that an event is overwritten.
-		 *
-		 * TODO: In future we may need to see if we can re-enumerate
-		 * with host.
-		 */
-		if (dwc->revision < DWC3_REVISION_230A)
-			dev_warn(dwc->dev, "Unacknowledged event overwritten\n");
-		break;
-	case DWC3_DEVICE_EVENT_VENDOR_DEV_TEST_LMP:
-		/*
-		 * Controllers prior to 2.30a revision has a bug, due to which
-		 * a vendor device test LMP event can not be filtered.  But
-		 * this event is not handled in the current code.  This is a
-		 * special event and 8 bytes of data will follow the event.
-		 * Handling this event is tricky when event buffer is almost
-		 * full. Moreover this event will not occur in normal scenario
-		 * and can only happen with special hosts in testing scenarios.
-		 * Add a warning message to indicate that this event is received
-		 * which means that event buffer might have corrupted.
-		 */
-		if (dwc->revision < DWC3_REVISION_230A)
-			dev_warn(dwc->dev, "Vendor Device Test LMP Received\n");
 		break;
 	default:
 		dev_dbg(dwc->dev, "UNKNOWN IRQ %d\n", event->type);
@@ -2411,7 +2314,8 @@ int __devinit dwc3_gadget_init(struct dwc3 *dwc)
 	}
 
 	/* Enable all but Start and End of Frame IRQs */
-	reg = (DWC3_DEVTEN_EVNTOVERFLOWEN |
+	reg = (DWC3_DEVTEN_VNDRDEVTSTRCVEDEN |
+			DWC3_DEVTEN_EVNTOVERFLOWEN |
 			DWC3_DEVTEN_CMDCMPLTEN |
 			DWC3_DEVTEN_ERRTICERREN |
 			DWC3_DEVTEN_WKUPEVTEN |
@@ -2432,20 +2336,6 @@ int __devinit dwc3_gadget_init(struct dwc3 *dwc)
 	if (ret) {
 		dev_err(dwc->dev, "failed to register udc\n");
 		goto err7;
-	}
-
-	if (dwc->dotg) {
-		/* dwc3 otg driver is active (DRD mode + SRPSupport=1) */
-		ret = otg_set_peripheral(&dwc->dotg->otg, &dwc->gadget);
-		if (ret) {
-			dev_err(dwc->dev, "failed to set peripheral to otg\n");
-			goto err7;
-		}
-	} else {
-		pm_runtime_no_callbacks(&dwc->gadget.dev);
-		pm_runtime_set_active(&dwc->gadget.dev);
-		pm_runtime_enable(&dwc->gadget.dev);
-		pm_runtime_get(&dwc->gadget.dev);
 	}
 
 	return 0;
@@ -2482,11 +2372,6 @@ err0:
 void dwc3_gadget_exit(struct dwc3 *dwc)
 {
 	int			irq;
-
-	if (dwc->dotg) {
-		pm_runtime_put(&dwc->gadget.dev);
-		pm_runtime_disable(&dwc->gadget.dev);
-	}
 
 	usb_del_gadget_udc(&dwc->gadget);
 	irq = platform_get_irq(to_platform_device(dwc->dev), 0);

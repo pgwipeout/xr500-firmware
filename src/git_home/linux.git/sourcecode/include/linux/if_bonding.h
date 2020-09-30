@@ -114,19 +114,6 @@ struct ad_info {
 	__u8 partner_system[ETH_ALEN];
 };
 
-#ifdef __KERNEL__
-struct bond_cb {
-	void (*bond_cb_link_up)(struct net_device *slave);
-	void (*bond_cb_link_down)(struct net_device *slave);
-	void (*bond_cb_enslave)(struct net_device *slave);
-	void (*bond_cb_release)(struct net_device *slave);
-};
-
-extern void bond_register_cb(struct bond_cb *cb);
-extern void bond_unregister_cb(void);
-extern int bond_get_id(struct net_device *bond_dev);
-#endif //__KERNEL__
-
 #endif /* _LINUX_IF_BONDING_H */
 
 /*

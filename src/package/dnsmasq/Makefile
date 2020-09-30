@@ -9,7 +9,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dnsmasq
-PKG_VERSION:=2.39
+PKG_VERSION:=2.76
 PKG_RELEASE:=1
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
@@ -54,6 +54,20 @@ define Build/Configure
 			$(config-y) \
 	);
 endef
+
+TARGET_CFLAGS += -ffunction-sections -fdata-sections
+TARGET_LDFLAGS += -Wl,--gc-sections
+
+COPTS = $(if $(CONFIG_IPV6),,-DNO_IPV6)
+
+COPTS += -DNO_DHCP6 -DNO_AUTH -DHAVE_IPSET
+
+MAKE_FLAGS := \
+	$(TARGET_CONFIGURE_OPTS) \
+	CFLAGS="$(TARGET_CFLAGS)" \
+	LDFLAGS="$(TARGET_LDFLAGS)" \
+	COPTS="$(COPTS)" \
+	PREFIX="/usr"
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \

@@ -122,6 +122,7 @@ static inline struct l2tp_net *l2tp_pernet(struct net *net)
 	return net_generic(net, l2tp_net_id);
 }
 
+
 /* Tunnel reference counts. Incremented per session that is added to
  * the tunnel.
  */
@@ -312,22 +313,6 @@ struct l2tp_tunnel *l2tp_tunnel_find_nth(struct net *net, int nth)
 	return NULL;
 }
 EXPORT_SYMBOL_GPL(l2tp_tunnel_find_nth);
-
-void l2tp_stats_update(struct l2tp_tunnel *tunnel,
-				struct l2tp_session *session,
-				struct l2tp_stats *stats)
-{
-	tunnel->stats.rx_packets += stats->rx_packets;
-	tunnel->stats.rx_bytes += stats->rx_bytes;
-	tunnel->stats.tx_packets += stats->tx_packets;
-	tunnel->stats.tx_bytes += stats->tx_bytes;
-
-	session->stats.rx_packets += stats->rx_packets;
-	session->stats.rx_bytes += stats->rx_bytes;
-	session->stats.tx_packets += stats->tx_packets;
-	session->stats.tx_bytes += stats->tx_bytes;
-}
-EXPORT_SYMBOL_GPL(l2tp_stats_update);
 
 /*****************************************************************************
  * Receive data handling
@@ -1268,10 +1253,11 @@ static void l2tp_tunnel_free(struct l2tp_tunnel *tunnel)
 	/* Remove from tunnel list */
 	spin_lock_bh(&pn->l2tp_tunnel_list_lock);
 	list_del_rcu(&tunnel->list);
-	kfree_rcu(tunnel, rcu);
 	spin_unlock_bh(&pn->l2tp_tunnel_list_lock);
+	synchronize_rcu();
 
 	atomic_dec(&l2tp_tunnel_count);
+	kfree(tunnel);
 }
 
 /* Create a socket for the tunnel, if one isn't set up by
@@ -1561,6 +1547,7 @@ int l2tp_session_delete(struct l2tp_session *session)
 	return 0;
 }
 EXPORT_SYMBOL_GPL(l2tp_session_delete);
+
 
 /* We come here whenever a session's send_seq, cookie_len or
  * l2specific_len parameters are set.

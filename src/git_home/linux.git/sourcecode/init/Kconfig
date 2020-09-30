@@ -917,10 +917,6 @@ config RELAY
 
 	  If unsure, say N.
 
-config CRASHLOG
-	bool "Crash logging"
-	depends on (!NO_BOOTMEM || HAVE_MEMBLOCK) && !ARM
-
 config BLK_DEV_INITRD
 	bool "Initial RAM filesystem and RAM disk (initramfs/initrd) support"
 	depends on BROKEN || !FRV
@@ -956,12 +952,6 @@ config SYSCTL
 
 config ANON_INODES
 	bool
-
-config PANIC_TIMEOUT
-	int "Default panic timeout"
-	default 0
-	help
-	  Set default panic timeout.
 
 menuconfig EXPERT
 	bool "Configure standard kernel features (expert users)"
@@ -1051,12 +1041,6 @@ config BUG
           option for embedded systems with no facilities for reporting errors.
           Just say Y.
 
-config DNI_CONSOLE_REDIRECT_DEBUG
-	bool "Console log redirect support" if EMBEDDED
-	default n
-	help
-	  Enable support redirect console log to user space
-
 config ELF_CORE
 	default y
 	bool "Enable ELF core dumps" if EXPERT
@@ -1141,15 +1125,6 @@ config SHMEM
 	  to userspace as tmpfs if TMPFS is enabled. Disabling this
 	  option replaces shmem and tmpfs with the much simpler ramfs code,
 	  which may be appropriate on small systems without swap.
-
-config ASHMEM
-	bool "Enable the Anonymous Shared Memory Subsystem"
-	default n
-	depends on SHMEM || TINY_SHMEM
-	help
-	  The ashmem subsystem is a new shared memory allocator, similar to
-	  POSIX SHM but with different behavior and sporting a simpler
-	  file-based API.
 
 config AIO
 	bool "Enable AIO support" if EXPERT
@@ -1289,7 +1264,6 @@ config SLAB
 	  per cpu and per node queues.
 
 config SLUB
-	depends on BROKEN || NUMA || !DISCONTIGMEM
 	bool "SLUB (Unqueued Allocator)"
 	help
 	   SLUB is a slab allocator that minimizes cache line usage
@@ -1461,13 +1435,5 @@ config PREEMPT_NOTIFIERS
 config PADATA
 	depends on SMP
 	bool
-
-config ASN1
-	tristate
-	help
-	  Build a simple ASN.1 grammar compiler that produces a bytecode output
-	  that can be interpreted by the ASN.1 stream decoder and used to
-	  inform it as to what tags are to be expected in a stream and what
-	  functions to call on what tags.
 
 source "kernel/Kconfig.locks"

@@ -1,4 +1,81 @@
 <% http_header("style/form.css", "/funcs.js") %>
+<style type="text/css">
+* {
+margin: 0;
+padding: 0;
+}  
+#progressbar {
+position: absolute;
+left:50px;
+top:5px;
+height: 20px;
+width: 500px;
+border: 1px solid #B22222;
+	border-radius: 5px;
+	text-align: center;
+	line-height: 10px;
+	font-size: 0.8em;
+	box-shadow: 1vw 3vh 10vh #8B0000;
+}
+#progressbar:before
+{
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+height: 100%;
+	background-image: linear-gradient(to bottom, #f2c9c9, rgba(255, 255, 255, 0.6) 15%, transparent 60%, #b90f0f);
+}  
+
+#progress {
+position: absolute;
+	  /*  border:1px solid;*/
+height: 100%;
+width: 0;
+background: #8B0000;
+	    border-radius: 5px;
+	    z-index: -1;
+}
+
+#progress {
+	background-size: 30px 30px;
+	background-image: -webkit-linear-gradient(-45deg, #B22222, #B22222 25%, #8B0000 25%, #8B0000 50%, #B22222 50%, #B22222 75%, #8B0000 75%, #8B0000);
+	background-image: -moz-linear-gradient(-45deg, #B22222, #B22222 25%, #8B0000 25%, #8B0000 50%, #B22222 50%, #B22222 75%, #8B0000 75%, #8B0000);
+	background-image: linear-gradient(-45deg, #B22222, #B22222 25%, #8B0000 25%, #8B0000 50%, #B22222 50%, #B22222 75%, #8B0000 75%, #8B0000);
+	-webkit-animation: animate 1.5s linear infinite;
+	-moz-animation: animate 1.5s linear infinite;
+animation: animate 1.5s linear infinite;
+}
+
+@-webkit-keyframes animate {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 60px 30px;
+	}
+}
+
+@-moz-keyframes animate {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 60px 30px;
+	}
+}
+
+@keyframes animate {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 60px 30px;
+	}
+}			
+</style>
 <% body_header("_wps", "WPS_failure.htm", "stop_wps_status") %>
 <div id="black_over_lay" class="black_overlay">
 </div>
@@ -18,15 +95,17 @@ var maxchars;
 if ( parent.wps_choice == 1 )
 	maxchars = (120*2+70);		//bug 22356, GUI will display timeout message after 4 minutes.
 else if ( parent.wps_choice == 0 )
-	{
-		maxchars = (60*4+50);		// bug 22360,GUI will display timeout message after 2 minutes.
-		pchar = "|";
-	}
+{
+	maxchars = (60*4+50);		// bug 22360,GUI will display timeout message after 2 minutes.
+	pchar = "|";
+}
 var delay_time = 500; // msecs		//bug16779: a half-second interval
-
+var currentPer = 1 ;
 pin_refresh_time = parent.pin_refresh_time; //bug 23496,the result page of timeout(PIN method) doesn't appearance when loading bar reach at 100%
 var percent = parseFloat(100/maxchars)*2;
-
+function isInteger(obj) {
+	return obj%1 === 0
+}
 function loadvalue()
 {
 	updateProgress();
@@ -34,8 +113,17 @@ function loadvalue()
 
 function makeStr(strsize)	//bug31147
 {
-	var currentPer = strsize * percent ;
-	document.getElementById("bar").style.width = currentPer + "%";
+
+	//document.getElementById("bar").style.width = currentPer + "%";
+	var progressbar = document.getElementById("progressbar");
+	progressbar = progressbar.getElementsByTagName("p");
+	if(isInteger(currentPer))
+		progressbar[0].innerHTML = currentPer + "%";
+	var progress = document.getElementById("progress");
+	progress.style.width = currentPer + "%";
+	if(currentPer!=100){
+		currentPer+=0.5;}
+	else currentPer=100;
 }
 
 function updateProgress()
@@ -56,7 +144,7 @@ function updateProgress()
 
 	if ( (wps_status == 0 || wps_status == 4 || wps_status == 6) && wps_status != "" )
 	{
-		document.getElementById("bar").style.width = 100 + "%";
+		document.getElementById("progress").style.width = 100 + "%";
 		setTimeout("location.href='WPS_failure.htm'",3000);
 	}
 	else if ( parent.wps_charcount == maxchars )
@@ -81,134 +169,138 @@ function updateProgress()
 function updateInfo()
 {
 
-if ( parent.wps_choice == 1 )
-{
-	document.getElementById("pin").style.display="";
+	if ( parent.wps_choice == 1 )
+	{
+		document.getElementById("pin").style.display="";
 
-	if((getTop(window).wps_process == 0 && (wps_status == 2 || wps_status == 3 || wps_status == 1))||
-		( getTop(window).wps_process == 1 && wps_status == 2))
-	{
-		document.getElementById("info_1").style.display="";
-		document.getElementById("info_2").style.display="none";
-		document.getElementById("info_3").style.display="none";
-		document.getElementById("info_4").style.display="none";
-		document.getElementById("info_5").style.display="none";
-		if( parent.pin_refresh_time % 2 == 0 )
-			getTop(window).wps_process = 1;	//Authenticating client...
-	}
-	else if(( getTop(window).wps_process == 1 && (wps_status == 3 || wps_status == 1)) ||
-		( getTop(window).wps_process == 2 && wps_status == 3 ))
-	{
-		document.getElementById("info_1").style.display="none";
-		document.getElementById("info_2").style.display="";
-		document.getElementById("info_3").style.display="none";
-		document.getElementById("info_4").style.display="none";
-		document.getElementById("info_5").style.display="none";
-		if( parent.pin_refresh_time % 2 == 0 )
-			getTop(window).wps_process = 2;  //Sending configuration data to the client...
-	}
-	else if( getTop(window).wps_process == 2 && wps_status == 1 )
-	{
-		document.getElementById("info_1").style.display="none";
-		document.getElementById("info_2").style.display="none";
-		document.getElementById("info_3").style.display="";
-		document.getElementById("info_4").style.display="none";
-		document.getElementById("info_5").style.display="none";
-		if( parent.pin_refresh_time % 2 == 0 )
+		if((getTop(window).wps_process == 0 && (wps_status == 2 || wps_status == 3 || wps_status == 1))||
+				( getTop(window).wps_process == 1 && wps_status == 2))
 		{
-			getTop(window).wps_process = 3;  //Collecting the client's information...
-                	location.href="WPS_client_status.htm";
+			document.getElementById("info_1").style.display="";
+			document.getElementById("info_2").style.display="none";
+			document.getElementById("info_3").style.display="none";
+			document.getElementById("info_4").style.display="none";
+			document.getElementById("info_5").style.display="none";
+			if( parent.pin_refresh_time % 2 == 0 )
+				getTop(window).wps_process = 1;	//Authenticating client...
 		}
-	}
-	else//bug30321 The gui lost a space and a paragraph on Connecting to New Wireless Client page via pin
-	{
-		document.getElementById("info_1").style.display="none";
-		document.getElementById("info_2").style.display="none";
-		document.getElementById("info_3").style.display="none";
-		document.getElementById("info_4").style.display="none";
-		document.getElementById("info_5").style.display="";
-	}
-
-}else{
-
-        if((getTop(window).wps_process == 0 && (wps_status == 2 || wps_status == 3 || wps_status == 1)) ||
-		( getTop(window).wps_process == 1 && wps_status == 2 ))
-        {
-		document.getElementById("info_1").style.display="";
-		document.getElementById("info_2").style.display="none";
-		document.getElementById("info_3").style.display="none";
-		document.getElementById("info_4").style.display="none";
-		document.getElementById("info_5").style.display="none";
-		if( parent.pin_refresh_time % 2 == 0 )
-                	getTop(window).wps_process = 1;   //Authenticating client...
-        }
-        else if(( getTop(window).wps_process == 1 && (wps_status == 3 || wps_status == 1)) ||
-		( getTop(window).wps_process == 2 && wps_status == 3 ))
-        {
-		document.getElementById("info_1").style.display="none";
-		document.getElementById("info_2").style.display="";
-		document.getElementById("info_3").style.display="none";
-		document.getElementById("info_4").style.display="none";
-		document.getElementById("info_5").style.display="none";
-		if( parent.pin_refresh_time % 2 == 0 )
-	                getTop(window).wps_process = 2;  //Sending configuration data to the client...
-        }
-        else if( getTop(window).wps_process == 2 && wps_status == 1 )
-        {
-		document.getElementById("info_1").style.display="none";
-		document.getElementById("info_2").style.display="none";
-		document.getElementById("info_3").style.display="";
-		document.getElementById("info_4").style.display="none";
-		document.getElementById("info_5").style.display="none";
-		if( parent.pin_refresh_time % 2 == 0 )
+		else if(( getTop(window).wps_process == 1 && (wps_status == 3 || wps_status == 1)) ||
+				( getTop(window).wps_process == 2 && wps_status == 3 ))
 		{
-			getTop(window).wps_process = 3;  //Collecting the client's information...
-        	        location.href="WPS_client_status.htm";
+			document.getElementById("info_1").style.display="none";
+			document.getElementById("info_2").style.display="";
+			document.getElementById("info_3").style.display="none";
+			document.getElementById("info_4").style.display="none";
+			document.getElementById("info_5").style.display="none";
+			if( parent.pin_refresh_time % 2 == 0 )
+				getTop(window).wps_process = 2;  //Sending configuration data to the client...
 		}
-        }
-	else
-	{
-		document.getElementById("info_1").style.display="none";
-		document.getElementById("info_2").style.display="none";
-		document.getElementById("info_3").style.display="none";
-		document.getElementById("info_4").style.display="";
-		document.getElementById("info_5").style.display="none";
-	}
+		else if( getTop(window).wps_process == 2 && wps_status == 1 )
+		{
+			document.getElementById("info_1").style.display="none";
+			document.getElementById("info_2").style.display="none";
+			document.getElementById("info_3").style.display="";
+			document.getElementById("info_4").style.display="none";
+			document.getElementById("info_5").style.display="none";
+			if( parent.pin_refresh_time % 2 == 0 )
+			{
+				getTop(window).wps_process = 3;  //Collecting the client's information...
+				location.href="WPS_client_status.htm";
+			}
+		}
+		else//bug30321 The gui lost a space and a paragraph on Connecting to New Wireless Client page via pin
+		{
+			document.getElementById("info_1").style.display="none";
+			document.getElementById("info_2").style.display="none";
+			document.getElementById("info_3").style.display="none";
+			document.getElementById("info_4").style.display="none";
+			document.getElementById("info_5").style.display="";
+		}
 
-}
+	}else{
+
+		if((getTop(window).wps_process == 0 && (wps_status == 2 || wps_status == 3 || wps_status == 1)) ||
+				( getTop(window).wps_process == 1 && wps_status == 2 ))
+		{
+			document.getElementById("info_1").style.display="";
+			document.getElementById("info_2").style.display="none";
+			document.getElementById("info_3").style.display="none";
+			document.getElementById("info_4").style.display="none";
+			document.getElementById("info_5").style.display="none";
+			if( parent.pin_refresh_time % 2 == 0 )
+				getTop(window).wps_process = 1;   //Authenticating client...
+		}
+		else if(( getTop(window).wps_process == 1 && (wps_status == 3 || wps_status == 1)) ||
+				( getTop(window).wps_process == 2 && wps_status == 3 ))
+		{
+			document.getElementById("info_1").style.display="none";
+			document.getElementById("info_2").style.display="";
+			document.getElementById("info_3").style.display="none";
+			document.getElementById("info_4").style.display="none";
+			document.getElementById("info_5").style.display="none";
+			if( parent.pin_refresh_time % 2 == 0 )
+				getTop(window).wps_process = 2;  //Sending configuration data to the client...
+		}
+		else if( getTop(window).wps_process == 2 && wps_status == 1 )
+		{
+			document.getElementById("info_1").style.display="none";
+			document.getElementById("info_2").style.display="none";
+			document.getElementById("info_3").style.display="";
+			document.getElementById("info_4").style.display="none";
+			document.getElementById("info_5").style.display="none";
+			if( parent.pin_refresh_time % 2 == 0 )
+			{
+				getTop(window).wps_process = 3;  //Collecting the client's information...
+				location.href="WPS_client_status.htm";
+			}
+		}
+		else
+		{
+			document.getElementById("info_1").style.display="none";
+			document.getElementById("info_2").style.display="none";
+			document.getElementById("info_3").style.display="none";
+			document.getElementById("info_4").style.display="";
+			document.getElementById("info_5").style.display="none";
+		}
+
+	}
 }
 </script>
 <TR id="pin" style="display:none;">
-	<TD>$wps_client_pin&nbsp;<font size=4><B><script>document.write(parent.wps_pin_num);</script></B></font>.</TD>
+<TD>$wps_client_pin&nbsp;<font size=4><B><script>document.write(parent.wps_pin_num);</script></B></font>.</TD>
 </TR>
 <TR id="info_1" style="display:none;">
-	<TD>$wps_authClient</TD>
+<TD>$wps_authClient</TD>
 </TR>
 <TR id="info_2" style="display:none;">
-	<TD>$wps_send2Client</TD>
+<TD>$wps_send2Client</TD>
 </TR>
 <TR id="info_3" style="display:none;">
-	<TD>$wps_collectInfo</TD>
+<TD>$wps_collectInfo</TD>
 </TR>
 <TR id="info_4" style="display:none;">
-	<TD>$wps_connect_status_text</TD>
+<TD>$wps_connect_status_text</TD>
 </TR>
 <TR id="info_5" style="display:none;">
-	<TD>$wps_connect_status_text1</TD>
+<TD>$wps_connect_status_text1</TD>
 </TR>
 
 <TR>
-	<TD nowrap align="center">
-	<div id="bar_td">
-	<div id="pic_on" class="pic_on"></div>
-	<div class="prgbar2" id="progress"><div id="bar" class="bar"></div></div>
-	</div>
-	</TD>
+<TD nowrap align="center">
+<div id="bar_td">
+<div id="pic_on" class="pic_on"></div>
+<!--<div class="prgbar2" id="progress"><div id="bar" class="bar"></div></div>-->
+<div id="progressbar">
+<div id='progress'></div>
+<p></p>
+</div>
+</div>
+</TD>
 </TR>
 <TR>
-	<TD ALIGN=center>
-	<input class="cancel_bt" id="cancel" type="button" name="Cancel" value="$cancel_mark" onclick="this.form.submit();">
-	</TD>
+<TD ALIGN=center>
+<input class="cancel_bt" id="cancel" type="button" name="Cancel" value="$cancel_mark" onclick="this.form.submit();" style="margin-top:30px">
+</TD>
 </TR>
 </TABLE>
 <iframe style="display:none" name="wps_status_frame" src="wps_get_status.htm" allowtransparency="true" scrolling="no" frameborder="0" ></iframe>

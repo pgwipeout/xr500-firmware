@@ -23,12 +23,6 @@ menuconfig NET
 
 if NET
 
-config ETHERNET_PACKET_MANGLE
-	bool
-	help
-	  This option can be selected by phy drivers that need to mangle
-	  packets going in or out of an ethernet device.
-
 config WANT_COMPAT_NETLINK_MESSAGES
 	bool
 	help
@@ -84,20 +78,6 @@ source "net/ipv6/Kconfig"
 source "net/netlabel/Kconfig"
 
 endif # if INET
-
-config ANDROID_PARANOID_NETWORK
-	bool "Only allow certain groups to create sockets"
-	default y
-	help
-		none
-
-config NET_ACTIVITY_STATS
-	bool "Network activity statistics tracking"
-	default y
-	help
-	 Network activity statistics are useful for tracking wireless
-	 modem activity on 2G, 3G, 4G wireless networks. Counts number of
-	 transmissions and groups them in specified time buckets.
 
 config NETWORK_SECMARK
 	bool "Security Marking"
@@ -238,7 +218,7 @@ source "net/batman-adv/Kconfig"
 source "net/openvswitch/Kconfig"
 
 config RPS
-	boolean "RPS"
+	boolean
 	depends on SMP && SYSFS && USE_GENERIC_SMP_HELPERS
 	default y
 
@@ -279,37 +259,6 @@ config BPF_JIT
 	  code when filter is loaded in memory. This should speedup
 	  packet sniffing (libpcap/tcpdump). Note : Admin should enable
 	  this feature changing /proc/sys/net/core/bpf_jit_enable
-
-config SKB_RECYCLER
-	bool "Generic skb recycling"
-	default y
-	---help---
-	 Enables RX-to-RX skb recycling scheme for bridging and
-	 routing workloads, reducing skbuff freeing/reallocation
-	 overhead.
-
-config SKB_RECYCLER_MULTI_CPU
-	bool "Cross-CPU recycling for CPU-locked workloads"
-	depends on SMP && SKB_RECYCLER
-	default n
-
-config SKB_RECYCLER_PREALLOC
-	bool "Enable preallocation of SKBs"
-	depends on SKB_RECYCLER
-	default n
-	---help---
-	 Preallocates SKBs in recycling lists and the number of
-	 SKBs are configured through CONFIG_SKB_RECYCLE_MAX_PREALLOC_SKBS.
-	 This needs SKB_RECYCLER to be enabled.
-	 The number of preallocated SKBs can be passed using
-	 SKB_RECYCLE_MAX_PREALLOC_SKBS.
-
-config SKB_RECYCLE_MAX_PREALLOC_SKBS
-	int "Number of SKBs to be preallocated"
-	depends on SKB_RECYCLER_PREALLOC
-	default 16384
-	---help---
-	 Number of SKBs each of 4K size to be preallocated for recycling
 
 menu "Network testing"
 
@@ -388,6 +337,6 @@ source "net/9p/Kconfig"
 source "net/caif/Kconfig"
 source "net/ceph/Kconfig"
 source "net/nfc/Kconfig"
-source "net/offload/Kconfig"
+
 
 endif   # if NET

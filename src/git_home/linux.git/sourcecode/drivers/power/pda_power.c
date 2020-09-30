@@ -24,7 +24,11 @@
 
 static inline unsigned int get_irq_flags(struct resource *res)
 {
-	return IRQF_SHARED | (res->flags & IRQF_TRIGGER_MASK);
+	unsigned int flags = IRQF_SAMPLE_RANDOM | IRQF_SHARED;
+
+	flags |= res->flags & IRQF_TRIGGER_MASK;
+
+	return flags;
 }
 
 static struct device *dev;

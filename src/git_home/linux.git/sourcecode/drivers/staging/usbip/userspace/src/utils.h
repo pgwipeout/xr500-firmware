@@ -1,25 +1,34 @@
-/*
- * Copyright (C) 2011 matt mooney <mfm@muteddisk.com>
- *               2005-2007 Takahiro Hirofuchi
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+#ifndef __UTILS_H__
+#define __UTILS_H__ 1
 
-#ifndef __UTILS_H
-#define __UTILS_H
+#include <asm/types.h>
+#include <resolv.h>
 
-int modify_match_busid(char *busid, int add);
+#include "libnetlink.h"
+#include "ll_map.h"
 
-#endif /* __UTILS_H */
+#define SPRINT_BSIZE 64
 
+#define NEXT_ARG() do { argv++; if (--argc <= 0)  exit(-1); } while(0)
+#define NEXT_ARG_OK() (argc - 1 > 0)
+#define PREV_ARG() do { argv--; argc++; } while(0)
+
+struct inet_prefix
+{
+	unsigned char family;
+	unsigned char bytelen;
+	signed short bitlen;
+	unsigned int flags;
+	unsigned int data[4];
+} ;
+
+#define PREFIXLEN_SPECIFIED 1
+
+extern const char *rt_addr_n2a(int af, int len, const void *addr, 
+			       char *buf, int buflen);
+
+extern void invalid_arg(const char *, const char *);
+
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
+#endif /* __UTILS_H__ */

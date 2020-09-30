@@ -214,8 +214,8 @@ function change_web_format()
 
 	if(getTop(window).access_control_flag == 0 )
 	{
-		document.getElementById("wlan_access").style.display="";
-		document.getElementById("ap_bluebar").style.display="";
+		document.getElementById("wlan_access").style.display="none";
+		document.getElementById("ap_bluebar").style.display="none";
 	}
 	else
 	{
@@ -581,7 +581,7 @@ function loadvalue()
 			document.getElementById("wladv_appin_cfg").style.display = "none";
 			document.getElementById("wladv_keep_exist").style.display = "none";
 			document.getElementById("wps_blank_line").style.display = "none";
-			document.getElementById("wps_settings_title").innerHTML = "WPS Settings (disabled when Smart Connect is enabled)";
+			document.getElementById("wps_settings_title").innerHTML = "$wps_settings_disable_smart";
 		}
 	}
 }

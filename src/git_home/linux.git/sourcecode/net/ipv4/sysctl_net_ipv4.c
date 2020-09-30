@@ -34,8 +34,6 @@ static int tcp_adv_win_scale_min = -31;
 static int tcp_adv_win_scale_max = 31;
 static int ip_ttl_min = 1;
 static int ip_ttl_max = 255;
-static int tcp_syn_retries_min = 1;
-static int tcp_syn_retries_max = MAX_TCP_SYNCNT;
 static int ip_ping_group_range_min[] = { 0, 0 };
 static int ip_ping_group_range_max[] = { GID_T_MAX, GID_T_MAX };
 
@@ -278,9 +276,7 @@ static struct ctl_table ipv4_table[] = {
 		.data		= &sysctl_tcp_syn_retries,
 		.maxlen		= sizeof(int),
 		.mode		= 0644,
-		.proc_handler	= proc_dointvec_minmax,
-		.extra1		= &tcp_syn_retries_min,
-		.extra2		= &tcp_syn_retries_max
+		.proc_handler	= proc_dointvec
 	},
 	{
 		.procname	= "tcp_synack_retries",
@@ -601,13 +597,6 @@ static struct ctl_table ipv4_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec
 	},
-	{
-		.procname	= "tcp_challenge_ack_limit",
-		.data		= &sysctl_tcp_challenge_ack_limit,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec
-	},
 #ifdef CONFIG_NET_DMA
 	{
 		.procname	= "tcp_dma_copybreak",
@@ -731,13 +720,6 @@ static struct ctl_table ipv4_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec,
 	},
-	{
-		.procname	= "ip_use_legacy_tos",
-		.data		= &sysctl_ip_use_legacy_tos,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec
-	},
 	{ }
 };
 
@@ -804,13 +786,6 @@ static struct ctl_table ipv4_net_table[] = {
 		.mode		= 0644,
 		.proc_handler	= ipv4_tcp_mem,
 	},
-	{
-		.procname	= "arp_attack_protect",
-		.data		= &init_net.ipv4.sysctl_arp_attack_protect,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec
-	},
 	{ }
 };
 
@@ -847,8 +822,6 @@ static __net_init int ipv4_sysctl_init_net(struct net *net)
 			&net->ipv4.sysctl_rt_cache_rebuild_count;
 		table[7].data =
 			&net->ipv4.sysctl_ping_group_range;
-		table[8].data =
-			&net->ipv4.sysctl_arp_attack_protect;
 
 	}
 
@@ -860,8 +833,6 @@ static __net_init int ipv4_sysctl_init_net(struct net *net)
 	net->ipv4.sysctl_ping_group_range[1] = 0;
 
 	net->ipv4.sysctl_rt_cache_rebuild_count = 4;
-	/* Dos attack: for log arp attack event */
-	net->ipv4.sysctl_arp_attack_protect = 0;
 
 	tcp_init_mem(net);
 

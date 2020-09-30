@@ -14,7 +14,6 @@
 #include <linux/list.h>
 #include <linux/init.h>
 #include <linux/mtd/mtd.h>
-#include <linux/mtd/partitions.h>
 #include <linux/mutex.h>
 #include <linux/mount.h>
 #include <linux/slab.h>
@@ -215,12 +214,11 @@ static void block2mtd_free_device(struct block2mtd_dev *dev)
 
 
 /* FIXME: ensure that mtd->size % erase_size == 0 */
-static struct block2mtd_dev *add_device(char *devname, int erase_size, const char *mtdname)
+static struct block2mtd_dev *add_device(char *devname, int erase_size)
 {
 	const fmode_t mode = FMODE_READ | FMODE_WRITE | FMODE_EXCL;
 	struct block_device *bdev;
 	struct block2mtd_dev *dev;
-	struct mtd_partition *part;
 	char *name;
 
 	if (!devname)
@@ -259,16 +257,13 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size, const cha
 
 	/* Setup the MTD structure */
 	/* make the name contain the block device in */
-	if (!mtdname)
-		mtdname = devname;
-	name = kmalloc(strlen(mtdname) + 1, GFP_KERNEL);
+	name = kasprintf(GFP_KERNEL, "block2mtd: %s", devname);
 	if (!name)
 		goto devinit_err;
 
-	strcpy(name, mtdname);
 	dev->mtd.name = name;
 
-	dev->mtd.size = dev->blkdev->bd_inode->i_size & PAGE_MASK & ~(erase_size - 1);
+	dev->mtd.size = dev->blkdev->bd_inode->i_size & PAGE_MASK;
 	dev->mtd.erasesize = erase_size;
 	dev->mtd.writesize = 1;
 	dev->mtd.writebufsize = PAGE_SIZE;
@@ -276,22 +271,20 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size, const cha
 	dev->mtd.flags = MTD_CAP_RAM;
 	dev->mtd._erase = block2mtd_erase;
 	dev->mtd._write = block2mtd_write;
+	dev->mtd._writev = mtd_writev;
 	dev->mtd._sync = block2mtd_sync;
 	dev->mtd._read = block2mtd_read;
 	dev->mtd.priv = dev;
 	dev->mtd.owner = THIS_MODULE;
 
-	part = kzalloc(sizeof(struct mtd_partition), GFP_KERNEL);
-	part->name = name;
-	part->offset = 0;
-	part->size = dev->mtd.size;
-	if (mtd_device_register(&dev->mtd, part, 1)) {
+	if (mtd_device_register(&dev->mtd, NULL, 0)) {
 		/* Device didn't get added, so free the entry */
 		goto devinit_err;
 	}
 	list_add(&dev->list, &blkmtd_device_list);
 	INFO("mtd%d: [%s] erase_size = %dKiB [%d]", dev->mtd.index,
-			mtdname, dev->mtd.erasesize >> 10, dev->mtd.erasesize);
+			dev->mtd.name + strlen("block2mtd: "),
+			dev->mtd.erasesize >> 10, dev->mtd.erasesize);
 	return dev;
 
 devinit_err:
@@ -364,9 +357,9 @@ static char block2mtd_paramline[80 + 12]; /* 80 for device, 12 for erase size */
 
 static int block2mtd_setup2(const char *val)
 {
-	char buf[80 + 12 + 80]; /* 80 for device, 12 for erase size, 80 for name */
+	char buf[80 + 12]; /* 80 for device, 12 for erase size */
 	char *str = buf;
-	char *token[3];
+	char *token[2];
 	char *name;
 	size_t erase_size = PAGE_SIZE;
 	int i, ret;
@@ -377,7 +370,7 @@ static int block2mtd_setup2(const char *val)
 	strcpy(str, val);
 	kill_final_newline(str);
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < 2; i++)
 		token[i] = strsep(&str, ",");
 
 	if (str)
@@ -396,10 +389,8 @@ static int block2mtd_setup2(const char *val)
 			parse_err("illegal erase size");
 		}
 	}
-	if (token[2] && (strlen(token[2]) + 1 > 80))
-		parse_err("mtd device name too long");
 
-	add_device(name, erase_size, token[2]);
+	add_device(name, erase_size);
 
 	return 0;
 }
@@ -433,7 +424,7 @@ static int block2mtd_setup(const char *val, struct kernel_param *kp)
 
 
 module_param_call(block2mtd, block2mtd_setup, NULL, NULL, 0200);
-MODULE_PARM_DESC(block2mtd, "Device to use. \"block2mtd=<dev>[,<erasesize>[,<name>]]\"");
+MODULE_PARM_DESC(block2mtd, "Device to use. \"block2mtd=<dev>[,<erasesize>]\"");
 
 static int __init block2mtd_init(void)
 {

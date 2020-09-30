@@ -120,12 +120,6 @@
 
 #define IGMP_Initial_Report_Delay		(1)
 
-#ifdef CONFIG_BT_IGMP
-#define BT_IGMP_GROUP_NAME	"bt_igmp_group"
-int igmp_bt_group = 0;
-static struct proc_dir_entry *igmp_bt_proc_entry;
-#endif
-
 /* IGMP_Initial_Report_Delay is not from IGMP specs!
  * IGMP specs require to report membership immediately after
  * joining a group, but we delay the first report by a
@@ -349,7 +343,7 @@ static struct sk_buff *igmpv3_newpack(struct net_device *dev, int size)
 	pip->saddr    = fl4.saddr;
 	pip->protocol = IPPROTO_IGMP;
 	pip->tot_len  = 0;	/* filled in later */
-	ip_select_ident(skb, NULL);
+	ip_select_ident(pip, &rt->dst, NULL);
 	((u8*)&pip[1])[0] = IPOPT_RA;
 	((u8*)&pip[1])[1] = 4;
 	((u8*)&pip[1])[2] = 0;
@@ -693,7 +687,7 @@ static int igmp_send_report(struct in_device *in_dev, struct ip_mc_list *pmc,
 	iph->daddr    = dst;
 	iph->saddr    = fl4.saddr;
 	iph->protocol = IPPROTO_IGMP;
-	ip_select_ident(skb, NULL);
+	ip_select_ident(iph, &rt->dst, NULL);
 	((u8*)&iph[1])[0] = IPOPT_RA;
 	((u8*)&iph[1])[1] = 4;
 	((u8*)&iph[1])[2] = 0;
@@ -715,7 +709,7 @@ static void igmp_gq_timer_expire(unsigned long data)
 
 	in_dev->mr_gq_running = 0;
 	igmpv3_send_report(in_dev, NULL);
-	in_dev_put(in_dev);
+	__in_dev_put(in_dev);
 }
 
 static void igmp_ifc_timer_expire(unsigned long data)
@@ -727,7 +721,7 @@ static void igmp_ifc_timer_expire(unsigned long data)
 		in_dev->mr_ifc_count--;
 		igmp_ifc_start_timer(in_dev, IGMP_Unsolicited_Report_Interval);
 	}
-	in_dev_put(in_dev);
+	__in_dev_put(in_dev);
 }
 
 static void igmp_ifc_event(struct in_device *in_dev)
@@ -1225,24 +1219,10 @@ void ip_mc_inc_group(struct in_device *in_dev, __be32 addr)
 	struct ip_mc_list *im;
 
 	ASSERT_RTNL();
+
 	for_each_pmc_rtnl(in_dev, im) {
 		if (im->multiaddr == addr) {
 			im->users++;
-#ifdef CONFIG_BT_IGMP
-			if(igmp_bt_group) {
-				im->users = 1;
-				im->interface = in_dev;
-				in_dev_hold(in_dev);
-				im->multiaddr = addr;
-				/* initial mode is (EX, empty) */
-				im->sfmode = MCAST_EXCLUDE;
-				im->sfcount[MCAST_EXCLUDE] = 1;
-				atomic_set(&im->refcnt, 1);
-				spin_lock_init(&im->lock);
-				goto bt_igmp;
-			}
-
-#endif
 			ip_mc_add_src(in_dev, &addr, MCAST_EXCLUDE, 0, NULL, 0);
 			goto out;
 		}
@@ -1270,9 +1250,6 @@ void ip_mc_inc_group(struct in_device *in_dev, __be32 addr)
 	in_dev->mc_count++;
 	rcu_assign_pointer(in_dev->mc_list, im);
 
-#ifdef CONFIG_BT_IGMP
-bt_igmp:
-#endif
 #ifdef CONFIG_IP_MULTICAST
 	igmpv3_del_delrec(in_dev, im->multiaddr);
 #endif
@@ -1828,17 +1805,8 @@ int ip_mc_join_group(struct sock *sk , struct ip_mreqn *imr)
 	ifindex = imr->imr_ifindex;
 	for_each_pmc_rtnl(inet, i) {
 		if (i->multi.imr_multiaddr.s_addr == addr &&
-		    i->multi.imr_ifindex == ifindex) {
-#ifdef CONFIG_BT_IGMP
-			if(igmp_bt_group) {
-				memcpy(&i->multi, imr, sizeof(*imr));
-				i->sflist = NULL;
-				i->sfmode = MCAST_EXCLUDE;
-				goto bt_igmp_report;
-			}
-#endif
+		    i->multi.imr_ifindex == ifindex)
 			goto done;
-		}
 		count++;
 	}
 	err = -ENOBUFS;
@@ -1853,7 +1821,6 @@ int ip_mc_join_group(struct sock *sk , struct ip_mreqn *imr)
 	iml->sflist = NULL;
 	iml->sfmode = MCAST_EXCLUDE;
 	rcu_assign_pointer(inet->mc_list, iml);
-bt_igmp_report:
 	ip_mc_inc_group(in_dev, addr);
 	err = 0;
 done:
@@ -1899,10 +1866,6 @@ int ip_mc_leave_group(struct sock *sk, struct ip_mreqn *imr)
 
 	rtnl_lock();
 	in_dev = ip_mc_find_dev(net, imr);
-	if (!in_dev) {
-		ret = -ENODEV;
-		goto out;
-	}
 	ifindex = imr->imr_ifindex;
 	for (imlp = &inet->mc_list;
 	     (iml = rtnl_dereference(*imlp)) != NULL;
@@ -1920,14 +1883,16 @@ int ip_mc_leave_group(struct sock *sk, struct ip_mreqn *imr)
 
 		*imlp = iml->next_rcu;
 
-		ip_mc_dec_group(in_dev, group);
+		if (in_dev)
+			ip_mc_dec_group(in_dev, group);
 		rtnl_unlock();
 		/* decrease mem now to avoid the memleak warning */
 		atomic_sub(sizeof(*iml), &sk->sk_omem_alloc);
 		kfree_rcu(iml, rcu);
 		return 0;
 	}
-out:
+	if (!in_dev)
+		ret = -ENODEV;
 	rtnl_unlock();
 	return ret;
 }
@@ -2665,45 +2630,10 @@ static const struct file_operations igmp_mcf_seq_fops = {
 	.release	=	seq_release_net,
 };
 
-#ifdef CONFIG_BT_IGMP
-int igmp_bt_read( char *page, char **start, off_t off,
-                                int count, int *eof, void *data )
-{
-	printk("BT IGMP is %s\n", igmp_bt_group ? "enabled" : "disabled");
-	return 0;
-}
-
-ssize_t igmp_bt_write( struct file *filp, const char __user *buff,
-                                         unsigned long len, void *data )
-{
-      char line[16];
-      memset(line, 0, 16);
-      if (copy_from_user( line, buff, len ))
-	return -EFAULT;
-
-      igmp_bt_group = line[0]-'0';
-
-      return len;
-}
-
-void create_bt_igmp_proc_entry(void)
-{
-      igmp_bt_proc_entry = create_proc_entry(BT_IGMP_GROUP_NAME, 0666, NULL);
-
-      if(igmp_bt_proc_entry) {
-              igmp_bt_proc_entry->read_proc = igmp_bt_read;
-              igmp_bt_proc_entry->write_proc = igmp_bt_write;
-      }
-}
-#endif
-
 static int __net_init igmp_net_init(struct net *net)
 {
 	struct proc_dir_entry *pde;
 
-#ifdef CONFIG_BT_IGMP
-	create_bt_igmp_proc_entry();
-#endif
 	pde = proc_net_fops_create(net, "igmp", S_IRUGO, &igmp_mc_seq_fops);
 	if (!pde)
 		goto out_igmp;
@@ -2733,8 +2663,4 @@ int __init igmp_mc_proc_init(void)
 {
 	return register_pernet_subsys(&igmp_net_ops);
 }
-#endif
-
-#ifdef CONFIG_BT_IGMP
-EXPORT_SYMBOL(igmp_bt_group);
 #endif

@@ -507,7 +507,8 @@ int __nand_correct_data(unsigned char *buf,
 	if ((bitsperbyte[b0] + bitsperbyte[b1] + bitsperbyte[b2]) == 1)
 		return 1;	/* error in ECC data; no action needed */
 
-	return -EBADMSG;
+	printk(KERN_ERR "uncorrectable error : ");
+	return -1;
 }
 EXPORT_SYMBOL(__nand_correct_data);
 

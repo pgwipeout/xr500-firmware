@@ -49,11 +49,24 @@ union nf_conntrack_expect_proto {
 /* per conntrack: application helper private data */
 union nf_conntrack_help {
 	/* insert conntrack helper private data (master) here */
+#if defined(CONFIG_NF_CONNTRACK_FTP) || defined(CONFIG_NF_CONNTRACK_FTP_MODULE)
 	struct nf_ct_ftp_master ct_ftp_info;
+#endif
+#if defined(CONFIG_NF_CONNTRACK_PPTP) || \
+    defined(CONFIG_NF_CONNTRACK_PPTP_MODULE)
 	struct nf_ct_pptp_master ct_pptp_info;
+#endif
+#if defined(CONFIG_NF_CONNTRACK_H323) || \
+    defined(CONFIG_NF_CONNTRACK_H323_MODULE)
 	struct nf_ct_h323_master ct_h323_info;
+#endif
+#if defined(CONFIG_NF_CONNTRACK_SANE) || \
+    defined(CONFIG_NF_CONNTRACK_SANE_MODULE)
 	struct nf_ct_sane_master ct_sane_info;
+#endif
+#if defined(CONFIG_NF_CONNTRACK_SIP) || defined(CONFIG_NF_CONNTRACK_SIP_MODULE)
 	struct nf_ct_sip_master ct_sip_info;
+#endif
 };
 
 #include <linux/types.h>
@@ -69,7 +82,7 @@ union nf_conntrack_help {
 struct nf_conntrack_helper;
 
 /* Must be kept in sync with the classes defined by helpers */
-#define NF_CT_MAX_EXPECT_CLASSES	5
+#define NF_CT_MAX_EXPECT_CLASSES	4
 
 /* nf_conn feature for connections that have a helper */
 struct nf_conn_help {

@@ -23,7 +23,7 @@
 #define TFTP_PORT	69
 
 /* Different Router */
-#define MODEL_NAME	"R7800"
+#define MODEL_NAME	"XR500"
 #define DFT_FILENAME	MODEL_NAME "_pkt_debug.txt"
 #define DFT_IFNAME	"brwan"
 

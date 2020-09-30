@@ -45,8 +45,6 @@
 #include <net/netfilter/nf_conntrack_zones.h>
 #include <net/netfilter/nf_conntrack_timestamp.h>
 #include <net/netfilter/nf_conntrack_timeout.h>
-#include <net/netfilter/nf_conntrack_dscpremark_ext.h>
-#include <net/netfilter/nf_conntrack_vlantag_ext.h>
 #include <net/netfilter/nf_nat.h>
 #include <net/netfilter/nf_nat_core.h>
 
@@ -360,14 +358,6 @@ destroy_conntrack(struct nf_conntrack *nfct)
 	if (!nf_ct_is_confirmed(ct)) {
 		BUG_ON(hlist_nulls_unhashed(&ct->tuplehash[IP_CT_DIR_ORIGINAL].hnnode));
 		hlist_nulls_del_rcu(&ct->tuplehash[IP_CT_DIR_ORIGINAL].hnnode);
-		/*
-		 See ticket R7800-DumaOS ticket #51 for explanation why the
-		 following conditional was added. -@NETDUMA_Iain
-		 */
-		if (ct->tuplehash[IP_CT_DIR_ORIGINAL].hnnode.pprev != LIST_POISON2)  {
-			BUG_ON(hlist_nulls_unhashed(&ct->tuplehash[IP_CT_DIR_ORIGINAL].hnnode));
-			hlist_nulls_del_rcu(&ct->tuplehash[IP_CT_DIR_ORIGINAL].hnnode);
-		}
 	}
 
 	NF_CT_STAT_INC(net, delete);
@@ -398,15 +388,12 @@ static void death_by_event(unsigned long ul_conntrack)
 {
 	struct nf_conn *ct = (void *)ul_conntrack;
 	struct net *net = nf_ct_net(ct);
-	struct nf_conntrack_ecache *ecache = nf_ct_ecache_find(ct);
-
-	BUG_ON(ecache == NULL);
 
 	if (nf_conntrack_event(IPCT_DESTROY, ct) < 0) {
 		/* bad luck, let's retry again */
-		ecache->timeout.expires = jiffies +
+		ct->timeout.expires = jiffies +
 			(random32() % net->ct.sysctl_events_retry_timeout);
-		add_timer(&ecache->timeout);
+		add_timer(&ct->timeout);
 		return;
 	}
 	/* we've got the event delivered, now it's dying */
@@ -420,9 +407,6 @@ static void death_by_event(unsigned long ul_conntrack)
 void nf_ct_insert_dying_list(struct nf_conn *ct)
 {
 	struct net *net = nf_ct_net(ct);
-	struct nf_conntrack_ecache *ecache = nf_ct_ecache_find(ct);
-
-	BUG_ON(ecache == NULL);
 
 	/* add this conntrack to the dying list */
 	spin_lock_bh(&nf_conntrack_lock);
@@ -431,9 +415,9 @@ void nf_ct_insert_dying_list(struct nf_conn *ct)
 	spin_unlock_bh(&nf_conntrack_lock);
 	/* set a new timer to retry event delivery */
 	setup_timer(&ct->timeout, death_by_event, (unsigned long)ct);
-	setup_timer(&ecache->timeout, death_by_event, (unsigned long)ct);
+	ct->timeout.expires = jiffies +
 		(random32() % net->ct.sysctl_events_retry_timeout);
-	add_timer(&ecache->timeout);
+	add_timer(&ct->timeout);
 }
 EXPORT_SYMBOL_GPL(nf_ct_insert_dying_list);
 
@@ -1534,8 +1518,6 @@ init_conntrack(struct net *net, struct nf_conn *tmpl,
 
 	nf_ct_acct_ext_add(ct, GFP_ATOMIC);
 	nf_ct_tstamp_ext_add(ct, GFP_ATOMIC);
-	nf_ct_dscpremark_ext_add(ct, GFP_ATOMIC);
-	nf_ct_vlantag_ext_add(ct, GFP_ATOMIC);
 
 	ecache = tmpl ? nf_ct_ecache_find(tmpl) : NULL;
 	nf_ct_ecache_ext_add(ct, ecache ? ecache->ctmask : 0,
@@ -2170,8 +2152,6 @@ static void nf_conntrack_cleanup_init_net(void)
 
 	nf_conntrack_helper_fini();
 	nf_conntrack_proto_fini();
-	nf_conntrack_dscpremark_ext_fini();
-	nf_conntrack_vlantag_ext_fini();
 #if defined(CONFIG_NF_CONNTRACK_NAT_MANAGEMENT)
 	kmem_cache_destroy(nf_ct_natlan_cachep);
 	free_pages((unsigned long) tcp_high_prio_port_table, get_order(65536/8));
@@ -2382,14 +2362,6 @@ static int nf_conntrack_init_init_net(void)
 	       NF_CONNTRACK_VERSION, nf_conntrack_htable_size,
 	       nf_conntrack_max);
 
-	ret = nf_conntrack_vlantag_ext_init();
-	if (ret < 0)
-		goto err_vlantag_ext;
-
-	ret = nf_conntrack_dscpremark_ext_init();
-	if (ret < 0)
-		goto err_dscpremark_ext;
-
 	ret = nf_conntrack_proto_init();
 	if (ret < 0)
 		goto err_proto;
@@ -2420,10 +2392,6 @@ err_extend:
 err_helper:
 	nf_conntrack_proto_fini();
 err_proto:
-	nf_conntrack_dscpremark_ext_fini();
-err_dscpremark_ext:
-	nf_conntrack_vlantag_ext_fini();
-err_vlantag_ext:
 	return ret;
 }
 
@@ -2505,9 +2473,6 @@ static int nf_conntrack_init_net(struct net *net)
 	if (ret < 0)
 		goto err_timeout;
 
-#ifdef CONFIG_NF_CONNTRACK_CHAIN_EVENTS
-	ATOMIC_INIT_NOTIFIER_HEAD(&net->ct.nf_conntrack_chain);
-#endif
 	return 0;
 
 err_timeout:

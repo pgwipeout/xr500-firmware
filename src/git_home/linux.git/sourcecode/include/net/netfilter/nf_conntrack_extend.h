@@ -23,12 +23,6 @@ enum nf_ct_ext_id {
 #ifdef CONFIG_NF_CONNTRACK_TIMEOUT
 	NF_CT_EXT_TIMEOUT,
 #endif
-#ifdef CONFIG_NF_CONNTRACK_DSCPREMARK_EXT
-	NF_CT_EXT_DSCPREMARK,
-#endif
-#ifdef CONFIG_NF_CONNTRACK_VLANTAG_EXT
-	NF_CT_EXT_VLANTAG,
-#endif
 	NF_CT_EXT_NUM,
 };
 
@@ -39,14 +33,12 @@ enum nf_ct_ext_id {
 #define NF_CT_EXT_ZONE_TYPE struct nf_conntrack_zone
 #define NF_CT_EXT_TSTAMP_TYPE struct nf_conn_tstamp
 #define NF_CT_EXT_TIMEOUT_TYPE struct nf_conn_timeout
-#define NF_CT_EXT_DSCPREMARK_TYPE struct nf_ct_dscpremark_ext
-#define NF_CT_EXT_VLANTAG_TYPE struct nf_ct_vlantag_ext
 
 /* Extensions: optional stuff which isn't permanently in struct. */
 struct nf_ct_ext {
 	struct rcu_head rcu;
-	u16 offset[NF_CT_EXT_NUM];
-	u16 len;
+	u8 offset[NF_CT_EXT_NUM];
+	u8 len;
 	char data[0];
 };
 
@@ -84,7 +76,7 @@ static inline void nf_ct_ext_destroy(struct nf_conn *ct)
 static inline void nf_ct_ext_free(struct nf_conn *ct)
 {
 	if (ct->ext)
-		kfree_rcu(ct->ext, rcu);
+		kfree(ct->ext);
 }
 
 /* Add this type, returns pointer to data or NULL. */

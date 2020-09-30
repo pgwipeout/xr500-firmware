@@ -24,7 +24,7 @@
 
 int rtc_hctosys_ret = -ENODEV;
 
-int rtc_hctosys(void)
+static int __init rtc_hctosys(void)
 {
 	int err = -ENODEV;
 	struct rtc_time tm;

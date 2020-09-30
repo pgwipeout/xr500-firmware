@@ -21,6 +21,10 @@ endef
 
 define Build/Prepare
 	$(CP) $(GIT_HOME)/qsdk-wifi-script.git/* $(PKG_BUILD_DIR)/
+
+	# Delete 11ad files
+	rm -rf $(PKG_BUILD_DIR)/lib/wifi/mac80211.sh
+	rm -rf $(PKG_BUILD_DIR)/usr/lib/stainfo_11ad.awk
 endef
 
 define Build/Compile

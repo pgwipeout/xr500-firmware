@@ -58,16 +58,6 @@ static unsigned int nr_uarts = CONFIG_SERIAL_8250_RUNTIME_UARTS;
 
 static struct uart_driver serial8250_reg;
 
-#ifdef CONFIG_DNI_CONSOLE_REDIRECT_DEBUG
-#define MAX_BUFF_COUNT 4090
-rwlock_t log_rwlock;
-char console_buf[4090];
-int console_index = 0;
-static int buf_num = 0;
-static const char *console_id[2] = {"enable", "close" };
-static int console_enable = 0;
-#endif
-
 static int serial_index(struct uart_port *port)
 {
 	return (serial8250_reg.minor - 64) + port->line;
@@ -292,33 +282,6 @@ static const struct serial8250_config uart_config[] = {
 		.fcr		= UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
 		.flags		= UART_CAP_FIFO | UART_CAP_AFE | UART_CAP_EFR,
 	},
-	[PORT_BRCM_TRUMANAGE] = {
-		.name		= "TruManage",
-		.fifo_size	= 1,
-		.tx_loadsz	= 1024,
-		.flags		= UART_CAP_HFIFO,
-	},
-	[PORT_ALTR_16550_F32] = {
-		.name		= "Altera 16550 FIFO32",
-		.fifo_size	= 32,
-		.tx_loadsz	= 32,
-		.fcr		= UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-		.flags		= UART_CAP_FIFO | UART_CAP_AFE,
-	},
-	[PORT_ALTR_16550_F64] = {
-		.name		= "Altera 16550 FIFO64",
-		.fifo_size	= 64,
-		.tx_loadsz	= 64,
-		.fcr		= UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-		.flags		= UART_CAP_FIFO | UART_CAP_AFE,
-	},
-	[PORT_ALTR_16550_F128] = {
-		.name		= "Altera 16550 FIFO128",
-		.fifo_size	= 128,
-		.tx_loadsz	= 128,
-		.fcr		= UART_FCR_ENABLE_FIFO | UART_FCR_R_TRIG_10,
-		.flags		= UART_CAP_FIFO | UART_CAP_AFE,
-	},
 };
 
 #if defined(CONFIG_MIPS_ALCHEMY)
@@ -403,58 +366,6 @@ static inline int map_8250_out_reg(struct uart_port *p, int offset)
 
 #endif
 
-#ifdef CONFIG_DNI_CONSOLE_REDIRECT_DEBUG
-/* sysfs */
-static ssize_t show_console(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	int len;
-	int i;
-
-	read_lock(&log_rwlock);
-
-	strcpy(buf, console_buf);
-//	memcpy(buf, console_buf, MAX_BUFF_COUNT);
-
-	len =  strlen(console_buf);
-	memset(console_buf, '\0', MAX_BUFF_COUNT);
-	console_index = 0;
-
-	read_unlock(&log_rwlock);
-
-	return len;
-}
-
-static ssize_t set_console(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
-{
-	char new_id[2];
-
-	memset(new_id, 0, 2);
-
-	if (sscanf(buf, "%s", new_id) != 1)
-		return -EINVAL;
-
-	if (strcmp(new_id, console_id[0]) == 0)
-		console_enable = 1;
-	else if (strcmp(new_id, console_id[1]) == 0)
-		console_enable = 0;
-
-	return count;
-}
-
-static DEVICE_ATTR(console, S_IRUGO | S_IWUSR, show_console, set_console);
-
-static struct attribute *console_sysfs_entries[] = {
-         &dev_attr_console.attr,
-         NULL
-};
-
-static struct attribute_group console_attr_group = {
-         .name = NULL,
-         .attrs = console_sysfs_entries,
-};
-
-#endif
-
 static unsigned int hub6_serial_in(struct uart_port *p, int offset)
 {
 	offset = map_8250_in_reg(p, offset) << p->regshift;
@@ -483,23 +394,6 @@ static void mem_serial_out(struct uart_port *p, int offset, int value)
 
 static void mem32_serial_out(struct uart_port *p, int offset, int value)
 {
-#ifdef CONFIG_DNI_CONSOLE_REDIRECT_DEBUG
-	if(console_enable == 1){
-		write_lock(&log_rwlock);
-		
-		buf_num = strlen(console_buf);
-		if (buf_num >= (MAX_BUFF_COUNT - 2)) {
-			memset(console_buf, '\0', MAX_BUFF_COUNT);
-			buf_num = 0;
-		}
-	
-		/* Skip some special character */	
-		if(!(value == 0x5 || value == 0x7 || value == 0x1B))
-			console_buf[buf_num] = (char)value;
-
-		write_unlock(&log_rwlock);
-	}
-#endif
 	offset = map_8250_out_reg(p, offset) << p->regshift;
 	writel(value, p->membase + offset);
 }
@@ -1576,11 +1470,6 @@ void serial8250_tx_chars(struct uart_8250_port *up)
 		port->icount.tx++;
 		if (uart_circ_empty(xmit))
 			break;
-		if (up->capabilities & UART_CAP_HFIFO) {
-			if ((serial_port_in(port, UART_LSR) & BOTH_EMPTY) !=
-			    BOTH_EMPTY)
-				break;
-		}
 	} while (--count > 0);
 
 	if (uart_circ_chars_pending(xmit) < WAKEUP_CHARS)
@@ -2391,11 +2280,10 @@ serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
 		quot++;
 
 	if (up->capabilities & UART_CAP_FIFO && port->fifosize > 1) {
-		fcr = uart_config[port->type].fcr;
-		if (baud < 2400) {
-			fcr &= ~UART_FCR_TRIGGER_MASK;
-			fcr |= UART_FCR_TRIGGER_1;
-		}
+		if (baud < 2400)
+			fcr = UART_FCR_ENABLE_FIFO | UART_FCR_TRIGGER_1;
+		else
+			fcr = uart_config[port->type].fcr;
 	}
 
 	/*
@@ -2710,7 +2598,6 @@ static int serial8250_request_port(struct uart_port *port)
 
 static void serial8250_config_port(struct uart_port *port, int flags)
 {
-//	printk("########## serial8250_config_port ###########\n");
 	struct uart_8250_port *up =
 		container_of(port, struct uart_8250_port, port);
 	int probeflags = PROBE_ANY;
@@ -2753,7 +2640,7 @@ serial8250_verify_port(struct uart_port *port, struct serial_struct *ser)
 	if (ser->irq >= nr_irqs || ser->irq < 0 ||
 	    ser->baud_base < 9600 || ser->type < PORT_UNKNOWN ||
 	    ser->type >= ARRAY_SIZE(uart_config) || ser->type == PORT_CIRRUS ||
-	    ser->type == PORT_STARTECH || uart_config[ser->type].name == NULL)
+	    ser->type == PORT_STARTECH)
 		return -EINVAL;
 	return 0;
 }
@@ -2763,7 +2650,7 @@ serial8250_type(struct uart_port *port)
 {
 	int type = port->type;
 
-	if (type >= ARRAY_SIZE(uart_config) || uart_config[type].name == NULL)
+	if (type >= ARRAY_SIZE(uart_config))
 		type = 0;
 	return uart_config[type].name;
 }
@@ -2830,7 +2717,7 @@ static void __init serial8250_isa_init_ports(void)
 		 */
 		up->mcr_mask = ~ALPHA_KLUDGE_MCR;
 		up->mcr_force = ALPHA_KLUDGE_MCR;
-	//	printk("###########  serial8250_pops ##################\n");
+
 		port->ops = &serial8250_pops;
 	}
 
@@ -2853,8 +2740,6 @@ static void __init serial8250_isa_init_ports(void)
 		port->regshift = old_serial_port[i].iomem_reg_shift;
 		set_io_from_upio(port);
 		port->irqflags |= irqflag;
-
-	//	printk("###### have processed the  uart port  %d ###\n",i);
 		if (serial8250_isa_config != NULL)
 			serial8250_isa_config(i, &up->port, &up->capabilities);
 
@@ -2873,9 +2758,6 @@ serial8250_init_fixed_type_port(struct uart_8250_port *up, unsigned int type)
 static void __init
 serial8250_register_ports(struct uart_driver *drv, struct device *dev)
 {
-
-
-//	printk("####### serial8250_register_ports ###########\n");
 	int i;
 
 	for (i = 0; i < nr_uarts; i++) {
@@ -3167,17 +3049,6 @@ static int __devinit serial8250_probe(struct platform_device *dev)
 				p->irq, ret);
 		}
 	}
-
-#ifdef CONFIG_DNI_CONSOLE_REDIRECT_DEBUG
-	rwlock_init(&log_rwlock);
-	memset(console_buf, '\0', MAX_BUFF_COUNT);
-
-	ret = sysfs_create_group(&dev->dev.kobj, &console_attr_group);
-	if(ret) {
-		printk("Error creating sysfs group\n");
-		return -1;
-        }
-#endif
 	return 0;
 }
 
@@ -3194,10 +3065,6 @@ static int __devexit serial8250_remove(struct platform_device *dev)
 		if (up->port.dev == &dev->dev)
 			serial8250_unregister_port(i);
 	}
-
-#ifdef CONFIG_DNI_CONSOLE_REDIRECT_DEBUG
-	sysfs_remove_group(&dev->dev.kobj, &console_attr_group);
-#endif
 	return 0;
 }
 

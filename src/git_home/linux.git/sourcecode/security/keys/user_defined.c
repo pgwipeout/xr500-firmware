@@ -58,14 +58,13 @@ EXPORT_SYMBOL_GPL(key_type_logon);
 /*
  * instantiate a user defined key
  */
-int user_instantiate(struct key *key, struct key_preparsed_payload *prep)
+int user_instantiate(struct key *key, const void *data, size_t datalen)
 {
 	struct user_key_payload *upayload;
-	size_t datalen = prep->datalen;
 	int ret;
 
 	ret = -EINVAL;
-	if (datalen <= 0 || datalen > 32767 || !prep->data)
+	if (datalen <= 0 || datalen > 32767 || !data)
 		goto error;
 
 	ret = key_payload_reserve(key, datalen);
@@ -79,7 +78,7 @@ int user_instantiate(struct key *key, struct key_preparsed_payload *prep)
 
 	/* attach the data */
 	upayload->datalen = datalen;
-	memcpy(upayload->data, prep->data, datalen);
+	memcpy(upayload->data, data, datalen);
 	rcu_assign_keypointer(key, upayload);
 	ret = 0;
 
@@ -93,14 +92,13 @@ EXPORT_SYMBOL_GPL(user_instantiate);
  * update a user defined key
  * - the key's semaphore is write-locked
  */
-int user_update(struct key *key, struct key_preparsed_payload *prep)
+int user_update(struct key *key, const void *data, size_t datalen)
 {
 	struct user_key_payload *upayload, *zap;
-	size_t datalen = prep->datalen;
 	int ret;
 
 	ret = -EINVAL;
-	if (datalen <= 0 || datalen > 32767 || !prep->data)
+	if (datalen <= 0 || datalen > 32767 || !data)
 		goto error;
 
 	/* construct a replacement payload */
@@ -110,7 +108,7 @@ int user_update(struct key *key, struct key_preparsed_payload *prep)
 		goto error;
 
 	upayload->datalen = datalen;
-	memcpy(upayload->data, prep->data, datalen);
+	memcpy(upayload->data, data, datalen);
 
 	/* check the quota and attach the new data */
 	zap = upayload;

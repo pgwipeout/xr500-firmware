@@ -1,11 +1,24 @@
 <% http_header("style/form.css", "/jquery-1.7.2.min.js", "style/form2.css","/funcs.js", "/funjsq.js" ) %>
 <body onLoad="loadvalue(); please_wait(false);" >
+<style>
+.WeChat .clear{
+position:absolute;
+top:-210px;
+right:0;
+width:16px;
+height:16px;
+border:1px white;
+}
+</style>
 <script language="javascript" type="text/javascript">
 <% refresh_timestamp("open_plugin","close_plugin","reset_plugin","reset_open_plugin","need_login") %>
 <% update_pay_result() %>
 var ts = "<% cfg_get("open_plugin") %>";
 function loadvalue()
 {
+}
+function clearwechat(){
+	document.getElementById("wechat").style.display="none";
 }
 </script>
 <form id="selectForm" method="POST" action="/admin.cgi?/funjsq_select.htm" target=formframe>
@@ -94,8 +107,9 @@ var funjsq_RXbyte = "<% cfg_get("funjsq_RXbyte") %>";
 </div>
 
 </form>
-<div class="WeChat">
+<div class="WeChat" id="wechat" style="position:relative;">
         <img id="WeChatImg" src="/image/WeChat.png" />
+	<div class="clear" onclick="clearwechat()">X</div>
 </div>
 </body>
 </html>

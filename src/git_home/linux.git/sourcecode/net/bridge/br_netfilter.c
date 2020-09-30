@@ -47,11 +47,6 @@
 #define store_orig_dstaddr(skb)	 (skb_origaddr(skb) = ip_hdr(skb)->daddr)
 #define dnat_took_place(skb)	 (skb_origaddr(skb) != ip_hdr(skb)->daddr)
 
-#define store_orig_srcaddr(skb, offset) \
-				 ((skb)->nf_bridge->data[(offset)/sizeof(unsigned long)] = ip_hdr(skb)->saddr)
-#define snat_took_place(skb, offset) \
-				 ((skb)->nf_bridge->data[(offset)/sizeof(unsigned long)] != ip_hdr(skb)->saddr)
-
 #ifdef CONFIG_SYSCTL
 static struct ctl_table_header *brnf_sysctl_header;
 static int brnf_call_iptables __read_mostly = 1;
@@ -231,14 +226,12 @@ static inline void nf_bridge_pull_encap_header_rcsum(struct sk_buff *skb)
 	skb->network_header += len;
 }
 
-static inline void nf_bridge_save_header(struct sk_buff *skb, u_int8_t pf)
+static inline void nf_bridge_save_header(struct sk_buff *skb)
 {
 	int header_size = ETH_HLEN + nf_bridge_encap_header_len(skb);
 
 	skb_copy_from_linear_data_offset(skb, -header_size,
 					 skb->nf_bridge->data, header_size);
-	if (pf == PF_INET)
-		store_orig_srcaddr(skb, ALIGN(header_size, sizeof(unsigned long)));
 }
 
 static inline void nf_bridge_update_protocol(struct sk_buff *skb)
@@ -260,9 +253,6 @@ static int br_parse_ip_options(struct sk_buff *skb)
 	const struct iphdr *iph;
 	struct net_device *dev = skb->dev;
 	u32 len;
-
-	if (!pskb_may_pull(skb, sizeof(struct iphdr)))
-		goto inhdr_error;
 
 	iph = ip_hdr(skb);
 	opt = &(IPCB(skb)->opt);
@@ -323,8 +313,6 @@ int nf_bridge_copy_header(struct sk_buff *skb)
 {
 	int err;
 	unsigned int header_size;
-	u_int8_t protocol = skb->protocol;
-	struct net_device *br = bridge_parent(skb->dev);
 
 	nf_bridge_update_protocol(skb);
 	header_size = ETH_HLEN + nf_bridge_encap_header_len(skb);
@@ -334,9 +322,6 @@ int nf_bridge_copy_header(struct sk_buff *skb)
 
 	skb_copy_to_linear_data_offset(skb, -header_size,
 				       skb->nf_bridge->data, header_size);
-	if ((protocol == htons(ETH_P_IP)) && br && snat_took_place(skb, ALIGN(header_size, sizeof(unsigned long))))
-		skb_copy_to_linear_data_offset(skb, ETH_ALEN - header_size, br->dev_addr, ETH_ALEN);
-
 	__skb_push(skb, nf_bridge_encap_header_len(skb));
 	return 0;
 }
@@ -885,7 +870,7 @@ static unsigned int br_nf_post_routing(unsigned int hook, struct sk_buff *skb,
 	}
 
 	nf_bridge_pull_encap_header(skb);
-	nf_bridge_save_header(skb, pf);
+	nf_bridge_save_header(skb);
 	if (pf == PF_INET)
 		skb->protocol = htons(ETH_P_IP);
 	else

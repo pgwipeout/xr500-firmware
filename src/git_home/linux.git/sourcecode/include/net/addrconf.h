@@ -81,9 +81,6 @@ extern int			ipv6_dev_get_saddr(struct net *net,
 					       const struct in6_addr *daddr,
 					       unsigned int srcprefs,
 					       struct in6_addr *saddr);
-extern int			__ipv6_get_lladdr(struct inet6_dev *idev,
-						  struct in6_addr *addr,
-						  unsigned char banned_flags);
 extern int			ipv6_get_lladdr(struct net_device *dev,
 						struct in6_addr *addr,
 						unsigned char banned_flags);
@@ -93,12 +90,6 @@ extern void			addrconf_join_solict(struct net_device *dev,
 					const struct in6_addr *addr);
 extern void			addrconf_leave_solict(struct inet6_dev *idev,
 					const struct in6_addr *addr);
-
-extern int			(*ipv6_dev_get_saddr_hook)(struct net *net,
-						struct net_device *dev,
-						const struct in6_addr *daddr,
-						unsigned int srcprefs,
-						struct in6_addr *saddr);
 
 static inline unsigned long addrconf_timeout_fixup(u32 timeout,
 						    unsigned unit)
@@ -285,8 +276,6 @@ static inline int ipv6_addr_is_isatap(const struct in6_addr *addr)
 {
 	return (addr->s6_addr32[2] | htonl(0x02000000)) == htonl(0x02005EFE);
 }
-
-struct net_device *ipv6_dev_find(struct net *net, struct in6_addr *addr, int strict);
 
 #ifdef CONFIG_PROC_FS
 extern int if6_proc_init(void);

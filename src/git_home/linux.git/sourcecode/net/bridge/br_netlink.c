@@ -104,7 +104,6 @@ void br_ifinfo_notify(int event, struct net_bridge_port *port)
 		kfree_skb(skb);
 		goto errout;
 	}
-	__br_notify(RTNLGRP_LINK, event, port);
 	rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL, GFP_ATOMIC);
 	return;
 errout:
@@ -124,7 +123,7 @@ static int br_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
 	idx = 0;
 	rcu_read_lock();
 	for_each_netdev_rcu(net, dev) {
-		struct net_bridge_port *port = br_port_get_rtnl(dev);
+		struct net_bridge_port *port = br_port_get_rcu(dev);
 
 		/* not a bridge port */
 		if (!port || idx < cb->args[0])
@@ -212,7 +211,7 @@ static int br_validate(struct nlattr *tb[], struct nlattr *data[])
 	return 0;
 }
 
-struct rtnl_link_ops br_link_ops __read_mostly = {
+static struct rtnl_link_ops br_link_ops __read_mostly = {
 	.kind		= "bridge",
 	.priv_size	= sizeof(struct net_bridge),
 	.setup		= br_dev_setup,

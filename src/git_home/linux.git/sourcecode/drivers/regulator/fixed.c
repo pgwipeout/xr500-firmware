@@ -142,19 +142,6 @@ static int fixed_voltage_get_voltage(struct regulator_dev *dev)
 		return -EINVAL;
 }
 
-static int fixed_voltage_set_voltage(struct regulator_dev *dev,
-					int min_uV, int max_uV,
-					unsigned *selector)
-{
-	/*
-	 * FIXME: Ideally fixed_voltage_ops.set_voltage would be NULL and
-	 * regulator_set_voltage() would return -EINVAL. However, we are
-	 * returning a zero here. Not sure if this will break some other
-	 * driver's assumption.
-	 */
-	return 0;
-}
-
 static int fixed_voltage_list_voltage(struct regulator_dev *dev,
 				      unsigned selector)
 {
@@ -166,17 +153,6 @@ static int fixed_voltage_list_voltage(struct regulator_dev *dev,
 	return data->microvolts;
 }
 
-static int fixed_set_voltage_sel(struct regulator_dev *dev, unsigned selector)
-{
-	/*
-	* FIXME: Ideally fixed_voltage_ops.set_voltage_sel would be NULL and
-	* regulator_set_voltage() would return -EINVAL. However, we are
-	* returning a zero here. Not sure if this will break some other
-	* driver's assumption.
-	*/
-	return 0;
-}
-
 static struct regulator_ops fixed_voltage_ops = {
 	.is_enabled = fixed_voltage_is_enabled,
 	.enable = fixed_voltage_enable,
@@ -184,8 +160,6 @@ static struct regulator_ops fixed_voltage_ops = {
 	.enable_time = fixed_voltage_enable_time,
 	.get_voltage = fixed_voltage_get_voltage,
 	.list_voltage = fixed_voltage_list_voltage,
-	.set_voltage = fixed_voltage_set_voltage,
-	.set_voltage_sel = fixed_set_voltage_sel,
 };
 
 static int __devinit reg_fixed_voltage_probe(struct platform_device *pdev)

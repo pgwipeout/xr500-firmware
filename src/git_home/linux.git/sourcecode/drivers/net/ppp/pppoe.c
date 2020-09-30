@@ -1,8 +1,6 @@
 /** -*- linux-c -*- ***********************************************************
  * Linux PPP over Ethernet (PPPoX/PPPoE) Sockets
  *
- * Copyright (c) 2013-2015 The Linux Foundation. All rights reserved.
- *
  * PPPoX --- Generic PPP encapsulation socket family
  * PPPoE --- PPP over Ethernet (RFC 2516)
  *
@@ -69,7 +67,6 @@
 #include <linux/inetdevice.h>
 #include <linux/etherdevice.h>
 #include <linux/skbuff.h>
-#include <linux/if_arp.h>
 #include <linux/init.h>
 #include <linux/if_ether.h>
 #include <linux/if_pppox.h>
@@ -95,7 +92,7 @@
 static int __pppoe_xmit(struct sock *sk, struct sk_buff *skb);
 
 static const struct proto_ops pppoe_ops;
-static const struct pppoe_channel_ops pppoe_chan_ops;
+static const struct ppp_channel_ops pppoe_chan_ops;
 
 /* per-net private data for this module */
 static int pppoe_net_id __read_mostly;
@@ -110,14 +107,6 @@ struct pppoe_net {
 	 */
 	struct pppox_sock *hash_table[PPPOE_HASH_SIZE];
 	rwlock_t hash_lock;
-
-	/*
-	 * This function is registered by the generic PPP
-	 * kernel module. It is called when the PPPoE
-	 * session is torn down.
-	 */
-	ppp_channel_destroy_method_t pppoe_destroy_method;
-	void *destroy_method_arg;
 };
 
 /*
@@ -575,8 +564,6 @@ static int pppoe_release(struct socket *sock)
 	struct pppox_sock *po;
 	struct pppoe_net *pn;
 	struct net *net = NULL;
-	ppp_channel_destroy_method_t pppoe_destroy_method;
-	void *destroy_method_arg;
 
 	if (!sk)
 		return 0;
@@ -589,7 +576,7 @@ static int pppoe_release(struct socket *sock)
 
 	po = pppox_sk(sk);
 
-	if (sk->sk_state & (PPPOX_CONNECTED | PPPOX_BOUND | PPPOX_ZOMBIE)) {
+	if (sk->sk_state & (PPPOX_CONNECTED | PPPOX_BOUND)) {
 		dev_put(po->pppoe_dev);
 		po->pppoe_dev = NULL;
 	}
@@ -601,21 +588,6 @@ static int pppoe_release(struct socket *sock)
 
 	net = sock_net(sk);
 	pn = pppoe_pernet(net);
-
-	/*
-	 * We must ensure to destroy all PPPoE NSS rules associated with this
-	 * PPPoE session before the socket is released.
-	 */
-	if (po->pppoe_pa.sid) {
-		read_lock_bh(&pn->hash_lock);
-		pppoe_destroy_method = pn->pppoe_destroy_method;
-		destroy_method_arg = pn->destroy_method_arg;
-		read_unlock_bh(&pn->hash_lock);
-
-		if (pppoe_destroy_method) {
-			pppoe_destroy_method(destroy_method_arg, be16_to_cpu(po->pppoe_pa.sid), po->pppoe_pa.remote);
-		}
-	}
 
 	/*
 	 * protect "po" from concurrent updates
@@ -644,8 +616,6 @@ static int pppoe_connect(struct socket *sock, struct sockaddr *uservaddr,
 	struct pppoe_net *pn;
 	struct net *net = NULL;
 	int error;
-	ppp_channel_destroy_method_t pppoe_destroy_method;
-	void *destroy_method_arg;
 
 	lock_sock(sk);
 
@@ -671,24 +641,6 @@ static int pppoe_connect(struct socket *sock, struct sockaddr *uservaddr,
 	if (stage_session(po->pppoe_pa.sid)) {
 		pppox_unbind_sock(sk);
 		pn = pppoe_pernet(sock_net(sk));
-
-		/*
-		 * In the case of related PPPoE session is torn down,
-		 * destruction function is called if it is registered before.
-		 *
-		 * TODO: In an SMP system, the destroy method could be called after
-		 * the user has unregitered because the destory existed while the lock was held.
-		 * This race needs to be fixed in a future patch.
-		 */
-		read_lock_bh(&pn->hash_lock);
-		pppoe_destroy_method = pn->pppoe_destroy_method;
-		destroy_method_arg = pn->destroy_method_arg;
-		read_unlock_bh(&pn->hash_lock);
-
-		if (pppoe_destroy_method) {
-			pppoe_destroy_method(destroy_method_arg, be16_to_cpu(po->pppoe_pa.sid), po->pppoe_pa.remote);
-		}
-
 		delete_item(pn, po->pppoe_pa.sid,
 			    po->pppoe_pa.remote, po->pppoe_ifindex);
 		if (po->pppoe_dev) {
@@ -699,15 +651,6 @@ static int pppoe_connect(struct socket *sock, struct sockaddr *uservaddr,
 		memset(sk_pppox(po) + 1, 0,
 		       sizeof(struct pppox_sock) - sizeof(struct sock));
 		sk->sk_state = PPPOX_NONE;
-
-		/*
-		 * Unregister the destroy method and its argument. They
-		 * will be re-registered once the new connection is established.
-		 */
-		write_lock_bh(&pn->hash_lock);
-		pn->pppoe_destroy_method = NULL;
-		pn->destroy_method_arg = NULL;
-		write_unlock_bh(&pn->hash_lock);
 	}
 
 	/* Re-bind in session stage only */
@@ -738,9 +681,9 @@ static int pppoe_connect(struct socket *sock, struct sockaddr *uservaddr,
 		po->chan.hdrlen = (sizeof(struct pppoe_hdr) +
 				   dev->hard_header_len);
 
-		po->chan.mtu = dev->mtu - sizeof(struct pppoe_hdr) - 2;
+		po->chan.mtu = dev->mtu - sizeof(struct pppoe_hdr);
 		po->chan.private = sk;
-		po->chan.ops = (struct ppp_channel_ops *)&pppoe_chan_ops;
+		po->chan.ops = &pppoe_chan_ops;
 
 		error = ppp_register_net_channel(dev_net(dev), &po->chan);
 		if (error) {
@@ -913,7 +856,7 @@ static int pppoe_sendmsg(struct kiocb *iocb, struct socket *sock,
 		goto end;
 
 
-	skb = sock_wmalloc(sk, total_len + dev->hard_header_len + 32 + NET_SKB_PAD,
+	skb = sock_wmalloc(sk, total_len + dev->hard_header_len + 32,
 			   0, GFP_KERNEL);
 	if (!skb) {
 		error = -ENOMEM;
@@ -921,7 +864,7 @@ static int pppoe_sendmsg(struct kiocb *iocb, struct socket *sock,
 	}
 
 	/* Reserve space for headers. */
-	skb_reserve(skb, dev->hard_header_len + NET_SKB_PAD);
+	skb_reserve(skb, dev->hard_header_len);
 	skb_reset_network_header(skb);
 
 	skb->dev = dev;
@@ -1021,165 +964,8 @@ static int pppoe_xmit(struct ppp_channel *chan, struct sk_buff *skb)
 	return __pppoe_xmit(sk, skb);
 }
 
-/************************************************************************
- *
- * function called by generic PPP driver to register destroy methods
- *
- ***********************************************************************/
-static bool pppoe_register_destroy_method(struct ppp_channel *chan, ppp_channel_destroy_method_t method, void *destroy_method_arg)
-{
-	struct sock *sk = (struct sock *)chan->private;
-	struct pppoe_net *pn = pppoe_pernet(sock_net(sk));
-
-	write_lock_bh(&pn->hash_lock);
-	if (pn->pppoe_destroy_method || pn->destroy_method_arg) {
-		write_unlock_bh(&pn->hash_lock);
-		return false;
-	}
-	pn->pppoe_destroy_method = method;
-	pn->destroy_method_arg = destroy_method_arg;
-	write_unlock_bh(&pn->hash_lock);
-
-	return true;
-}
-
-/************************************************************************
- *
- * function called by generic PPP driver to unregister destroy methods
- *
- ***********************************************************************/
-static void pppoe_unregister_destroy_method(struct ppp_channel *chan)
-{
-	struct sock *sk = (struct sock *)chan->private;
-	struct pppoe_net *pn = pppoe_pernet(sock_net(sk));
-
-	write_lock_bh(&pn->hash_lock);
-	pn->pppoe_destroy_method = NULL;
-	pn->destroy_method_arg = NULL;
-	write_unlock_bh(&pn->hash_lock);
-}
-
-/************************************************************************
- *
- * function called by generic PPP driver to hold channel
- *
- ***********************************************************************/
-static void pppoe_hold_chan(struct ppp_channel *chan)
-{
-	struct sock *sk = (struct sock *)chan->private;
-	sock_hold(sk);
-}
-
-/************************************************************************
- *
- * function called by generic PPP driver to release channel
- *
- ***********************************************************************/
-static void pppoe_release_chan(struct ppp_channel *chan)
-{
-	struct sock *sk = (struct sock *)chan->private;
-	sock_put(sk);
-}
-
-/************************************************************************
- *
- * function called to get the channel protocol type
- *
- ***********************************************************************/
-static int pppoe_get_channel_protocol(struct ppp_channel *chan)
-{
-	return PX_PROTO_OE;
-}
-
-/************************************************************************
- *
- * function called to get the PPPoE channel addressing
- * NOTE: This function returns a HOLD to the netdevice
- *
- ***********************************************************************/
-static void pppoe_get_addressing(struct ppp_channel *chan, struct pppoe_opt *addressing)
-{
-	struct sock *sk = (struct sock *)chan->private;
-	struct pppox_sock *po = pppox_sk(sk);
-	*addressing = po->proto.pppoe;
-	if (addressing->dev) {
-		dev_hold(addressing->dev);
-	}
-}
-
-/*
- * pppoe_channel_addressing_get()
- *	Return PPPoE channel specific addressing information.
- */
-void pppoe_channel_addressing_get(struct ppp_channel *chan, struct pppoe_opt *addressing)
-{
-	pppoe_get_addressing(chan, addressing);
-}
-EXPORT_SYMBOL(pppoe_channel_addressing_get);
-
-/*
- * pppoe_get_and_hold_netdev_from_session_info()
- *	Return netdevice associated with the session id and the remote mac
- *	address passed in the parameter list.
- *
- *	NOTE: The caller of this API should release the netdev (dev_put())
- *	after finishing its job with the net device.
- */
-struct net_device *pppoe_get_and_hold_netdev_from_session_info(uint16_t sid, uint8_t *mac)
-{
-	struct net_device *dev;
-	struct ppp_channel *ppp_chan[1];
-	int channel_protocol;
-	struct pppoe_opt addressing;
-
-	for_each_netdev_rcu(&init_net, dev) {
-		if (dev->type != ARPHRD_PPP) {
-			continue;
-		}
-
-		/*
-		 * Get the ppp channel form the net device. Currently we only support
-		 * single channel on each netdevice.
-		 */
-		if (ppp_hold_channels(dev, ppp_chan, 1) != 1) {
-			continue;
-		}
-
-		/*
-		 * Check if the protocol is PPPoE.
-		 */
-		channel_protocol = ppp_channel_get_protocol(ppp_chan[0]);
-		if (channel_protocol != PX_PROTO_OE) {
-			ppp_release_channels(ppp_chan, 1);
-			continue;
-		}
-
-		/*
-		 * Get the addressing information from the channel.
-		 */
-		pppoe_channel_addressing_get(ppp_chan[0], &addressing);
-		if ((addressing.pa.sid == cpu_to_be16(sid)) && !memcmp(addressing.pa.remote, mac, ETH_ALEN)) {
-			ppp_release_channels(ppp_chan, 1);
-			dev_hold(dev);
-			return dev;
-		}
-		ppp_release_channels(ppp_chan, 1);
-	}
-
-	return NULL;
-}
-EXPORT_SYMBOL(pppoe_get_and_hold_netdev_from_session_info);
-
-static const struct pppoe_channel_ops pppoe_chan_ops = {
-	/* PPPoE specific channel ops */
-	.get_addressing = pppoe_get_addressing,
-	/* General ppp channel ops */
-	.ops.start_xmit = pppoe_xmit,
-	.ops.reg_destroy_method = pppoe_register_destroy_method,
-	.ops.unreg_destroy_method = pppoe_unregister_destroy_method,
-	.ops.get_channel_protocol = pppoe_get_channel_protocol,
-	.ops.hold = pppoe_hold_chan,
-	.ops.release = pppoe_release_chan,
+static const struct ppp_channel_ops pppoe_chan_ops = {
+	.start_xmit = pppoe_xmit,
 };
 
 static int pppoe_recvmsg(struct kiocb *iocb, struct socket *sock,
@@ -1198,6 +984,8 @@ static int pppoe_recvmsg(struct kiocb *iocb, struct socket *sock,
 				flags & MSG_DONTWAIT, &error);
 	if (error < 0)
 		goto end;
+
+	m->msg_namelen = 0;
 
 	if (skb) {
 		total_len = min_t(size_t, total_len, skb->len);
@@ -1349,9 +1137,6 @@ static __net_init int pppoe_init_net(struct net *net)
 	struct proc_dir_entry *pde;
 
 	rwlock_init(&pn->hash_lock);
-
-	pn->pppoe_destroy_method = NULL;
-	pn->destroy_method_arg = NULL;
 
 	pde = proc_net_fops_create(net, "pppoe", S_IRUGO, &pppoe_seq_fops);
 #ifdef CONFIG_PROC_FS

@@ -35,26 +35,13 @@
  */
 #define PAGE_ALLOC_COSTLY_ORDER 3
 
-enum {
-	MIGRATE_UNMOVABLE,
-	MIGRATE_RECLAIMABLE,
-	MIGRATE_MOVABLE,
-	MIGRATE_PCPTYPES,	/* the number of types on the pcp lists */
-	MIGRATE_RESERVE = MIGRATE_PCPTYPES,
-	MIGRATE_ISOLATE,	/* can't allocate from here */
-	MIGRATE_TYPES
-};
-
-/*
- * Returns a list which contains the migrate types on to which
- * an allocation falls back when the free list for the migrate
- * type mtype is depleted.
- * The end of the list is delimited by the type MIGRATE_RESERVE.
- */
-extern int *get_migratetype_fallbacks(int mtype);
-
-#  define is_cma_pageblock(page) false
-#  define is_migrate_cma(migratetype) false
+#define MIGRATE_UNMOVABLE     0
+#define MIGRATE_RECLAIMABLE   1
+#define MIGRATE_MOVABLE       2
+#define MIGRATE_PCPTYPES      3 /* the number of types on the pcp lists */
+#define MIGRATE_RESERVE       3
+#define MIGRATE_ISOLATE       4 /* can't allocate from here */
+#define MIGRATE_TYPES         5
 
 #define for_each_migratetype_order(order, type) \
 	for (order = 0; order < MAX_ORDER; order++) \
@@ -129,7 +116,6 @@ enum zone_stat_item {
 	NUMA_OTHER,		/* allocation from other node */
 #endif
 	NR_ANON_TRANSPARENT_HUGEPAGES,
-	NR_FREE_CMA_PAGES,
 	NR_VM_ZONE_STAT_ITEMS };
 
 /*
@@ -498,12 +484,6 @@ static inline int zone_is_oom_locked(const struct zone *zone)
 	return test_bit(ZONE_OOM_LOCKED, &zone->flags);
 }
 
-#ifdef CONFIG_SMP
-unsigned long zone_nr_free_pages(struct zone *zone);
-#else
-#define zone_nr_free_pages(zone) zone_page_state(zone, NR_FREE_PAGES)
-#endif /* CONFIG_SMP */
-
 /*
  * The "priority" of VM scanning is how much of the queues we will scan in one
  * go. A value of 12 for DEF_PRIORITY implies that we will scan 1/4096th of the
@@ -683,7 +663,7 @@ typedef struct pglist_data {
 					     range, including holes */
 	int node_id;
 	wait_queue_head_t kswapd_wait;
-	struct task_struct *kswapd;	/* Protected by lock_memory_hotplug() */
+	struct task_struct *kswapd;
 	int kswapd_max_order;
 	enum zone_type classzone_idx;
 } pg_data_t;
@@ -1139,10 +1119,7 @@ static inline int pfn_present(unsigned long pfn)
 #define pfn_to_nid(pfn)		(0)
 #endif
 
-#ifndef early_pfn_valid
 #define early_pfn_valid(pfn)	pfn_valid(pfn)
-#endif
-
 void sparse_init(void);
 #else
 #define sparse_init()	do {} while (0)

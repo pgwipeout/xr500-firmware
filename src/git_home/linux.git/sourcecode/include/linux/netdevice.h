@@ -146,7 +146,7 @@ static inline bool dev_xmit_complete(int rc)
  */
 
 #if defined(CONFIG_WLAN) || IS_ENABLED(CONFIG_AX25)
-# if 1 || defined(CONFIG_MAC80211_MESH)
+# if defined(CONFIG_MAC80211_MESH)
 #  define LL_MAX_HEADER 128
 # else
 #  define LL_MAX_HEADER 96
@@ -232,9 +232,9 @@ struct netdev_hw_addr {
 #define NETDEV_HW_ADDR_T_SLAVE		3
 #define NETDEV_HW_ADDR_T_UNICAST	4
 #define NETDEV_HW_ADDR_T_MULTICAST	5
+	bool			synced;
 	bool			global_use;
 	int			refcount;
-	int			synced;
 	struct rcu_head		rcu_head;
 };
 
@@ -1079,11 +1079,6 @@ struct net_device {
 	const struct net_device_ops *netdev_ops;
 	const struct ethtool_ops *ethtool_ops;
 
-#ifdef CONFIG_ETHERNET_PACKET_MANGLE
-	void (*eth_mangle_rx)(struct net_device *dev, struct sk_buff *skb);
-	struct sk_buff *(*eth_mangle_tx)(struct net_device *dev, struct sk_buff *skb);
-#endif
-
 	/* Hardware header description */
 	const struct header_ops *header_ops;
 
@@ -1141,9 +1136,6 @@ struct net_device {
 	void			*ax25_ptr;	/* AX.25 specific data */
 	struct wireless_dev	*ieee80211_ptr;	/* IEEE 802.11 specific data,
 						   assign before registering */
-#ifdef CONFIG_ETHERNET_PACKET_MANGLE
-	void			*phy_ptr; /* PHY device specific data */
-#endif
 
 /*
  * Cache lines mostly used on receive path (including eth_type_trans())
@@ -1273,10 +1265,6 @@ struct net_device {
 		struct pcpu_tstats __percpu	*tstats; /* tunnel stats */
 		struct pcpu_dstats __percpu	*dstats; /* dummy stats */
 	};
-
-	/* bridge stuff */
-	struct net_bridge_port  *br_port;
-
 	/* GARP */
 	struct garp_port __rcu	*garp_port;
 
@@ -1291,8 +1279,6 @@ struct net_device {
 	/* for setting kernel sock attribute on TCP connection setup */
 #define GSO_MAX_SIZE		65536
 	unsigned int		gso_max_size;
-#define GSO_MAX_SEGS		65535
-	u16			gso_max_segs;
 
 #ifdef CONFIG_DCB
 	/* Data Center Bridging netlink ops */
@@ -1508,8 +1494,6 @@ struct packet_type {
 	struct sk_buff		**(*gro_receive)(struct sk_buff **head,
 					       struct sk_buff *skb);
 	int			(*gro_complete)(struct sk_buff *skb);
-	bool			(*id_match)(struct packet_type *ptype,
-					    struct sock *sk);
 	void			*af_packet_priv;
 	struct list_head	list;
 };
@@ -1543,8 +1527,6 @@ struct packet_type {
 #define NETDEV_RELEASE		0x0012
 #define NETDEV_NOTIFY_PEERS	0x0013
 #define NETDEV_JOIN		0x0014
-#define NETDEV_BR_JOIN		0x0015
-#define NETDEV_BR_LEAVE		0x0016
 
 extern int register_netdevice_notifier(struct notifier_block *nb);
 extern int unregister_netdevice_notifier(struct notifier_block *nb);
@@ -1645,6 +1627,7 @@ extern int		netpoll_trap(void);
 #endif
 extern int	       skb_gro_receive(struct sk_buff **head,
 				       struct sk_buff *skb);
+extern void	       skb_gro_reset_offset(struct sk_buff *skb);
 
 static inline unsigned int skb_gro_offset(const struct sk_buff *skb)
 {
@@ -1713,15 +1696,6 @@ static inline int dev_parse_header(const struct sk_buff *skb,
 	if (!dev->header_ops || !dev->header_ops->parse)
 		return 0;
 	return dev->header_ops->parse(skb, haddr);
-}
-
-static inline int dev_rebuild_header(struct sk_buff *skb)
-{
-	const struct net_device *dev = skb->dev;
-
-	if (!dev->header_ops || !dev->header_ops->rebuild)
-		return 0;
-	return dev->header_ops->rebuild(skb);
 }
 
 typedef int gifconf_func_t(struct net_device * dev, char __user * bufptr, int len);

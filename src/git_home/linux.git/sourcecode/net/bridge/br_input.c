@@ -19,30 +19,6 @@
 #include <linux/export.h>
 #include "br_private.h"
 
-#define MAX_DEVICE 128
-
-extern struct mac_traffic mac_updownload[MAX_DEVICE];
-
-#ifdef CONFIG_DNI_MCAST_TO_UNICAST
-#include <linux/ip.h>
-#include <linux/igmp.h>
-
-#endif
-
-static int check_authorized_mac(unsigned char *dev_mac)
-{
-    int i;
-
-    for (i = 0; i < MAX_DEVICE; i++) {
-        if (mac_updownload[i].flag == 0)
-            continue;
-        if (compare_ether_addr(mac_updownload[i].mac, dev_mac) == 0)
-            return i;
-    }
-
-    return -1;
-}
-
 /* Bridge group multicast address 802.1d (pg 51). */
 const u8 br_group_address[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x00 };
 
@@ -50,70 +26,19 @@ const u8 br_group_address[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x00 };
 br_should_route_hook_t __rcu *br_should_route_hook __read_mostly;
 EXPORT_SYMBOL(br_should_route_hook);
 
-/* Hook for external Multicast handler */
-br_multicast_handle_hook_t __rcu *br_multicast_handle_hook __read_mostly;
-EXPORT_SYMBOL_GPL(br_multicast_handle_hook);
-
-/* Hook for external forwarding logic */
-br_get_dst_hook_t __rcu *br_get_dst_hook __read_mostly;
-EXPORT_SYMBOL_GPL(br_get_dst_hook);
-
 static int br_pass_frame_up(struct sk_buff *skb)
 {
 	struct net_device *indev, *brdev = BR_INPUT_SKB_CB(skb)->brdev;
 	struct net_bridge *br = netdev_priv(brdev);
 	struct br_cpu_netstats *brstats = this_cpu_ptr(br->stats);
-	unsigned char *dev_mac;
-	int ret;
 
-//#ifdef CONFIG_DNI_MCAST_TO_UNICAST
-//      unsigned char *dest;
-//      struct iphdr *iph;
-//      unsigned char proto=0;
-//      struct ethhdr *ethernet=(struct ethhdr *)skb->mac_header;
-//
-//      // if skb come from wireless interface, ex. ath0, ath1, ath2...
-//      if (skb->dev->name[0] == 'a')
-//      {
-//              iph = (struct iphdr *)skb->network_header;
-//              proto =  iph->protocol;
-//              dest = ethernet->h_dest;
-//              if ( igmp_snoop_enable && MULTICAST_MAC(dest)
-//                       && (ethernet->h_proto == ETH_P_IP))
-//              {
-//                      if (proto == IPPROTO_IGMP)
-//                              add_mac_cache(skb);
-//              }
-//      }
-//#endif
-#ifdef CONFIG_BRIDGE_NETGEAR_ACL
-      if (!br_acl_should_pass(br, skb, ACL_CHECK_SRC)) {
-              br->dev->stats.rx_dropped++;
-              kfree_skb(skb);
-              return;
-      }
-#endif
 	u64_stats_update_begin(&brstats->syncp);
 	brstats->rx_packets++;
 	brstats->rx_bytes += skb->len;
 	u64_stats_update_end(&brstats->syncp);
 
-    if (brdev->name != NULL && brdev->name[0] == 'b' &&
-        brdev->name[1] == 'r' && brdev->name[2] == '0') {
-         dev_mac = eth_hdr(skb)->h_source;
-         if (NULL != dev_mac) {
-            ret = check_authorized_mac(dev_mac);
-            if (ret >= 0) {
-                mac_updownload[ret].upload += skb->len;
-                //printk("upload package len = %d\n", mac_updownload[ret].upload);
-            }
-         }
-    }
-
 	indev = skb->dev;
 	skb->dev = brdev;
-
-	br_drop_fake_rtable(skb);
 
 	return NF_HOOK(NFPROTO_BRIDGE, NF_BR_LOCAL_IN, skb, indev, NULL,
 		       netif_receive_skb);
@@ -128,8 +53,6 @@ int br_handle_frame_finish(struct sk_buff *skb)
 	struct net_bridge_fdb_entry *dst;
 	struct net_bridge_mdb_entry *mdst;
 	struct sk_buff *skb2;
-	struct net_bridge_port *pdst = NULL;
-	br_get_dst_hook_t *get_dst_hook = rcu_dereference(br_get_dst_hook);
 
 	if (!p || p->state == BR_STATE_DISABLED)
 		goto drop;
@@ -138,12 +61,11 @@ int br_handle_frame_finish(struct sk_buff *skb)
 	br = p->br;
 	br_fdb_update(br, p, eth_hdr(skb)->h_source);
 
-
 	if (!is_broadcast_ether_addr(dest) && is_multicast_ether_addr(dest) &&
 	    br_multicast_rcv(br, p, skb))
 		goto drop;
 
-	if ((p->state == BR_STATE_LEARNING) && skb->protocol != htons(ETH_P_PAE))
+	if (p->state == BR_STATE_LEARNING)
 		goto drop;
 
 	BR_INPUT_SKB_CB(skb)->brdev = br->dev;
@@ -156,21 +78,9 @@ int br_handle_frame_finish(struct sk_buff *skb)
 
 	dst = NULL;
 
-	if (skb->protocol == htons(ETH_P_PAE)) {
+	if (is_broadcast_ether_addr(dest))
 		skb2 = skb;
-		/* Do not forward 802.1x/EAP frames */
-		skb = NULL;
-	} else if (is_broadcast_ether_addr(dest))
-		skb2 = skb;
-	else if (is_multicast_ether_addr(dest)
-#ifdef CONFIG_DNI_IPV6_PASSTHROUGH
-			|| (skb->protocol == __constant_htons(ETH_P_IPV6))
-#endif
-			) {
-		br_multicast_handle_hook_t *multicast_handle_hook = rcu_dereference(br_multicast_handle_hook);
-		if (!__br_get(multicast_handle_hook, true, p, skb))
-			goto out;
-
+	else if (is_multicast_ether_addr(dest)) {
 		mdst = br_mdb_get(br, skb);
 		if (mdst || BR_INPUT_SKB_CB_MROUTERS_ONLY(skb)) {
 			if ((mdst && mdst->mglist) ||
@@ -184,10 +94,7 @@ int br_handle_frame_finish(struct sk_buff *skb)
 			skb2 = skb;
 
 		br->dev->stats.multicast++;
-	} else if ((pdst = __br_get(get_dst_hook, NULL, p, &skb))) {
-		if (!skb) goto out;
-	} else if ((p->flags & BR_ISOLATE_MODE) ||
-		   ((dst = __br_fdb_get(br, dest)) && dst->is_local)) {
+	} else if ((dst = __br_fdb_get(br, dest)) && dst->is_local) {
 		skb2 = skb;
 		/* Do not forward the packet since it's local. */
 		skb = NULL;
@@ -196,12 +103,8 @@ int br_handle_frame_finish(struct sk_buff *skb)
 	if (skb) {
 		if (dst) {
 			dst->used = jiffies;
-			pdst = dst->dst;
-		}
-
-		if (pdst)
-			br_forward(pdst, skb, skb2);
-		else
+			br_forward(dst->dst, skb, skb2);
+		} else
 			br_flood_forward(br, skb, skb2);
 	}
 

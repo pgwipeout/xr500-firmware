@@ -24,10 +24,6 @@
 #include <linux/ftrace.h>
 #include <linux/smp.h>
 #include <linux/tick.h>
-#ifdef CONFIG_STOPWATCH_SOFT_IRQ
-#define __STOPWATCH_USE__
-#endif
-#include <linux/stopwatch.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/irq.h>
@@ -55,8 +51,6 @@
 irq_cpustat_t irq_stat[NR_CPUS] ____cacheline_aligned;
 EXPORT_SYMBOL(irq_stat);
 #endif
-
-DEFINE_STOPWATCH_ARRAY(softirq, NR_SOFTIRQS);
 
 static struct softirq_action softirq_vec[NR_SOFTIRQS] __cacheline_aligned_in_smp;
 
@@ -199,67 +193,23 @@ void local_bh_enable_ip(unsigned long ip)
 }
 EXPORT_SYMBOL(local_bh_enable_ip);
 
-#ifdef __STOPWATCH_USE__
-int stopwatch_softirq_show(struct seq_file *f, void *v)
-{
-	int cpu;
-	int sirq = *((loff_t *) v);
-
-	if (sirq == 0)
-		seq_printf(f, "%20s\tCPU\tmin(us)\tavg(us)\tmax(us)\n\n", "");
-
-	seq_printf(f, "%2d:%-18s", sirq, softirq_to_name[sirq]);
-	for_each_cpu(cpu, cpu_online_mask) {
-		if (!cpu)
-			seq_printf(f, "\t%d", cpu);
-		else
-			seq_printf(f, "%20s\t%d", "", cpu);
-		stopwatch_show(&STOPWATCH_INSTANCE_CPU(softirq[sirq], cpu), f, STOPWATCH_MICRO);
-		seq_printf(f, "\n");
-	}
-	seq_printf(f, "\n");
-	return 0;
-}
-
-static int __init softirq_stopwatch_init(void)
-{
-	INIT_STOPWATCH_ARRAY(softirq, NR_SOFTIRQS);
-	return stopwatch_register("softirq", NR_SOFTIRQS, stopwatch_softirq_show);
-}
-module_init(softirq_stopwatch_init)
-#endif
-
-
 /*
- * Adding support for sysctl parameter softirq_max_time.
- * This can be used to configure the max time limit (in ms) for
- * softirq processing.
- */
-int softirq_max_time = 2;
-
-/*
- * We restart softirq processing for at most MAX_SOFTIRQ_RESTART times,
- * but break the loop if need_resched() is set or after 2 ms.
- * The MAX_SOFTIRQ_TIME provides a nice upper bound in most cases, but in
- * certain cases, such as stop_machine(), jiffies may cease to
- * increment and so we need the MAX_SOFTIRQ_RESTART limit as
- * well to make sure we eventually return from this method.
+ * We restart softirq processing MAX_SOFTIRQ_RESTART times,
+ * and we fall back to softirqd after that.
  *
- * These limits have been established via experimentation.
+ * This number has been established via experimentation.
  * The two things to balance is latency against fairness -
  * we want to handle softirqs as soon as possible, but they
  * should not be able to lock up the box.
  */
-#define MAX_SOFTIRQ_TIME  msecs_to_jiffies(softirq_max_time)
 #define MAX_SOFTIRQ_RESTART 10
 
 asmlinkage void __do_softirq(void)
 {
 	struct softirq_action *h;
 	__u32 pending;
-	unsigned long end = jiffies + MAX_SOFTIRQ_TIME;
-	int cpu;
 	int max_restart = MAX_SOFTIRQ_RESTART;
+	int cpu;
 
 	pending = local_softirq_pending();
 	account_system_vtime(current);
@@ -285,9 +235,7 @@ restart:
 			kstat_incr_softirqs_this_cpu(vec_nr);
 
 			trace_softirq_entry(vec_nr);
-			STOPWATCH_START(softirq[vec_nr]);
 			h->action(h);
-			STOPWATCH_STOP(softirq[vec_nr]);
 			trace_softirq_exit(vec_nr);
 			if (unlikely(prev_count != preempt_count())) {
 				printk(KERN_ERR "huh, entered softirq %u %s %p"
@@ -307,13 +255,11 @@ restart:
 	local_irq_disable();
 
 	pending = local_softirq_pending();
-	if (pending) {
-		if (time_before(jiffies, end) && !need_resched() &&
-		    --max_restart)
-			goto restart;
+	if (pending && --max_restart)
+		goto restart;
 
+	if (pending)
 		wakeup_softirqd();
-	}
 
 	lockdep_softirq_exit();
 

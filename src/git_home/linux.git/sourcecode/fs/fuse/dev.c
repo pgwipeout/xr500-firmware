@@ -19,7 +19,6 @@
 #include <linux/pipe_fs_i.h>
 #include <linux/swap.h>
 #include <linux/splice.h>
-#include <linux/freezer.h>
 
 MODULE_ALIAS_MISCDEV(FUSE_MINOR);
 MODULE_ALIAS("devname:fuse");
@@ -388,10 +387,7 @@ __acquires(fc->lock)
 	 * Wait it out.
 	 */
 	spin_unlock(&fc->lock);
-
-	while (req->state != FUSE_REQ_FINISHED)
-		wait_event_freezable(req->waitq,
-				     req->state == FUSE_REQ_FINISHED);
+	wait_event(req->waitq, req->state == FUSE_REQ_FINISHED);
 	spin_lock(&fc->lock);
 
 	if (!req->aborted)
@@ -1580,7 +1576,6 @@ static int fuse_retrieve(struct fuse_conn *fc, struct inode *inode,
 		req->pages[req->num_pages] = page;
 		req->num_pages++;
 
-		offset = 0;
 		num -= this_num;
 		total_len += this_num;
 		index++;

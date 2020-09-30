@@ -20,7 +20,6 @@
 #include <linux/init.h>
 #include <linux/uaccess.h>
 #include <linux/user.h>
-#include <linux/proc_fs.h>
 
 #include <asm/cp15.h>
 #include <asm/cputype.h>
@@ -86,11 +85,6 @@ static void vfp_force_reload(unsigned int cpu, struct thread_info *thread)
 	thread->vfpstate.hard.cpu = NR_CPUS;
 #endif
 }
-
-/*
- * Used for reporting emulation statistics via /proc
- */
-static atomic64_t vfp_bounce_count = ATOMIC64_INIT(0);
 
 /*
  * Per-thread VFP initialization.
@@ -343,7 +337,6 @@ void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	u32 fpscr, orig_fpscr, fpsid, exceptions;
 
 	pr_debug("VFP: bounce: trigger %08x fpexc %08x\n", trigger, fpexc);
-	atomic64_inc(&vfp_bounce_count);
 
 	/*
 	 * At this point, FPEXC can have the following configuration:
@@ -420,7 +413,7 @@ void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	 * If there isn't a second FP instruction, exit now. Note that
 	 * the FPEXC.FP2V bit is valid only if FPEXC.EX is 1.
 	 */
-	if ((fpexc & (FPEXC_EX | FPEXC_FP2V)) != (FPEXC_EX | FPEXC_FP2V))
+	if (fpexc ^ (FPEXC_EX | FPEXC_FP2V))
 		goto exit;
 
 	/*
@@ -452,7 +445,7 @@ static void vfp_enable(void *unused)
 }
 
 #ifdef CONFIG_CPU_PM
-int vfp_pm_suspend(void)
+static int vfp_pm_suspend(void)
 {
 	struct thread_info *ti = current_thread_info();
 	u32 fpexc = fmrx(FPEXC);
@@ -464,21 +457,15 @@ int vfp_pm_suspend(void)
 
 		/* disable, just in case */
 		fmxr(FPEXC, fmrx(FPEXC) & ~FPEXC_EN);
-	} else if (vfp_current_hw_state[ti->cpu]) {
-#ifndef CONFIG_SMP
-		fmxr(FPEXC, fpexc | FPEXC_EN);
-		vfp_save_state(vfp_current_hw_state[ti->cpu], fpexc);
-		fmxr(FPEXC, fpexc);
-#endif
 	}
 
 	/* clear any information we had about last context state */
-	vfp_current_hw_state[ti->cpu] = NULL;
+	memset(vfp_current_hw_state, 0, sizeof(vfp_current_hw_state));
 
 	return 0;
 }
 
-void vfp_pm_resume(void)
+static void vfp_pm_resume(void)
 {
 	/* ensure we have access to the vfp */
 	vfp_enable(NULL);
@@ -655,26 +642,6 @@ static int vfp_hotplug(struct notifier_block *b, unsigned long action,
 	return NOTIFY_OK;
 }
 
-#ifdef CONFIG_PROC_FS
-static int proc_read_status(char *page, char **start, off_t off, int count,
-			    int *eof, void *data)
-{
-	char *p = page;
-	int len;
-
-	p += snprintf(p, PAGE_SIZE, "%llu\n", atomic64_read(&vfp_bounce_count));
-
-	len = (p - page) - off;
-	if (len < 0)
-		len = 0;
-
-	*eof = (len <= count) ? 1 : 0;
-	*start = page + off;
-
-	return len;
-}
-#endif
-
 /*
  * VFP support code initialisation.
  */
@@ -682,9 +649,7 @@ static int __init vfp_init(void)
 {
 	unsigned int vfpsid;
 	unsigned int cpu_arch = cpu_architecture();
-#ifdef CONFIG_PROC_FS
-	static struct proc_dir_entry *procfs_entry;
-#endif
+
 	if (cpu_arch >= CPU_ARCH_ARMv6)
 		on_each_cpu(vfp_enable, NULL, 1);
 
@@ -730,14 +695,11 @@ static int __init vfp_init(void)
 			elf_hwcap |= HWCAP_VFPv3;
 
 			/*
-			 * Check for VFPv3 D16 and VFPv4 D16.  CPUs in
-			 * this configuration only have 16 x 64bit
-			 * registers.
+			 * Check for VFPv3 D16. CPUs in this configuration
+			 * only have 16 x 64bit registers.
 			 */
 			if (((fmrx(MVFR0) & MVFR0_A_SIMD_MASK)) == 1)
-				elf_hwcap |= HWCAP_VFPv3D16; /* also v4-D16 */
-			else
-				elf_hwcap |= HWCAP_VFPD32;
+				elf_hwcap |= HWCAP_VFPv3D16;
 		}
 #endif
 		/*
@@ -751,23 +713,10 @@ static int __init vfp_init(void)
 			if ((fmrx(MVFR1) & 0x000fff00) == 0x00011100)
 				elf_hwcap |= HWCAP_NEON;
 #endif
-#ifdef CONFIG_VFPv3
-			if ((fmrx(MVFR1) & 0xf0000000) == 0x10000000 ||
-			    (read_cpuid_id() & 0xff00fc00) == 0x51000400)
+			if ((fmrx(MVFR1) & 0xf0000000) == 0x10000000)
 				elf_hwcap |= HWCAP_VFPv4;
-#endif
 		}
 	}
-
-#ifdef CONFIG_PROC_FS
-	procfs_entry = create_proc_entry("cpu/vfp_bounce", S_IRUGO, NULL);
-
-	if (procfs_entry)
-		procfs_entry->read_proc = proc_read_status;
-	else
-		pr_err("Failed to create procfs node for VFP bounce reporting\n");
-#endif
-
 	return 0;
 }
 

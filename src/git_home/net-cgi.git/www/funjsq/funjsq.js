@@ -83,15 +83,15 @@
 
 			cf.action="/admin.cgi?/funjsq_login.htm timestamp="+ts;
 			$$('#loginForm').css('display','none');
-			$$('.plz_wait').css('display','block');
-			$$('body').css('background','white');
+			$$('#formframe_wait_div').css('display','block');
+			//$$('body').css('background','black');
 			$$.postForm('#loginForm', '', function(json) {
 				if ( json.status == "success" && json.code =="1000") {
                                         location.href = "funjsq_select.htm";
                                 } else if ( json.code !="1000"){
 					$$('#loginForm').css('display','block');
-					$$('.plz_wait').css('display','none');
-					$$('body').css('background','rgb(229,229,229)');
+					$$('#formframe_wait_div').css('display','none');
+					//$$('body').css('background','rgb(229,229,229)');
 					if( json.code == "1001"){
 						alert("该号码尚未注册完成，请确认输入是否正确");
 					}else if( json.code == "1002" || json.code == "1003"){
@@ -110,8 +110,8 @@
                                         //location.href = "funjsq_login.htm";
                                 } else{
 					$$('#loginForm').css('display','block');
-                                        $$('.plz_wait').css('display','none');
-					$$('body').css('background','rgb(229,229,229)');
+                                        $$('#formframe_wait_div').css('display','none');
+					//$$('body').css('background','rgb(229,229,229)');
                                         alert("请检查你的网络连接。");
                                         //location.href = "funjsq_login.htm";
                                 }
@@ -226,9 +226,9 @@
 			cf.hidden_funjsq_verify.value = cf.funjsq_verify.value;
 			cf.action="/admin.cgi?/funjsq_login.htm timestamp="+ts;
 			cf.submit_flag.value="funjsq_"+form+"";
-			$$('.plz_wait').css('display','block');
+			$$('#formframe_wait_div').css('display','block');
 			$$('#'+form+'Form').css('display','none');
-			$$('body').css('background','white');
+			//$$('body').css('background','white');
 			$$.postForm('#'+form+'Form', '', function(json) {
 				if ( json.code == "1000" ) {
 					cf.submit_flag.value="funjsq_login";
@@ -236,15 +236,15 @@
 						if ( json.status == "success" && json.code =="1000") {
 							location.href = "funjsq_select.htm";
 						}else{
-							$$('.plz_wait').css('display','none');
+							$$('#formframe_wait_div').css('display','none');
 							$$('#loginForm').css('display','block');
-							$$('body').css('background','rgb(229,229,229)');
+							//$$('body').css('background','rgb(229,229,229)');
 							alert("请重新登陆");
 						}
 					});
 				}else{
-					$$('.plz_wait').css('display','none');
-					$$('body').css('background','rgb(229,229,229)');
+					$$('#formframe_wait_div').css('display','none');
+					//$$('body').css('background','rgb(229,229,229)');
 					$$('#'+form+'Form').css('display','block');
 					if ( json.code == "1002" ) {
 						alert("手机号码输入错误，请确人输入是否正确");
@@ -690,7 +690,7 @@
 		$$('#payFinish').click(function() {
 			var cf=document.forms[0];
 			cf.action="/admin.cgi?/funjsq_pay.htm timestamp="+ts;
-			$$('.plz_wait').css('display','block');	
+			$$('#formframe_wait_div').css('display','block');	
 			$$('#confirmForm').css('display','none');
 			$$.postForm('#payForm', '', function(json) {
                                 if ( json.code == "1000" ) {
@@ -699,10 +699,10 @@
 					alert(json.msg);
 					$$('#payForm').css('display','block');
 					$$('#confirmForm').css('display','none');
-					$$('.plz_wait').css('display','none');
+					$$('#formframe_wait_div').css('display','none');
                                 } else{
                                         alert("请检查你的网络连接。");
-					$$('.plz_wait').css('display','none');
+					$$('#formframe_wait_div').css('display','none');
 					$$('#payForm').css('display','block');
                                         $$('#confirmForm').css('display','none');
                                 }

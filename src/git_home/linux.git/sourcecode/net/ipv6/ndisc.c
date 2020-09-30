@@ -153,8 +153,6 @@ struct neigh_table nd_tbl = {
 	.gc_thresh3 =	1024,
 };
 
-EXPORT_SYMBOL_GPL(nd_tbl);
-
 /* ND options */
 struct ndisc_options {
 	struct nd_opt_hdr *nd_opt_array[__ND_OPT_ARRAY_MAX];
@@ -443,6 +441,7 @@ struct sk_buff *ndisc_build_skb(struct net_device *dev,
 	int hlen = LL_RESERVED_SPACE(dev);
 	int tlen = dev->needed_tailroom;
 	int len;
+	int err;
 	u8 *opt;
 
 	if (!dev->addr_len)
@@ -452,12 +451,14 @@ struct sk_buff *ndisc_build_skb(struct net_device *dev,
 	if (llinfo)
 		len += ndisc_opt_addr_space(dev);
 
-	skb = alloc_skb((MAX_HEADER + sizeof(struct ipv6hdr) +
-			 len + hlen + tlen), GFP_ATOMIC);
+	skb = sock_alloc_send_skb(sk,
+				  (MAX_HEADER + sizeof(struct ipv6hdr) +
+				   len + hlen + tlen),
+				  1, &err);
 	if (!skb) {
 		ND_PRINTK0(KERN_ERR
-			   "ICMPv6 ND: %s() failed to allocate an skb.\n",
-			   __func__);
+			   "ICMPv6 ND: %s() failed to allocate an skb, err=%d.\n",
+			   __func__, err);
 		return NULL;
 	}
 
@@ -484,11 +485,6 @@ struct sk_buff *ndisc_build_skb(struct net_device *dev,
 					   IPPROTO_ICMPV6,
 					   csum_partial(hdr,
 							len, 0));
-
-	/* Manually assign socket ownership as we avoid calling
-	 * sock_alloc_send_pskb() to bypass wmem buffer limits
-	 */
-	skb_set_owner_w(skb, sk);
 
 	return skb;
 }
@@ -597,7 +593,7 @@ static void ndisc_send_unsol_na(struct net_device *dev)
 {
 	struct inet6_dev *idev;
 	struct inet6_ifaddr *ifa;
-	struct in6_addr mcaddr = IN6ADDR_LINKLOCAL_ALLNODES_INIT;
+	struct in6_addr mcaddr;
 
 	idev = in6_dev_get(dev);
 	if (!idev)
@@ -605,6 +601,7 @@ static void ndisc_send_unsol_na(struct net_device *dev)
 
 	read_lock_bh(&idev->lock);
 	list_for_each_entry(ifa, &idev->addr_list, if_list) {
+		addrconf_addr_solict_mult(&ifa->addr, &mcaddr);
 		ndisc_send_na(dev, NULL, &mcaddr, &ifa->addr,
 			      /*router=*/ !!idev->cnf.forwarding,
 			      /*solicited=*/ false, /*override=*/ true,
@@ -635,7 +632,6 @@ void ndisc_send_ns(struct net_device *dev, struct neighbour *neigh,
 		     &icmp6h, solicit,
 		     !ipv6_addr_any(saddr) ? ND_OPT_SOURCE_LL_ADDR : 0);
 }
-EXPORT_SYMBOL(ndisc_send_ns);
 
 void ndisc_send_rs(struct net_device *dev, const struct in6_addr *saddr,
 		   const struct in6_addr *daddr)
@@ -1123,7 +1119,7 @@ static inline int accept_ra(struct inet6_dev *in6_dev)
 	 * If forwarding is enabled, RA are not accepted unless the special
 	 * hybrid mode (accept_ra=2) is enabled.
 	 */
-	if (!in6_dev->cnf.autoconf && in6_dev->cnf.accept_ra < 2)
+	if (in6_dev->cnf.forwarding && in6_dev->cnf.accept_ra < 2)
 		return 0;
 
 	return in6_dev->cnf.accept_ra;

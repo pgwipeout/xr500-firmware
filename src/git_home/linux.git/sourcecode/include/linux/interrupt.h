@@ -42,6 +42,7 @@
  *
  * IRQF_DISABLED - keep irqs disabled when calling the action handler.
  *                 DEPRECATED. This flag is a NOOP and scheduled to be removed
+ * IRQF_SAMPLE_RANDOM - irq is used to feed the random generator
  * IRQF_SHARED - allow sharing the irq among several devices
  * IRQF_PROBE_SHARED - set by callers when they expect sharing mismatches to occur
  * IRQF_TIMER - Flag to mark this interrupt as timer interrupt
@@ -60,6 +61,7 @@
  *                resume time.
  */
 #define IRQF_DISABLED		0x00000020
+#define IRQF_SAMPLE_RANDOM	0x00000040
 #define IRQF_SHARED		0x00000080
 #define IRQF_PROBE_SHARED	0x00000100
 #define __IRQF_TIMER		0x00000200
@@ -352,7 +354,6 @@ static inline void enable_irq_lockdep_irqrestore(unsigned int irq, unsigned long
 
 /* IRQ wakeup (PM) control: */
 extern int irq_set_irq_wake(unsigned int irq, unsigned int on);
-extern int irq_read_line(unsigned int irq);
 
 static inline int enable_irq_wake(unsigned int irq)
 {
@@ -698,5 +699,5 @@ int arch_show_interrupts(struct seq_file *p, int prec);
 extern int early_irq_init(void);
 extern int arch_probe_nr_irqs(void);
 extern int arch_early_irq_init(void);
-extern void irq_set_pending(unsigned int irq);
+
 #endif

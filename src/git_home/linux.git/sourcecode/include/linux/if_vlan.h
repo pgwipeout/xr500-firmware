@@ -82,23 +82,16 @@ static inline int is_vlan_dev(struct net_device *dev)
 }
 
 #define vlan_tx_tag_present(__skb)	((__skb)->vlan_tci & VLAN_TAG_PRESENT)
-#define vlan_tx_nonzero_tag_present(__skb) \
-	(vlan_tx_tag_present(__skb) && ((__skb)->vlan_tci & VLAN_VID_MASK))
 #define vlan_tx_tag_get(__skb)		((__skb)->vlan_tci & ~VLAN_TAG_PRESENT)
 
 #if defined(CONFIG_VLAN_8021Q) || defined(CONFIG_VLAN_8021Q_MODULE)
-
-extern void __vlan_dev_update_accel_stats(struct net_device *dev,
-				    struct rtnl_link_stats64 *stats);
-
-extern u16 vlan_dev_get_egress_prio(struct net_device *dev, u32 skb_prio);
 
 extern struct net_device *__vlan_find_dev_deep(struct net_device *real_dev,
 					       u16 vlan_id);
 extern struct net_device *vlan_dev_real_dev(const struct net_device *dev);
 extern u16 vlan_dev_vlan_id(const struct net_device *dev);
 
-extern bool vlan_do_receive(struct sk_buff **skb);
+extern bool vlan_do_receive(struct sk_buff **skb, bool last_handler);
 extern struct sk_buff *vlan_untag(struct sk_buff *skb);
 
 extern int vlan_vid_add(struct net_device *dev, unsigned short vid);
@@ -109,18 +102,6 @@ extern int vlan_vids_add_by_dev(struct net_device *dev,
 extern void vlan_vids_del_by_dev(struct net_device *dev,
 				 const struct net_device *by_dev);
 #else
-static inline void __vlan_dev_update_accel_stats(struct net_device *dev,
-					   struct rtnl_link_stats64 *stats)
-{
-	return;
-}
-
-static inline u16 vlan_dev_get_egress_prio(struct net_device *dev,
-						u32 skb_prio)
-{
-	return 0;
-}
-
 static inline struct net_device *
 __vlan_find_dev_deep(struct net_device *real_dev, u16 vlan_id)
 {
@@ -139,8 +120,10 @@ static inline u16 vlan_dev_vlan_id(const struct net_device *dev)
 	return 0;
 }
 
-static inline bool vlan_do_receive(struct sk_buff **skb)
+static inline bool vlan_do_receive(struct sk_buff **skb, bool last_handler)
 {
+	if (((*skb)->vlan_tci & VLAN_VID_MASK) && last_handler)
+		(*skb)->pkt_type = PACKET_OTHERHOST;
 	return false;
 }
 
@@ -344,7 +327,7 @@ static inline void vlan_set_encap_proto(struct sk_buff *skb,
 					struct vlan_hdr *vhdr)
 {
 	__be16 proto;
-	unsigned short *rawp;
+	unsigned char *rawp;
 
 	/*
 	 * Was a VLAN packet, grab the encapsulated protocol, which the layer
@@ -357,8 +340,8 @@ static inline void vlan_set_encap_proto(struct sk_buff *skb,
 		return;
 	}
 
-	rawp = (unsigned short *)(vhdr + 1);
-	if (*rawp == 0xFFFF)
+	rawp = skb->data;
+	if (*(unsigned short *) rawp == 0xFFFF)
 		/*
 		 * This is a magic hack to spot IPX packets. Older Novell
 		 * breaks the protocol design and runs IPX over 802.3 without
@@ -418,7 +401,7 @@ struct vlan_ioctl_args {
 		unsigned int flag; /* Matches vlan_dev_priv flags */
         } u;
 
-	short vlan_qos;
+	short vlan_qos;   
 };
 
 #endif /* !(_LINUX_IF_VLAN_H_) */

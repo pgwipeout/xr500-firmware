@@ -1,4 +1,4 @@
-<% http_header("style/form.css", "/funcs.js", "/jquery-1.7.2.min.js", "/moment.js", "/funjsq.js") %>
+<% http_header("style/form.css","style/formframe_wait.css", "/funcs.js", "/jquery-1.7.2.min.js", "/moment.js", "/funjsq.js") %>
 <body onLoad="loadvalue(); please_wait(false);">
 <form method="post" id="payForm" action="/apply.cgi?/funjsq_select.htm" target="formframe">
 <input type="hidden" name="submit_flag" value="funjsq_pay" />
@@ -125,11 +125,12 @@ function loadvalue()
                </div>
 	</div>
 </form>
-<div class="plz_wait" hidden="">
-        <div align="center"><br/><br/><b><script>document.write(getText(top.bh_plz_wait_moment, "请等待一会..."));</script></b><br/><br/></div>
-        <div class="waiting_img_div" align="center">
-                <img src="image/wait30.gif"/>
-        </div>
-</div>
+<div id="formframe_wait_div" style="display:none;">
+<div>$wizard_pls_wait
+<div class="loader">
+<svg class="spinner" width="28px" height="28px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+<circle class="path" fill="none" stroke-width="5" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+</svg></div></div></div>
+
 </body>
 </html>

@@ -173,13 +173,15 @@ static regexp * compile_and_cache(const char * regex_string,
 	}
 
 	tmp->regex_string  = kmalloc(strlen(regex_string) + 1, GFP_ATOMIC);
-	tmp->pattern = NULL;
+	tmp->pattern       = kmalloc(sizeof(struct regexp),    GFP_ATOMIC);
 	tmp->next = NULL;
 
-	if(!tmp->regex_string) {
+	if(!tmp->regex_string || !tmp->pattern) {
 		if (net_ratelimit())
 			printk(KERN_ERR "layer7: out of memory in "
 					"compile_and_cache, bailing.\n");
+		kfree(tmp->regex_string);
+		kfree(tmp->pattern);
 		kfree(tmp);
 		return NULL;
 	}
@@ -392,7 +394,6 @@ static int layer7_write_proc(struct file* file, const char* buffer,
 	}
 
 	if(copy_from_user(foo, buffer, count)) {
-		kfree(foo);
 		return -EFAULT;
 	}
 
@@ -664,13 +665,8 @@ static void layer7_init_proc(void)
 {
 	struct proc_dir_entry* entry;
 	entry = create_proc_entry("layer7_numpackets", 0644, init_net.proc_net);
-	if (entry) {
-		entry->read_proc = layer7_read_proc;
-		entry->write_proc = layer7_write_proc;
-	}
-	else {
-		printk(KERN_WARNING "layer7: Unable to create proc entry.\n");
-	}
+	entry->read_proc = layer7_read_proc;
+	entry->write_proc = layer7_write_proc;
 }
 
 static int __init xt_layer7_init(void)

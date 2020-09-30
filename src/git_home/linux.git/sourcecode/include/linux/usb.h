@@ -331,15 +331,6 @@ struct usb_bus {
 	u8 otg_port;			/* 0, or number of OTG/HNP port */
 	unsigned is_b_host:1;		/* true during some HNP roleswitches */
 	unsigned b_hnp_enable:1;	/* OTG: did A-Host enable HNP? */
-	unsigned hnp_support:1;		/* OTG: HNP is supported on OTG port */
-	unsigned quick_hnp:1;		/* OTG: Indiacates if hnp is required
-					   irrespective of host_request flag
-					 */
-	unsigned otg_vbus_off:1;	/* OTG: OTG test device feature bit that
-					 * tells A-device to turn off VBUS after
-					 * B-device is disconnected.
-					 */
-	struct delayed_work hnp_polling;/* OTG: HNP polling work */
 	unsigned sg_tablesize;		/* 0 or largest number of sg list entries */
 
 	int devnum_next;		/* Next open device number in
@@ -368,15 +359,6 @@ struct usb_bus {
 	struct mon_bus *mon_bus;	/* non-null when associated */
 	int monitored;			/* non-zero when monitored */
 #endif
-	unsigned skip_resume:1;		/* All USB devices are brought into full
-					 * power state after system resume. It
-					 * is desirable for some buses to keep
-					 * their devices in suspend state even
-					 * after system resume. The devices
-					 * are resumed later when a remote
-					 * wakeup is detected or an interface
-					 * driver starts I/O.
-					 */
 };
 
 /* ----------------------------------------------------------------------- */
@@ -390,16 +372,6 @@ struct usb_bus {
  * limit. Because the arrays need to add a bit for hub status data, we
  * do 31, so plus one evens out to four bytes.
  */
-
-#if defined(CONFIG_USB_PEHCI_HCD) || defined(CONFIG_USB_PEHCI_HCD_MODULE)
-#define USB_OTG_SUSPEND		0x1
-#define USB_OTG_ENUMERATE	0x2
-#define USB_OTG_DISCONNECT	0x4
-#define USB_OTG_RESUME		0x8
-#define USB_OTG_REMOTEWAKEUP	0x10
-#define USB_OTG_WAKEUP_ALL	0x20
-#endif
-
 #define USB_MAXCHILDREN		(31)
 
 struct usb_tt;
@@ -528,18 +500,6 @@ struct usb_device {
 	struct dentry *usbfs_dentry;
 #endif
 
-#if defined(CONFIG_USB_PEHCI_HCD) || defined(CONFIG_USB_PEHCI_HCD_MODULE)
-	/*otg add ons */
-	u8 otgdevice;				/*device is otg type */
-
-	/*otg states from otg driver, suspend, enumerate, disconnect */
-	u8 otgstate;
-	void *otgpriv;
-	void (*otg_notif) (void *otg_priv,
-				unsigned long notif, unsigned long data);
-	void *hcd_priv;
-	void (*hcd_suspend) (void *hcd_priv);
-#endif
 	int maxchild;
 	struct usb_device **children;
 
@@ -579,7 +539,6 @@ extern int usb_lock_device_for_reset(struct usb_device *udev,
 extern int usb_reset_device(struct usb_device *dev);
 extern void usb_queue_reset_device(struct usb_interface *dev);
 
-extern struct usb_device *usb_find_device_by_name(const char *name);
 
 /* USB autosuspend and autoresume */
 #ifdef CONFIG_USB_SUSPEND
@@ -756,22 +715,6 @@ static inline int usb_make_path(struct usb_device *dev, char *buf, size_t size)
 	.bcdDevice_hi = (hi)
 
 /**
- * USB_DEVICE_INTERFACE_CLASS - describe a usb device with a specific interface class
- * @vend: the 16 bit USB Vendor ID
- * @prod: the 16 bit USB Product ID
- * @cl: bInterfaceClass value
- *
- * This macro is used to create a struct usb_device_id that matches a
- * specific interface class of devices.
- */
-#define USB_DEVICE_INTERFACE_CLASS(vend, prod, cl) \
-	.match_flags = USB_DEVICE_ID_MATCH_DEVICE | \
-		       USB_DEVICE_ID_MATCH_INT_CLASS, \
-	.idVendor = (vend), \
-	.idProduct = (prod), \
-	.bInterfaceClass = (cl)
-
-/**
  * USB_DEVICE_INTERFACE_PROTOCOL - describe a usb device with a specific interface protocol
  * @vend: the 16 bit USB Vendor ID
  * @prod: the 16 bit USB Product ID
@@ -786,22 +729,6 @@ static inline int usb_make_path(struct usb_device *dev, char *buf, size_t size)
 	.idVendor = (vend), \
 	.idProduct = (prod), \
 	.bInterfaceProtocol = (pr)
-
-/**
- * USB_DEVICE_INTERFACE_NUMBER - describe a usb device with a specific interface number
- * @vend: the 16 bit USB Vendor ID
- * @prod: the 16 bit USB Product ID
- * @num: bInterfaceNumber value
- *
- * This macro is used to create a struct usb_device_id that matches a
- * specific interface number of devices.
- */
-#define USB_DEVICE_INTERFACE_NUMBER(vend, prod, num) \
-	.match_flags = USB_DEVICE_ID_MATCH_DEVICE | \
-		       USB_DEVICE_ID_MATCH_INT_NUMBER, \
-	.idVendor = (vend), \
-	.idProduct = (prod), \
-	.bInterfaceNumber = (num)
 
 /**
  * USB_DEVICE_INFO - macro used to describe a class of usb devices
@@ -852,27 +779,6 @@ static inline int usb_make_path(struct usb_device *dev, char *buf, size_t size)
 		| USB_DEVICE_ID_MATCH_DEVICE, \
 	.idVendor = (vend), \
 	.idProduct = (prod), \
-	.bInterfaceClass = (cl), \
-	.bInterfaceSubClass = (sc), \
-	.bInterfaceProtocol = (pr)
-
-/**
- * USB_VENDOR_AND_INTERFACE_INFO - describe a specific usb vendor with a class of usb interfaces
- * @vend: the 16 bit USB Vendor ID
- * @cl: bInterfaceClass value
- * @sc: bInterfaceSubClass value
- * @pr: bInterfaceProtocol value
- *
- * This macro is used to create a struct usb_device_id that matches a
- * specific vendor with a specific class of interfaces.
- *
- * This is especially useful when explicitly matching devices that have
- * vendor specific bDeviceClass values, but standards-compliant interfaces.
- */
-#define USB_VENDOR_AND_INTERFACE_INFO(vend, cl, sc, pr) \
-	.match_flags = USB_DEVICE_ID_MATCH_INT_INFO \
-		| USB_DEVICE_ID_MATCH_VENDOR, \
-	.idVendor = (vend), \
 	.bInterfaceClass = (cl), \
 	.bInterfaceSubClass = (sc), \
 	.bInterfaceProtocol = (pr)
@@ -1473,7 +1379,6 @@ extern int usb_unlink_urb(struct urb *urb);
 extern void usb_kill_urb(struct urb *urb);
 extern void usb_poison_urb(struct urb *urb);
 extern void usb_unpoison_urb(struct urb *urb);
-extern void usb_block_urb(struct urb *urb);
 extern void usb_kill_anchored_urbs(struct usb_anchor *anchor);
 extern void usb_poison_anchored_urbs(struct usb_anchor *anchor);
 extern void usb_unpoison_anchored_urbs(struct usb_anchor *anchor);
@@ -1485,8 +1390,6 @@ extern int usb_wait_anchor_empty_timeout(struct usb_anchor *anchor,
 extern struct urb *usb_get_from_anchor(struct usb_anchor *anchor);
 extern void usb_scuttle_anchored_urbs(struct usb_anchor *anchor);
 extern int usb_anchor_empty(struct usb_anchor *anchor);
-
-#define usb_unblock_urb	usb_unpoison_urb
 
 /**
  * usb_urb_dir_in - check if an URB describes an IN transfer
@@ -1735,8 +1638,6 @@ static inline int usb_translate_errors(int error_code)
 #define USB_DEVICE_REMOVE	0x0002
 #define USB_BUS_ADD		0x0003
 #define USB_BUS_REMOVE		0x0004
-#define USB_DEVICE_CONFIG	0x0005
-
 extern void usb_register_notify(struct notifier_block *nb);
 extern void usb_unregister_notify(struct notifier_block *nb);
 

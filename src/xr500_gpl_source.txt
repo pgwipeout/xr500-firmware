@@ -830,8 +830,8 @@ User application
         GPL
         Source Code
 [ubus]
-        ubus-34c6e81.tar.gz
-        http://git.openwrt.org/?p=project/ubus.git
+        netduma-ubus.tar.gz
+        netduma
         GPL
         Source Code
 [uci]

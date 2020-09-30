@@ -1,7 +1,6 @@
 /*
  * linux/sound/soc/codecs/tlv320aic32x4.c
  *
- * Copyright (c) 2013 The Linux Foundation. All rights reserved.
  * Copyright 2011 Vista Silicon S.L.
  *
  * Author: Javier Martin <javier.martin@vista-silicon.com>
@@ -30,7 +29,6 @@
 #include <linux/delay.h>
 #include <linux/pm.h>
 #include <linux/i2c.h>
-#include <linux/spi/spi.h>
 #include <linux/cdev.h>
 #include <linux/slab.h>
 
@@ -64,7 +62,6 @@ struct aic32x4_priv {
 	u32 sysclk;
 	u8 page_no;
 	void *control_data;
-	enum snd_soc_control_type control_type;
 	u32 power_cfg;
 	u32 micpga_routing;
 	bool swapdacs;
@@ -123,43 +120,29 @@ static const struct snd_kcontrol_new aic32x4_snd_controls[] = {
 
 static const struct aic32x4_rate_divs aic32x4_divs[] = {
 	/* 8k rate */
-	{AIC32X4_FREQ_11289600, 8000, 1, 10, 0000, 504, 14, 2, 126, 14, 8, 24},
 	{AIC32X4_FREQ_12000000, 8000, 1, 7, 6800, 768, 5, 3, 128, 5, 18, 24},
-	{AIC32X4_FREQ_12288000, 8000, 1, 8, 0000, 768, 8, 2, 128, 8, 12, 24},
 	{AIC32X4_FREQ_24000000, 8000, 2, 7, 6800, 768, 15, 1, 64, 45, 4, 24},
 	{AIC32X4_FREQ_25000000, 8000, 2, 7, 3728, 768, 15, 1, 64, 45, 4, 24},
 	/* 11.025k rate */
-	{AIC32X4_FREQ_11289600, 11025, 1, 8, 0000, 512, 16, 1, 128, 16, 4, 16},
 	{AIC32X4_FREQ_12000000, 11025, 1, 7, 5264, 512, 8, 2, 128, 8, 8, 16},
-	{AIC32X4_FREQ_12288000, 11025, 1, 11, 0250, 512, 12, 2, 128, 12, 8, 16},
 	{AIC32X4_FREQ_24000000, 11025, 2, 7, 5264, 512, 16, 1, 64, 32, 4, 16},
 	/* 16k rate */
-	{AIC32X4_FREQ_11289600, 16000, 1, 10, 0000, 252, 14, 2, 126, 14, 4, 12},
 	{AIC32X4_FREQ_12000000, 16000, 1, 7, 6800, 384, 5, 3, 128, 5, 9, 12},
-	{AIC32X4_FREQ_12288000, 16000, 1, 8, 0000, 384, 8, 2, 128, 8, 6, 12},
 	{AIC32X4_FREQ_24000000, 16000, 2, 7, 6800, 384, 15, 1, 64, 18, 5, 12},
 	{AIC32X4_FREQ_25000000, 16000, 2, 7, 3728, 384, 15, 1, 64, 18, 5, 12},
 	/* 22.05k rate */
-	{AIC32X4_FREQ_11289600, 22050, 1, 8, 0000, 256, 8, 2, 128, 8, 4, 8},
 	{AIC32X4_FREQ_12000000, 22050, 1, 7, 5264, 256, 4, 4, 128, 4, 8, 8},
-	{AIC32X4_FREQ_12288000, 22050, 1, 11, 0250, 256, 12, 2, 128, 12, 4, 8},
 	{AIC32X4_FREQ_24000000, 22050, 2, 7, 5264, 256, 16, 1, 64, 16, 4, 8},
 	{AIC32X4_FREQ_25000000, 22050, 2, 7, 2253, 256, 16, 1, 64, 16, 4, 8},
 	/* 32k rate */
-	{AIC32X4_FREQ_11289600, 32000, 1, 10, 0000, 126, 7, 4, 63, 7, 8, 6},
 	{AIC32X4_FREQ_12000000, 32000, 1, 7, 1680, 192, 2, 7, 64, 2, 21, 6},
-	{AIC32X4_FREQ_12288000, 32000, 1, 8, 0000, 192, 8, 2, 64, 8, 6, 6},
 	{AIC32X4_FREQ_24000000, 32000, 2, 7, 1680, 192, 7, 2, 64, 7, 6, 6},
 	/* 44.1k rate */
-	{AIC32X4_FREQ_11289600, 44100, 1, 8, 0000, 128, 8, 2, 64, 8, 4, 4},
 	{AIC32X4_FREQ_12000000, 44100, 1, 7, 5264, 128, 2, 8, 128, 2, 8, 4},
-	{AIC32X4_FREQ_12288000, 44100, 1, 11, 0250, 128, 12, 2, 128, 12, 2, 4},
 	{AIC32X4_FREQ_24000000, 44100, 2, 7, 5264, 128, 8, 2, 64, 8, 4, 4},
 	{AIC32X4_FREQ_25000000, 44100, 2, 7, 2253, 128, 8, 2, 64, 8, 4, 4},
 	/* 48k rate */
-	{AIC32X4_FREQ_11289600, 48000, 1, 10, 0000, 84, 7, 4, 42, 7, 8, 4},
 	{AIC32X4_FREQ_12000000, 48000, 1, 8, 1920, 128, 2, 8, 128, 2, 8, 4},
-	{AIC32X4_FREQ_12288000, 48000, 1, 8, 0000, 128, 8, 2, 128, 8, 2, 4},
 	{AIC32X4_FREQ_24000000, 48000, 2, 8, 1920, 128, 8, 2, 64, 8, 4, 4},
 	{AIC32X4_FREQ_25000000, 48000, 2, 7, 8643, 128, 8, 2, 64, 8, 4, 4}
 };
@@ -288,20 +271,11 @@ static inline int aic32x4_change_page(struct snd_soc_codec *codec,
 	data[1] = new_page & 0xff;
 
 	ret = codec->hw_write(codec->control_data, data, 2);
-	if (aic32x4->control_type == SND_SOC_SPI) {
-		if (ret == 0) {
-			aic32x4->page_no = new_page;
-			return 0;
-		} else {
-			return ret;
-		}
+	if (ret == 2) {
+		aic32x4->page_no = new_page;
+		return 0;
 	} else {
-		if (ret == 2) {
-			aic32x4->page_no = new_page;
-			return 0;
-		} else {
-			return ret;
-		}
+		return ret;
 	}
 }
 
@@ -324,10 +298,7 @@ static int aic32x4_write(struct snd_soc_codec *codec, unsigned int reg,
 			return ret;
 	}
 
-	if (aic32x4->control_type == SND_SOC_SPI)
-		data[0] = (fixed_reg << 1);
-	else
-		data[0] = fixed_reg & 0xff;
+	data[0] = fixed_reg & 0xff;
 	data[1] = val & 0xff;
 
 	if (codec->hw_write(codec->control_data, data, 2) == 2)
@@ -342,24 +313,13 @@ static unsigned int aic32x4_read(struct snd_soc_codec *codec, unsigned int reg)
 	unsigned int page = reg / 128;
 	unsigned int fixed_reg = reg % 128;
 	int ret;
-	u8 buffer;
 
 	if (aic32x4->page_no != page) {
 		ret = aic32x4_change_page(codec, page);
 		if (ret != 0)
 			return ret;
 	}
-
-	if (aic32x4->control_type == SND_SOC_SPI) {
-		buffer = (fixed_reg<<1) | 0x01;
-		ret = spi_write_then_read(codec->control_data, &buffer, 1, &buffer, 1);
-		if (ret) {
-			dev_err(codec->dev, "AIC32x4 reg read error\n");
-			return -EIO;
-		}
-		return (unsigned int)buffer;
-	} else
-		return i2c_smbus_read_byte_data(codec->control_data, fixed_reg & 0xff);
+	return i2c_smbus_read_byte_data(codec->control_data, fixed_reg & 0xff);
 }
 
 static inline int aic32x4_get_divs(int mclk, int rate)
@@ -395,9 +355,7 @@ static int aic32x4_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 	struct aic32x4_priv *aic32x4 = snd_soc_codec_get_drvdata(codec);
 
 	switch (freq) {
-	case AIC32X4_FREQ_11289600:
 	case AIC32X4_FREQ_12000000:
-	case AIC32X4_FREQ_12288000:
 	case AIC32X4_FREQ_24000000:
 	case AIC32X4_FREQ_25000000:
 		aic32x4->sysclk = freq;
@@ -589,7 +547,6 @@ static int aic32x4_set_bias_level(struct snd_soc_codec *codec,
 		/* Switch on BCLK_N Divider */
 		snd_soc_update_bits(codec, AIC32X4_BCLKN,
 				    AIC32X4_BCLKEN, AIC32X4_BCLKEN);
-
 		break;
 	case SND_SOC_BIAS_PREPARE:
 		break;
@@ -671,10 +628,7 @@ static int aic32x4_probe(struct snd_soc_codec *codec)
 	struct aic32x4_priv *aic32x4 = snd_soc_codec_get_drvdata(codec);
 	u32 tmp_reg;
 
-	if (aic32x4->control_type == SND_SOC_SPI)
-		codec->hw_write = (hw_write_t) spi_write;
-	else
-		codec->hw_write = (hw_write_t) i2c_master_send;
+	codec->hw_write = (hw_write_t) i2c_master_send;
 	codec->control_data = aic32x4->control_data;
 
 	snd_soc_write(codec, AIC32X4_RESET, 0x01);
@@ -687,9 +641,11 @@ static int aic32x4_probe(struct snd_soc_codec *codec)
 	if (aic32x4->power_cfg & AIC32X4_PWR_AVDD_DVDD_WEAK_DISABLE) {
 		snd_soc_write(codec, AIC32X4_PWRCFG, AIC32X4_AVDDWEAKDISABLE);
 	}
+
 	tmp_reg = (aic32x4->power_cfg & AIC32X4_PWR_AIC32X4_LDO_ENABLE) ?
 			AIC32X4_LDOCTLEN : 0;
 	snd_soc_write(codec, AIC32X4_LDOCTL, tmp_reg);
+
 	tmp_reg = snd_soc_read(codec, AIC32X4_CMMODE);
 	if (aic32x4->power_cfg & AIC32X4_PWR_CMMODE_LDOIN_RANGE_18_36) {
 		tmp_reg |= AIC32X4_LDOIN_18_36;
@@ -738,7 +694,6 @@ static struct snd_soc_codec_driver soc_codec_dev_aic32x4 = {
 	.set_bias_level = aic32x4_set_bias_level,
 };
 
-#if defined(CONFIG_I2C) || defined(CONFIG_I2C_MODULE)
 static __devinit int aic32x4_i2c_probe(struct i2c_client *i2c,
 				      const struct i2c_device_id *id)
 {
@@ -752,7 +707,6 @@ static __devinit int aic32x4_i2c_probe(struct i2c_client *i2c,
 		return -ENOMEM;
 
 	aic32x4->control_data = i2c;
-	aic32x4->control_type = SND_SOC_I2C;
 	i2c_set_clientdata(i2c, aic32x4);
 
 	if (pdata) {
@@ -791,91 +745,23 @@ static struct i2c_driver aic32x4_i2c_driver = {
 	.remove =   __devexit_p(aic32x4_i2c_remove),
 	.id_table = aic32x4_i2c_id,
 };
-#endif
-
-#if defined(CONFIG_SPI_MASTER)
-static int __devinit aic32x4_spi_probe(struct spi_device *spi)
-{
-	struct aic32x4_pdata *pdata = spi->dev.platform_data;
-	struct aic32x4_priv *aic32x4;
-	int ret;
-
-	aic32x4 = devm_kzalloc(&spi->dev, sizeof(struct aic32x4_priv),
-			       GFP_KERNEL);
-	if (aic32x4 == NULL)
-		return -ENOMEM;
-
-	spi->mode = SPI_MODE_1;
-	ret = spi_setup(spi);
-	if (ret < 0)
-		return ret;
-
-	aic32x4->control_data = spi;
-	aic32x4->control_type = SND_SOC_SPI;
-	spi_set_drvdata(spi, aic32x4);
-
-	if (pdata) {
-		aic32x4->power_cfg = pdata->power_cfg;
-		aic32x4->swapdacs = pdata->swapdacs;
-		aic32x4->micpga_routing = pdata->micpga_routing;
-	} else {
-		aic32x4->power_cfg = 0;
-		aic32x4->swapdacs = false;
-		aic32x4->micpga_routing = 0;
-	}
-
-	ret = snd_soc_register_codec(&spi->dev,
-			&soc_codec_dev_aic32x4, &aic32x4_dai, 1);
-	return ret;
-}
-
-static int __devexit aic32x4_spi_remove(struct spi_device *spi)
-{
-	snd_soc_unregister_codec(&spi->dev);
-	return 0;
-}
-
-static struct spi_driver aic32x4_spi_driver = {
-	.driver = {
-		.name	= "tlv320aic32x4-spi",
-		.owner	= THIS_MODULE,
-	},
-	.probe		= aic32x4_spi_probe,
-	.remove		= __devexit_p(aic32x4_spi_remove),
-};
-#endif /* CONFIG_SPI_MASTER */
-
 
 static int __init aic32x4_modinit(void)
 {
 	int ret = 0;
 
-#if defined(CONFIG_I2C) || defined(CONFIG_I2C_MODULE)
 	ret = i2c_add_driver(&aic32x4_i2c_driver);
 	if (ret != 0) {
 		printk(KERN_ERR "Failed to register aic32x4 I2C driver: %d\n",
 		       ret);
 	}
-#endif
-#if defined(CONFIG_SPI_MASTER)
-	ret = spi_register_driver(&aic32x4_spi_driver);
-	if (ret != 0) {
-		printk(KERN_ERR "Failed to register aic32x4 SPI driver: %d\n",
-		       ret);
-	}
-#endif
 	return ret;
 }
 module_init(aic32x4_modinit);
 
 static void __exit aic32x4_exit(void)
 {
-#if defined(CONFIG_I2C) || defined(CONFIG_I2C_MODULE)
 	i2c_del_driver(&aic32x4_i2c_driver);
-#endif
-#if defined(CONFIG_SPI_MASTER)
-	spi_unregister_driver(&aic32x4_spi_driver);
-#endif
 }
 module_exit(aic32x4_exit);
 

@@ -1,12 +1,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ubus
-PKG_VERSION:=2017-02-20
+PKG_VERSION:=2017-05-1
 PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=34c6e81
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_SOURCE_VERSION).tar.gz
+#PKG_SOURCE_PROTO:=git
+#PKG_SOURCE_URL:=$(TOPDIR)/git_home/netduma-ubus.git
+#PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+#PKG_SOURCE_VERSION:=37ec310382e6e291f7ed4524be432093e9bf9485
+PKG_SOURCE:=netduma-ubus.tar.gz
 CMAKE_INSTALL:=1
 
 PKG_LICENSE:=LGPLv2.1
@@ -56,7 +58,7 @@ CMAKE_OPTIONS = \
 
 define Build/Prepare
 	mkdir -p $(PKG_BUILD_DIR)
-	tar xvf $(TOPDIR)/dl/$(PKG_SOURCE) --strip-components=1 -C $(PKG_BUILD_DIR)/
+	tar zxvf $(TOPDIR)/dl/$(PKG_SOURCE) -C $(PKG_BUILD_DIR)/
 	$(call Build/Patch/Default)
 endef
 

@@ -101,10 +101,6 @@ int kvm_iommu_map_pages(struct kvm *kvm, struct kvm_memory_slot *slot)
 		while ((gfn << PAGE_SHIFT) & (page_size - 1))
 			page_size >>= 1;
 
-		/* Make sure hva is aligned to the page size we want to map */
-		while (gfn_to_hva_memslot(slot, gfn) & (page_size - 1))
-			page_size >>= 1;
-
 		/*
 		 * Pin all pages we are about to map in memory. This is
 		 * important because we unmap and unpin in 4kb steps later.
@@ -246,7 +242,7 @@ int kvm_iommu_map_guest(struct kvm *kvm)
 
 	mutex_lock(&kvm->slots_lock);
 
-	kvm->arch.iommu_domain = iommu_domain_alloc(&pci_bus_type, 0);
+	kvm->arch.iommu_domain = iommu_domain_alloc(&pci_bus_type);
 	if (!kvm->arch.iommu_domain) {
 		r = -ENOMEM;
 		goto out_unlock;

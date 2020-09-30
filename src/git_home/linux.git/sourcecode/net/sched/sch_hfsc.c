@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2013 The Linux Foundation. All rights reserved.
  * Copyright (c) 2003 Patrick McHardy, <kaber@trash.net>
  *
  * This program is free software; you can redistribute it and/or
@@ -976,7 +975,6 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
 	struct nlattr *opt = tca[TCA_OPTIONS];
 	struct nlattr *tb[TCA_HFSC_MAX + 1];
 	struct tc_service_curve *rsc = NULL, *fsc = NULL, *usc = NULL;
-	bool prev_rsc = false, prev_fsc = false;
 	u64 cur_time;
 	int err;
 
@@ -987,14 +985,23 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
 	if (err < 0)
 		return err;
 
-	if (tb[TCA_HFSC_RSC])
+	if (tb[TCA_HFSC_RSC]) {
 		rsc = nla_data(tb[TCA_HFSC_RSC]);
+		if (rsc->m1 == 0 && rsc->m2 == 0)
+			rsc = NULL;
+	}
 
-	if (tb[TCA_HFSC_FSC])
+	if (tb[TCA_HFSC_FSC]) {
 		fsc = nla_data(tb[TCA_HFSC_FSC]);
+		if (fsc->m1 == 0 && fsc->m2 == 0)
+			fsc = NULL;
+	}
 
-	if (tb[TCA_HFSC_USC])
+	if (tb[TCA_HFSC_USC]) {
 		usc = nla_data(tb[TCA_HFSC_USC]);
+		if (usc->m1 == 0 && usc->m2 == 0)
+			usc = NULL;
+	}
 
 	if (cl != NULL) {
 		if (parentid) {
@@ -1015,69 +1022,23 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
 		}
 
 		sch_tree_lock(sch);
-		/* Changed class: if any new curves are zero, and that curve
-		   exists for this class, remove the curve. */
-		prev_rsc = cl->cl_flags & HFSC_RSC;
-		if (rsc != NULL) {
-			if (rsc->m1 == 0 && rsc->m2 == 0) {
-				if (prev_rsc) {
-					cl->cl_flags &= ~HFSC_RSC;
-					if (cl->qdisc->q.qlen != 0)
-						eltree_remove(cl);
-				}
-			} else {
-				hfsc_change_rsc(cl, rsc, cur_time);
-			}
-		}
-
-		prev_fsc = cl->cl_flags & HFSC_FSC;
-		if (fsc != NULL) {
-			if (fsc->m1 == 0 && fsc->m2 == 0) {
-				if (prev_fsc) {
-					cl->cl_flags &= ~HFSC_FSC;
-					if (cl->qdisc->q.qlen != 0) {
-						vttree_remove(cl);
-						cftree_remove(cl);
-					}
-				}
-			} else
-				hfsc_change_fsc(cl, fsc);
-		}
-
-		if (usc != NULL) {
-			if (usc->m1 == 0 && usc->m2 == 0)
-				cl->cl_flags &= ~HFSC_USC;
-			else
-				hfsc_change_usc(cl, usc, cur_time);
-		}
+		if (rsc != NULL)
+			hfsc_change_rsc(cl, rsc, cur_time);
+		if (fsc != NULL)
+			hfsc_change_fsc(cl, fsc);
+		if (usc != NULL)
+			hfsc_change_usc(cl, usc, cur_time);
 
 		if (cl->qdisc->q.qlen != 0) {
-			unsigned int len = qdisc_peek_len(cl->qdisc);
-			if (cl->cl_flags & HFSC_RSC) {
-				if (prev_rsc)
-					update_ed(cl, len);
-				else
-					init_ed(cl, len);
-			}
-			if (cl->cl_flags & HFSC_FSC) {
-				if (prev_fsc)
-					update_vf(cl, 0, cur_time);
-				else
-					init_vf(cl, len);
-			}
+			if (cl->cl_flags & HFSC_RSC)
+				update_ed(cl, qdisc_peek_len(cl->qdisc));
+			if (cl->cl_flags & HFSC_FSC)
+				update_vf(cl, 0, cur_time);
 		}
 		sch_tree_unlock(sch);
 
 		return 0;
 	}
-
-	/* New class: if any curves are zero, do not create them */
-	if (rsc && (rsc->m1 == 0 && rsc->m2 == 0))
-		rsc = NULL;
-	if (fsc && (fsc->m1 == 0 && fsc->m2 == 0))
-		fsc = NULL;
-	if (usc && (usc->m1 == 0 && usc->m2 == 0))
-		usc = NULL;
 
 	if (parentid == TC_H_ROOT)
 		return -EEXIST;

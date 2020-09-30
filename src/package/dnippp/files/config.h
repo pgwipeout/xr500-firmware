@@ -9,7 +9,7 @@
 #define _DNI_CONFIG_H
 
 /* Define the hostname for PPTP control connection request, e.g. "WNDR3700" */
-#define PPTP_HOSTNAME			"R7800"
+#define PPTP_HOSTNAME			"XR500"
 
 /* Define the vendor for PPTP control connection request, e.g. "NETGEAR" */
 #define PPTP_VENDOR			"NETGEAR"

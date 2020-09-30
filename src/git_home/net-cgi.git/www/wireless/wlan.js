@@ -169,6 +169,18 @@ function setSecurity(num)
 		if(form.security_type[i].checked)
 			sync_user_input(form.security_type[i]);
 	}
+	if (num==6)
+   {
+        if(form.enable_smart_connect.checked) {
+			var radius_ids = ["radius_ipaddress1", "radius_ipaddress2", "radius_ipaddress3", "radius_ipaddress4", "radius_port", "radius_secret"];
+			for(var i=0; i<radius_ids.length; i++) {
+			form[id_mapping(radius_ids[i])].value = form[radius_ids[i]].value;
+			}
+			form.wpae_mode_an.options[form.wpae_mode.selectedIndex].selected = true;
+			wpaemode_an();
+		}
+   }
+	
 	handle_sync_input();
 	toggle_an_edit();
 }
@@ -2027,8 +2039,8 @@ function handle_samrt_connect() {
 		return;
 	}
 
-	alert("You currently have different WiFi settings for the 2.4GHz Radio and the 5GHz Radio. Once click Apply button, we will overwrite the settings for the 5GHz Radio with the 2.4GHz Radio settings.");
-
+	//alert("You currently have different WiFi settings for the 2.4GHz Radio and the 5GHz Radio. Once click Apply button, we will overwrite the settings for the 5GHz Radio with the 2.4GHz Radio settings.");
+	alert("$wlan_have_diff_setting");
 	cf.ssid_an.value = cf.ssid.value;
 	cf.ssid_bc_an.checked = cf.ssid_bc.checked;
 	cf.hid_enable_smart_connect.value = "1";
@@ -2060,6 +2072,8 @@ function handle_samrt_connect() {
 		}
 	}
 	else {
+		cf[id_mapping(wl_id)].checked = true;
+		cf[id_mapping(wl_id)].onclick();
 		var radius_ids = ["radius_ipaddress1", "radius_ipaddress2", "radius_ipaddress3", "radius_ipaddress4", "radius_port", "radius_secret"];
 		for(var i=0; i<radius_ids.length; i++) {
 			cf[id_mapping(radius_ids[i])].value = cf[radius_ids[i]].value;

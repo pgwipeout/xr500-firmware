@@ -18,7 +18,6 @@
 #include <linux/timer.h>
 #include <linux/proc_fs.h>
 #include <linux/if_bonding.h>
-#include <linux/etherdevice.h>
 #include <linux/cpumask.h>
 #include <linux/in6.h>
 #include <linux/netpoll.h>
@@ -248,7 +247,6 @@ struct bonding {
 	/* debugging suport via debugfs */
 	struct	 dentry *debug_dir;
 #endif /* CONFIG_DEBUG_FS */
-	u32      id;
 };
 
 static inline bool bond_vlan_used(struct bonding *bond)
@@ -419,9 +417,6 @@ void bond_debug_register(struct bonding *bond);
 void bond_debug_unregister(struct bonding *bond);
 void bond_debug_reregister(struct bonding *bond);
 const char *bond_mode_name(int mode);
-uint32_t bond_xmit_hash(uint8_t *src_mac, uint8_t *dst_mac, void *psrc,
-			void *pdst, uint16_t protocol, struct net_device *bond_dev,
-			__be16 *layer4hdr);
 
 struct bond_net {
 	struct net *		net;	/* Associated network namespace */
@@ -455,18 +450,6 @@ static inline void bond_destroy_proc_dir(struct bond_net *bn)
 }
 #endif
 
-static inline struct slave *bond_slave_has_mac(struct bonding *bond,
-					       const u8 *mac)
-{
-	int i = 0;
-	struct slave *tmp;
-
-	bond_for_each_slave(bond, tmp, i)
-		if (!compare_ether_addr_64bits(mac, tmp->dev->dev_addr))
-			return tmp;
-
-	return NULL;
-}
 
 /* exported from bond_main.c */
 extern int bond_net_id;

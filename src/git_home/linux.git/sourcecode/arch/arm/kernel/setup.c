@@ -81,7 +81,6 @@ __setup("fpe=", fpe_setup);
 extern void paging_init(struct machine_desc *desc);
 extern void sanity_check_meminfo(void);
 extern void reboot_setup(char *str);
-extern void setup_dma_zone(struct machine_desc *desc);
 
 unsigned int processor_id;
 EXPORT_SYMBOL(processor_id);
@@ -104,8 +103,6 @@ EXPORT_SYMBOL(system_serial_high);
 unsigned int elf_hwcap __read_mostly;
 EXPORT_SYMBOL(elf_hwcap);
 
-unsigned int boot_reason;
-EXPORT_SYMBOL(boot_reason);
 
 #ifdef MULTI_CPU
 struct processor processor __read_mostly;
@@ -864,10 +861,6 @@ static struct machine_desc * __init setup_machine_tags(unsigned int nr)
 	struct tag *tags = (struct tag *)&init_tags;
 	struct machine_desc *mdesc = NULL, *p;
 	char *from = default_command_line;
-	char qca_cmdline[COMMAND_LINE_SIZE];
-	char dni_cmdline[COMMAND_LINE_SIZE];
-	char *token;
-	int flag = 0;
 
 	init_tags.mem.start = PHYS_OFFSET;
 
@@ -923,32 +916,7 @@ static struct machine_desc * __init setup_machine_tags(unsigned int nr)
 	}
 
 	/* parse_early_param needs a boot_command_line */
-	strlcpy(qca_cmdline, from, COMMAND_LINE_SIZE);
-	printk("QCA command line: %s\n", from);
-
-	memset(dni_cmdline, 0, COMMAND_LINE_SIZE);
-	from = qca_cmdline;
-	while ((token = strsep(&from, " ")) != NULL) {
-		if (strncmp(token, "ubi.mtd=", 8) == 0) {
-			strcat(dni_cmdline, " ubi.mtd=netgear");
-			flag |= 0x1;
-		}
-		else if (strncmp(token, "root=", 5) == 0) {
-			strcat(dni_cmdline, " root=/dev/mtdblock6");
-			flag |= 0x2;
-		}
-		else {
-			if (dni_cmdline[0] != 0)
-				strcat(dni_cmdline, " ");
-			strcat(dni_cmdline, token);
-		}
-	}
-	if (!(flag & 0x1))
-		strcat(dni_cmdline, " ubi.mtd=netgear");
-	if (!(flag & 0x2))
-		strcat(dni_cmdline, " root=/dev/mtdblock6");
-	printk("DNI command line: %s\n", dni_cmdline);
-	strlcpy(boot_command_line, dni_cmdline, COMMAND_LINE_SIZE);
+	strlcpy(boot_command_line, from, COMMAND_LINE_SIZE);
 
 	return mdesc;
 }
@@ -971,8 +939,12 @@ void __init setup_arch(char **cmdline_p)
 	machine_desc = mdesc;
 	machine_name = mdesc->name;
 
-	setup_dma_zone(mdesc);
-
+#ifdef CONFIG_ZONE_DMA
+	if (mdesc->dma_zone_size) {
+		extern unsigned long arm_dma_zone_size;
+		arm_dma_zone_size = mdesc->dma_zone_size;
+	}
+#endif
 	if (mdesc->restart_mode)
 		reboot_setup(&mdesc->restart_mode);
 
@@ -986,9 +958,6 @@ void __init setup_arch(char **cmdline_p)
 	*cmdline_p = cmd_line;
 
 	parse_early_param();
-
-	if (mdesc->init_very_early)
-		mdesc->init_very_early();
 
 	sort(&meminfo.bank, meminfo.nr_banks, sizeof(meminfo.bank[0]), meminfo_cmp, NULL);
 	sanity_check_meminfo();
@@ -1085,7 +1054,7 @@ static int c_show(struct seq_file *m, void *v)
 		   cpu_name, read_cpuid_id() & 15, elf_platform);
 
 #if defined(CONFIG_SMP)
-	for_each_present_cpu(i) {
+	for_each_online_cpu(i) {
 		/*
 		 * glibc reads /proc/cpuinfo to determine the number of
 		 * online processors, looking for lines beginning with

@@ -36,10 +36,18 @@ struct dst_entry {
 	struct net_device       *dev;
 	struct  dst_ops	        *ops;
 	unsigned long		_metrics;
-	unsigned long           expires;
+	union {
+		unsigned long           expires;
+		/* point to where the dst_entry copied from */
+		struct dst_entry        *from;
+	};
 	struct dst_entry	*path;
 	struct neighbour __rcu	*_neighbour;
-	struct dst_entry	*from;
+#ifdef CONFIG_XFRM
+	struct xfrm_state	*xfrm;
+#else
+	void			*__pad1;
+#endif
 	int			(*input)(struct sk_buff*);
 	int			(*output)(struct sk_buff*);
 
@@ -52,7 +60,8 @@ struct dst_entry {
 #define DST_NOCOUNT		0x0020
 #define DST_NOPEER		0x0040
 #define DST_FAKE_RTABLE		0x0080
-#define DST_XFRM_TUNNEL		0x0100
+#define DST_FIRST_REDIRECTED    0x10000 /* send the first redirect packet
+                                           unconditionally. */
 
 	short			error;
 	short			obsolete;
@@ -84,11 +93,6 @@ struct dst_entry {
 		struct rt6_info		*rt6_next;
 		struct dn_route __rcu	*dn_next;
 	};
-#ifdef CONFIG_XFRM
-	struct xfrm_state	*xfrm;
-#else
-	void			*__pad1;
-#endif
 };
 
 static inline struct neighbour *dst_get_neighbour_noref(struct dst_entry *dst)
@@ -461,22 +465,10 @@ static inline struct dst_entry *xfrm_lookup(struct net *net,
 {
 	return dst_orig;
 } 
-
-static inline struct xfrm_state *dst_xfrm(const struct dst_entry *dst)
-{
-	return NULL;
-}
-
 #else
 extern struct dst_entry *xfrm_lookup(struct net *net, struct dst_entry *dst_orig,
 				     const struct flowi *fl, struct sock *sk,
 				     int flags);
-
-/* skb attached with this dst needs transformation if dst->xfrm is valid */
-static inline struct xfrm_state *dst_xfrm(const struct dst_entry *dst)
-{
-	return dst->xfrm;
-}
 #endif
 
 #endif /* _NET_DST_H */

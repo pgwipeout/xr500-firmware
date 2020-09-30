@@ -298,17 +298,17 @@ function change_vlan_type(cf)
 					document.write('<TD rowspan="2" nowrap align=center>'+each_info[3]+'</TD>');
 				}
 				if (port1_flag==0){
-					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="hid_che"><label for="hid_che">Port1 </label>&nbsp;&nbsp;');
+					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="hid_che"><label for="hid_che">$port_mark 1 </label>&nbsp;&nbsp;');
 					form.hid_inter_lan1.value="1";
 				}
 				else
-					document.write('<TD nowrap align=center><input type="checkbox" disabled id="hid_che"><label for="hid_che">Port1 </label>&nbsp;&nbsp;');
+					document.write('<TD nowrap align=center><input type="checkbox" disabled id="hid_che"><label for="hid_che">$port_mark 1 </label>&nbsp;&nbsp;');
 				if(port2_flag==0){
-					document.write('<input type="checkbox" checked disabled id="hid_che2"><label for="hid_che2">Port2</label></TD>');
+					document.write('<input type="checkbox" checked disabled id="hid_che2"><label for="hid_che2">$port_mark 2</label></TD>');
 					form.hid_inter_lan2.value="1";
 				}
 				else
-					document.write('<input type="checkbox" disabled id="hid_che2"><label for="hid_che2">Port2</label></TD>');
+					document.write('<input type="checkbox" disabled id="hid_che2"><label for="hid_che2">$port_mark 2</label></TD>');
 				if(port5_flag==0){
 					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="hid_che3"><label for="hid_che3">WiFi2.4G</label> &nbsp;&nbsp;');
 					form.hid_inter_wireless1.value="1";
@@ -327,17 +327,17 @@ function change_vlan_type(cf)
 				else
 					document.write("<TR class=\"odd_line\">");	
 				if(port3_flag==0){
-					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="hid_che5"><label for="hid_che5">Port3</label> &nbsp;&nbsp;');
+					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="hid_che5"><label for="hid_che5">$port_mark 3</label> &nbsp;&nbsp;');
 					form.hid_inter_lan3.value="1";
 				}
 				else
-					document.write('<TD nowrap align=center><input type="checkbox" disabled id="hid_che5"><label for="hid_che5">Port3 </label>&nbsp;&nbsp;');
+					document.write('<TD nowrap align=center><input type="checkbox" disabled id="hid_che5"><label for="hid_che5">$port_mark 3 </label>&nbsp;&nbsp;');
 				if(port4_flag==0){
-					document.write('<input type="checkbox" checked disabled id="hid_che6"><label for="hid_che6">Port4</label></TD>');
+					document.write('<input type="checkbox" checked disabled id="hid_che6"><label for="hid_che6">$port_mark 4</label></TD>');
 					form.hid_inter_lan4.value="1";
 				}
 				else
-					document.write('<input type="checkbox" disabled id="hid_che6"><label for="hid_che6">Port4</label></TD>');
+					document.write('<input type="checkbox" disabled id="hid_che6"><label for="hid_che6">$port_mark 4</label></TD>');
 				document.write("<TD nowrap align=center></TD>");
 				document.write("</TR>");
 			}
@@ -358,13 +358,13 @@ function change_vlan_type(cf)
 				document.write('<TD rowspan="2" nowrap align=center>'+each_info[2]+'</TD>');
 				document.write('<TD rowspan="2" nowrap align=center>'+each_info[3]+'</TD>');
 				if(wired_port%2 ==1)
-					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="Port1_ch"><label for="Port1_ch">Port1 </label>&nbsp;&nbsp;');
+					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="Port1_ch"><label for="Port1_ch">$port_mark 1 </label>&nbsp;&nbsp;');
 				else
-					document.write('<TD nowrap align=center><input type="checkbox" disabled id="Port1_ch"><label for="Port1_ch">Port1</label> &nbsp;&nbsp;');
+					document.write('<TD nowrap align=center><input type="checkbox" disabled id="Port1_ch"><label for="Port1_ch">$port_mark 1</label> &nbsp;&nbsp;');
 				if(wired_port==15 ||wired_port==14 ||wired_port==11 ||wired_port==10 ||wired_port==7 ||wired_port==6 ||wired_port==3 ||wired_port==2)
-					document.write('<input type="checkbox" checked disabled id="port_2"><label for="port_2">Port2</label></TD>');
+					document.write('<input type="checkbox" checked disabled id="port_2"><label for="port_2">$port_mark 2</label></TD>');
 				else
-					document.write('<input type="checkbox" disabled id="port_2"><label for="port_2">Port2</label></TD>');
+					document.write('<input type="checkbox" disabled id="port_2"><label for="port_2">$port_mark 2</label></TD>');
 				if(wireless_port%2 ==1)
 					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="WiFi24G_ch"><label for="WiFi24G_ch">WiFi2.4G </label>&nbsp;&nbsp;');
 				else
@@ -379,13 +379,13 @@ function change_vlan_type(cf)
 				else
 					document.write("<TR class=\"odd_line\">");
 				if((wired_port>=12 && wired_port<=15) || (wired_port>=4 && wired_port<=7))
-					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="Port3_ch"><label for="Port3_ch">Port3</label> &nbsp;&nbsp;');
+					document.write('<TD nowrap align=center><input type="checkbox" checked disabled id="Port3_ch"><label for="Port3_ch">$port_mark 3</label> &nbsp;&nbsp;');
 				else
-					document.write('<TD nowrap align=center><input type="checkbox" disabled  id="Port3_ch"><label for="Port3_ch">Port3 </label>&nbsp;&nbsp;');
+					document.write('<TD nowrap align=center><input type="checkbox" disabled  id="Port3_ch"><label for="Port3_ch">$port_mark 3 </label>&nbsp;&nbsp;');
 				if(wired_port>=8 && wired_port<=15)
-					document.write('<input type="checkbox" checked disabled id="Port4_ch"><label for="Port4_ch">Port4</label></TD>');
+					document.write('<input type="checkbox" checked disabled id="Port4_ch"><label for="Port4_ch">$port_mark 4</label></TD>');
 				else
-					document.write('<input type="checkbox" disabled id="Port4_ch"><label for="Port4_ch">Port4</label></TD>');
+					document.write('<input type="checkbox" disabled id="Port4_ch"><label for="Port4_ch">$port_mark 4</label></TD>');
 				document.write("<TD nowrap align=center></TD>");
 				document.write('</TR>');
 			}

@@ -46,9 +46,6 @@ static int key_get_type_from_user(char *type,
  * Extract the description of a new key from userspace and either add it as a
  * new key to the specified keyring or update a matching key in that keyring.
  *
- * If the description is NULL or an empty string, the key type is asked to
- * generate one from the payload.
- *
  * The keyring must be writable so that we can attach the key to it.
  *
  * If successful, the new key's serial number is returned, otherwise an error
@@ -75,17 +72,10 @@ SYSCALL_DEFINE5(add_key, const char __user *, _type,
 	if (ret < 0)
 		goto error;
 
-	description = NULL;
-	if (_description) {
-		description = strndup_user(_description, PAGE_SIZE);
-		if (IS_ERR(description)) {
-			ret = PTR_ERR(description);
-			goto error;
-		}
-		if (!*description) {
-			kfree(description);
-			description = NULL;
-		}
+	description = strndup_user(_description, PAGE_SIZE);
+	if (IS_ERR(description)) {
+		ret = PTR_ERR(description);
+		goto error;
 	}
 
 	/* pull the payload in if one was supplied */
@@ -1091,12 +1081,12 @@ long keyctl_instantiate_key_iov(key_serial_t id,
 	ret = rw_copy_check_uvector(WRITE, _payload_iov, ioc,
 				    ARRAY_SIZE(iovstack), iovstack, &iov, 1);
 	if (ret < 0)
-		goto err;
+		return ret;
 	if (ret == 0)
 		goto no_payload_free;
 
 	ret = keyctl_instantiate_key_common(id, iov, ioc, ret, ringid);
-err:
+
 	if (iov != iovstack)
 		kfree(iov);
 	return ret;

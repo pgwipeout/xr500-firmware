@@ -288,20 +288,6 @@ config CHARGER_MAX8998
 	  Say Y to enable support for the battery charger control sysfs and
 	  platform data of MAX8998/LP3974 PMICs.
 
-config BATTERY_MSM_FAKE
-	tristate "Fake MSM battery"
-	depends on ARCH_MSM && BATTERY_MSM
-	default n
-	help
-	  Say Y to bypass actual battery queries.
-
-config BQ27520_TEST_ENABLE
-	bool "Enable BQ27520 Fuel Gauge Chip Test"
-	depends on BATTERY_BQ27520
-	default n
-	help
-	  Say Y here to enable Test sysfs Interface for BQ27520 Drivers.
-
 config CHARGER_SMB347
 	tristate "Summit Microelectronics SMB347 Battery Charger"
 	depends on I2C

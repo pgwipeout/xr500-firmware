@@ -21,7 +21,6 @@
 #include <linux/platform_device.h>
 #include <linux/libata.h>
 #include <linux/ahci_platform.h>
-#include <linux/pm_runtime.h>
 #include "ahci.h"
 
 enum ahci_type {
@@ -74,7 +73,7 @@ static struct scsi_host_template ahci_platform_sht = {
 	AHCI_SHT("ahci_platform"),
 };
 
-static int __devinit ahci_probe(struct platform_device *pdev)
+static int __init ahci_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct ahci_platform_data *pdata = dev_get_platdata(dev);
@@ -193,14 +192,6 @@ static int __devinit ahci_probe(struct platform_device *pdev)
 	if (rc)
 		goto err0;
 
-	rc = pm_runtime_set_active(dev);
-	if (rc) {
-		dev_warn(dev, "Unable to set runtime pm active err=%d\n", rc);
-	} else {
-		pm_runtime_enable(dev);
-		pm_runtime_forbid(dev);
-	}
-
 	return 0;
 err0:
 	if (pdata && pdata->exit)
@@ -284,8 +275,6 @@ static int ahci_resume(struct device *dev)
 static struct dev_pm_ops ahci_pm_ops = {
 	.suspend		= &ahci_suspend,
 	.resume			= &ahci_resume,
-	.runtime_suspend        = &ahci_suspend,
-	.runtime_resume         = &ahci_resume,
 };
 #endif
 
@@ -297,7 +286,6 @@ static const struct of_device_id ahci_of_match[] = {
 MODULE_DEVICE_TABLE(of, ahci_of_match);
 
 static struct platform_driver ahci_driver = {
-	.probe = ahci_probe,
 	.remove = __devexit_p(ahci_remove),
 	.driver = {
 		.name = "ahci",
@@ -312,7 +300,7 @@ static struct platform_driver ahci_driver = {
 
 static int __init ahci_init(void)
 {
-	return platform_driver_register(&ahci_driver);
+	return platform_driver_probe(&ahci_driver, ahci_probe);
 }
 module_init(ahci_init);
 

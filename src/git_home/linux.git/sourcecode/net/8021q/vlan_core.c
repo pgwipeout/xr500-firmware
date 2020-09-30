@@ -5,7 +5,7 @@
 #include <linux/export.h>
 #include "vlan.h"
 
-bool vlan_do_receive(struct sk_buff **skbp)
+bool vlan_do_receive(struct sk_buff **skbp, bool last_handler)
 {
 	struct sk_buff *skb = *skbp;
 	u16 vlan_id = skb->vlan_tci & VLAN_VID_MASK;
@@ -13,8 +13,14 @@ bool vlan_do_receive(struct sk_buff **skbp)
 	struct vlan_pcpu_stats *rx_stats;
 
 	vlan_dev = vlan_find_dev(skb->dev, vlan_id);
-	if (!vlan_dev)
+	if (!vlan_dev) {
+		/* Only the last call to vlan_do_receive() should change
+		 * pkt_type to PACKET_OTHERHOST
+		 */
+		if (vlan_id && last_handler)
+			skb->pkt_type = PACKET_OTHERHOST;
 		return false;
+	}
 
 	skb = *skbp = skb_share_check(skb, GFP_ATOMIC);
 	if (unlikely(!skb))
@@ -61,44 +67,6 @@ bool vlan_do_receive(struct sk_buff **skbp)
 	return true;
 }
 
-/* Update the VLAN device with statistics from network offload engines */
-void __vlan_dev_update_accel_stats(struct net_device *dev, struct rtnl_link_stats64 *nlstats)
-{
-	struct vlan_pcpu_stats *stats;
-
-	if (!is_vlan_dev(dev))
-		return;
-
-	stats = per_cpu_ptr(vlan_dev_priv(dev)->vlan_pcpu_stats, 0);
-
-	u64_stats_update_begin(&stats->syncp);
-	stats->rx_packets += nlstats->rx_packets;
-	stats->rx_bytes += nlstats->rx_bytes;
-	stats->tx_packets += nlstats->tx_packets;
-	stats->tx_bytes += nlstats->tx_bytes;
-	u64_stats_update_end(&stats->syncp);
-}
-EXPORT_SYMBOL(__vlan_dev_update_accel_stats);
-
-/* Lookup the 802.1p egress_map table and return the 802.1p value */
-u16 vlan_dev_get_egress_prio(struct net_device *dev, u32 skb_prio)
-{
-	struct vlan_priority_tci_mapping *mp;
-
-	mp = vlan_dev_priv(dev)->egress_priority_map[(skb_prio & 0xF)];
-	while (mp) {
-		if (mp->priority == skb_prio) {
-			return mp->vlan_qos; /* This should already be shifted
-					      * to mask correctly with the
-					      * VLAN's TCI */
-		}
-		mp = mp->next;
-	}
-	return 0;
-}
-
-EXPORT_SYMBOL(vlan_dev_get_egress_prio);
-
 /* Must be invoked with rcu_read_lock or with RTNL. */
 struct net_device *__vlan_find_dev_deep(struct net_device *real_dev,
 					u16 vlan_id)
@@ -134,13 +102,11 @@ EXPORT_SYMBOL(vlan_dev_vlan_id);
 
 static struct sk_buff *vlan_reorder_header(struct sk_buff *skb)
 {
-	if (skb_cow(skb, skb_headroom(skb)) < 0) {
-		kfree_skb(skb);
+	if (skb_cow(skb, skb_headroom(skb)) < 0)
 		return NULL;
-	}
-
 	memmove(skb->data - ETH_HLEN, skb->data - VLAN_ETH_HLEN, 2 * ETH_ALEN);
 	skb->mac_header += VLAN_HLEN;
+	skb_reset_mac_len(skb);
 	return skb;
 }
 
@@ -174,8 +140,6 @@ struct sk_buff *vlan_untag(struct sk_buff *skb)
 
 	skb_reset_network_header(skb);
 	skb_reset_transport_header(skb);
-	skb_reset_mac_len(skb);
-
 	return skb;
 
 err_free:

@@ -697,6 +697,4 @@ static inline int idx2vol_id(const struct ubi_device *ubi, int idx)
 		return idx;
 }
 
-extern int mtd_read_raw(struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen, u_char *buf);
-#define mtd_read mtd_read_raw
 #endif /* !__UBI_UBI_H__ */

@@ -321,6 +321,43 @@ var adsl_list = {"Australia":{
 
 };
 
+function change_button_position()
+{
+        var form0 = document.forms[0];
+        var fchild = form0.childNodes;
+        var main = document.createElement("div");
+        var fixbutton = document.getElementsByClassName("fix_button");
+
+        main.className="main";
+
+        if(form0 && (form0.target == "formframe") && fixbutton.length>0)
+        {
+
+                for(var i=0; i<form0.childNodes.length;)
+                {
+                        //after move to main, f.childNodes.length reduce one, so this loop not need i++.
+                        main.appendChild(form0.childNodes[i]);
+                }
+
+                form0.appendChild(main);
+
+                var overylay = document.getElementById("black_over_lay");
+                if(overylay)
+                {
+                        form0.appendChild(overylay);
+                }
+
+
+                var fixbutton = document.getElementsByClassName("fix_button");
+
+                if(fixbutton.length>0)
+                {
+                        form0.appendChild(fixbutton[0]);
+                }
+					
+        }
+}
+
 function getTop(frameWindow) 
 { 
 	try 

@@ -775,6 +775,7 @@ head_end:
 				/* timeout exceeded or interrupted by SIGCHLD */
 				else
 				{
+					system("echo '\nNo response for net-cgi within 40 seconds, uhttpd kill net-cgi!\n' > /dev/console");
 					ensure_out(kill(child, 0));
 					if( (errno != EINTR) && ! header_sent )
 					{

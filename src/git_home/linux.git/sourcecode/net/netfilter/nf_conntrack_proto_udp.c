@@ -36,6 +36,8 @@ static unsigned int udp_timeouts[UDP_CT_MAX] = {
 	[UDP_CT_REPLIED]	= 180*HZ,
 };
 
+extern unsigned int sysctl_conntrack_refresh_outbound_only;
+
 static bool udp_pkt_to_tuple(const struct sk_buff *skb,
 			     unsigned int dataoff,
 			     struct nf_conntrack_tuple *tuple)
@@ -85,15 +87,46 @@ static int udp_packet(struct nf_conn *ct,
 		      unsigned int hooknum,
 		      unsigned int *timeouts)
 {
+	int refresh = 1;
+	enum ip_conntrack_dir dir = CTINFO2DIR(ctinfo);
+
 	/* If we've seen traffic both ways, this is some kind of UDP
 	   stream.  Extend timeout. */
 	if (test_bit(IPS_SEEN_REPLY_BIT, &ct->status)) {
-		nf_ct_refresh_acct(ct, ctinfo, skb,
-				   timeouts[UDP_CT_REPLIED]);
+		/*
+		 * REQ-6: The NAT mapping Refresh Direction MUST have a "NAT Outbound refresh
+		 * behavior" of "True".
+		 *
+		 * NETGEAR Requirements (UDP/TCP) --- 1. NAT Outbound Refresh Behavior: MUST;
+		 * 2. Inbound Refresh Behavior: MUST NOT.
+		 *
+		 * Do some optimization from `CTINFO2DIR':
+		 * #define CTINFO2DIR(ctinfo)   \
+		 *     ((ctinfo) >= IP_CT_IS_REPLY ? IP_CT_DIR_REPLY : IP_CT_DIR_ORIGINAL)
+		 */
+		if (sysctl_conntrack_refresh_outbound_only != 0) {
+			if (ct->status & IPS_SRC_NAT) {
+				if (dir == IP_CT_DIR_REPLY)
+					refresh = 0;
+				else
+					refresh = 1;
+			} else if (ct->status & IPS_DST_NAT) {
+				if (dir == IP_CT_DIR_ORIGINAL)
+					refresh = 0;
+				else
+					refresh = 1;
+			} else
+				refresh = 1;
+		}
+
+		if (refresh)
+			nf_ct_refresh_acct(ct, ctinfo, skb, timeouts[UDP_CT_REPLIED]);
 		/* Also, more likely to be important, and not a probe */
 		if (!test_and_set_bit(IPS_ASSURED_BIT, &ct->status))
 			nf_conntrack_event_cache(IPCT_ASSURED, ct);
-	} else {
+	} else if ((sysctl_conntrack_refresh_outbound_only == 0) ||
+		   (sysctl_conntrack_refresh_outbound_only != 0 &&
+		    ctinfo < IP_CT_IS_REPLY && !(ct->status & IPS_CONENAT))){
 		nf_ct_refresh_acct(ct, ctinfo, skb,
 				   timeouts[UDP_CT_UNREPLIED]);
 	}

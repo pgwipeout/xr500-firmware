@@ -29,7 +29,8 @@ endef
 
 define Package/net-wall/install
 	install -d -m0755 $(1)/usr/sbin
-	install -m0755 $(PKG_BUILD_DIR)/net-wall $(1)/usr/sbin/
+	install -m0755 $(PKG_BUILD_DIR)/net-wall $(1)/usr/sbin/net-wall-nolock
+	install -m0755 ./files/net-wall $(1)/usr/sbin/net-wall 
 	install -d -m0755 $(1)/etc
 	$(CP) ./files/l7_patten.dat $(1)/etc
 	$(CP) ./files/etc/* $(1)/etc

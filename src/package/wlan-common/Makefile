@@ -30,6 +30,8 @@ endef
 
 define Build/Prepare
 	$(CP) $(GIT_HOME)/wlan-common.git/* $(PKG_BUILD_DIR)/
+
+	$(CP) ./files/non_limit_country.conf $(PKG_BUILD_DIR)/etc/ath
 endef
 
 define Build/Compile

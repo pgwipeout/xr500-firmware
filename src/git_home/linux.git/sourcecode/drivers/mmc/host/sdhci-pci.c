@@ -157,7 +157,6 @@ static const struct sdhci_pci_fixes sdhci_ene_714 = {
 static const struct sdhci_pci_fixes sdhci_cafe = {
 	.quirks		= SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER |
 			  SDHCI_QUIRK_NO_BUSY_IRQ |
-			  SDHCI_QUIRK_BROKEN_CARD_DETECTION |
 			  SDHCI_QUIRK_BROKEN_TIMEOUT_VAL,
 };
 
@@ -367,8 +366,6 @@ static int o2_probe(struct sdhci_pci_chip *chip)
 		scratch |= 0x80;
 		pci_write_config_byte(chip->pdev, O2_SD_LOCK_WP, scratch);
 	}
-
-	slot->host->mmc->caps2 = MMC_CAP2_BOOTPART_NOACC;
 
 	return 0;
 }

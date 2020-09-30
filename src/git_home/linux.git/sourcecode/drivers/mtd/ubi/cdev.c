@@ -977,7 +977,7 @@ static long ubi_cdev_ioctl(struct file *file, unsigned int cmd,
 static long ctrl_cdev_ioctl(struct file *file, unsigned int cmd,
 			    unsigned long arg)
 {
-	int err = 0, force = 0;
+	int err = 0;
 	void __user *argp = (void __user *)arg;
 
 	if (!capable(CAP_SYS_RESOURCE))
@@ -1026,10 +1026,6 @@ static long ctrl_cdev_ioctl(struct file *file, unsigned int cmd,
 	}
 
 	/* Detach an MTD device command */
-	case UBI_IOCFDET:
-		force = 1;
-		/* no break */
-
 	case UBI_IOCDET:
 	{
 		int ubi_num;
@@ -1042,7 +1038,7 @@ static long ctrl_cdev_ioctl(struct file *file, unsigned int cmd,
 		}
 
 		mutex_lock(&ubi_devices_mutex);
-		err = ubi_detach_mtd_dev(ubi_num, force);
+		err = ubi_detach_mtd_dev(ubi_num, 0);
 		mutex_unlock(&ubi_devices_mutex);
 		break;
 	}

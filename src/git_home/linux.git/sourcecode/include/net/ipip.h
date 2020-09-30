@@ -50,7 +50,7 @@ struct ip_tunnel_prl_entry {
 	int pkt_len = skb->len - skb_transport_offset(skb);		\
 									\
 	skb->ip_summed = CHECKSUM_NONE;					\
-	ip_select_ident(skb, NULL);				\
+	ip_select_ident(iph, &rt->dst, NULL);				\
 									\
 	err = ip_local_out(skb);					\
 	if (likely(net_xmit_eval(err) == 0)) {				\
@@ -64,6 +64,4 @@ struct ip_tunnel_prl_entry {
 
 #define IPTUNNEL_XMIT() __IPTUNNEL_XMIT(txq, stats)
 
-void ipip6_update_offload_stats(struct net_device *dev, void *ptr);
-void ip6_update_offload_stats(struct net_device *dev, void *ptr);
 #endif

@@ -3,11 +3,91 @@
 <style>
 .waiting { font: bold 17px arial; }
 .prgbar { width: 393px; }
+
+* {
+margin: 0;
+padding: 0;
+}
+
+#progressbar {
+position: absolute;
+left:25%;
+top:100px;
+height: 20px;
+width: 500px;
+border: 1px solid #B22222;
+	border-radius: 5px;
+	text-align: center;
+	line-height: 10px;
+	font-size: 0.8em;
+	box-shadow: 1vw 3vh 10vh #8B0000;
+}
+#progressbar:before
+{
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+height: 100%;
+	background-image: linear-gradient(to bottom, #f2c9c9, rgba(255, 255, 255, 0.6) 15%, transparent 60%, #b90f0f);
+}  
+
+#progress {
+position: absolute;
+	  /*  border:1px solid;*/
+height: 100%;
+width: 0;
+background: #8B0000;
+	    border-radius: 5px;
+	    z-index: -1;
+}
+
+#progress {
+	background-size: 30px 30px;
+	background-image: -webkit-linear-gradient(-45deg, #B22222, #B22222 25%, #8B0000 25%, #8B0000 50%, #B22222 50%, #B22222 75%, #8B0000 75%, #8B0000);
+	background-image: -moz-linear-gradient(-45deg, #B22222, #B22222 25%, #8B0000 25%, #8B0000 50%, #B22222 50%, #B22222 75%, #8B0000 75%, #8B0000);
+	background-image: linear-gradient(-45deg, #B22222, #B22222 25%, #8B0000 25%, #8B0000 50%, #B22222 50%, #B22222 75%, #8B0000 75%, #8B0000);
+	-webkit-animation: animate 1.5s linear infinite;
+	-moz-animation: animate 1.5s linear infinite;
+animation: animate 1.5s linear infinite;
+}
+
+@-webkit-keyframes animate {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 60px 30px;
+	}
+}
+
+@-moz-keyframes animate {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 60px 30px;
+	}
+}
+
+@keyframes animate {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 60px 30px;
+	}
+}
+
 </style>
 <script type="text/javascript">
 var pchar = "|||"; // progress char
-var maxchars = 40; 
-var delay_time = 1969; // msecs
+//var maxchars = 40; 
+//var delay_time = 1969; // msecs
+var maxchars = 100; 
+var delay_time = 780;
 var charcount = 0;
 
 function makeStr(strSize, fillChar)
@@ -24,7 +104,14 @@ function updateProgress()
 	if (charcount < maxchars)
 	{
 		charcount ++;
-		cf.progress.value = makeStr(charcount,pchar);
+		//cf.progress.value = makeStr(charcount,pchar);
+		var progressbar = document.getElementById("progressbar");
+		progressbar = progressbar.getElementsByTagName("p");
+
+		progressbar[0].innerHTML = charcount + "%";
+		var progress = document.getElementById("progress");
+		progress.style.width = charcount + "%";
+
 		setTimeout("updateProgress()",delay_time);
 	}
 	else
@@ -36,11 +123,13 @@ function updateProgress()
 <form>
 <table border="0" cellpadding="0" cellspacing="3" width="100%">
 <tr>
-	<td nowrap align=left class="waiting">$reboot_waiting</td>
+<td nowrap align=left class="waiting">$reboot_waiting</td>
 </tr>
-<tr>
-	<td nowrap align=center><input type="text" name="progress" class="prgbar" value=""></td>
-</tr>
+
+<div id="progressbar">
+<div id='progress'></div>
+<p></p>
+</div>
 $bluebar
 </table>
 </form>

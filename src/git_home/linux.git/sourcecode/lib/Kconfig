@@ -166,24 +166,18 @@ config AUDIT_GENERIC
 # compression support is select'ed if needed
 #
 config ZLIB_INFLATE
-	tristate "ZLIB inflate support"
+	tristate
 
 config ZLIB_DEFLATE
-	tristate "ZLIB deflate support"
+	tristate
 
 config LZO_COMPRESS
-	tristate "LZO compress support"
+	tristate
 
 config LZO_DECOMPRESS
-	tristate "LZO decompress support"
+	tristate
 
 source "lib/xz/Kconfig"
-
-config LZMA_COMPRESS
-    tristate
-
-config LZMA_DECOMPRESS
-    tristate
 
 #
 # These all provide a common interface (hence the apparent duplication with
@@ -274,16 +268,16 @@ config BCH_CONST_T
 # Textsearch support is select'ed if needed
 #
 config TEXTSEARCH
-	boolean	"Textsearch support"
+	boolean
 
 config TEXTSEARCH_KMP
-	tristate "Textsearch KMP"
+	tristate
 
 config TEXTSEARCH_BM
-	tristate "Textsearch BM"
+	tristate
 
 config TEXTSEARCH_FSM
-	tristate "Textsearch FSM"
+	tristate
 
 config BTREE
 	boolean
@@ -367,6 +361,14 @@ config MPILIB
 	  It is used to implement RSA digital signature verification,
 	  which is used by IMA/EVM digital signature extension.
 
+config MPILIB_EXTRA
+	bool
+	depends on MPILIB
+	help
+	  Additional sources of multiprecision maths library from GnuPG.
+	  This code is unnecessary for RSA digital signature verification,
+	  but can be compiled if needed.
+
 config SIGNATURE
 	tristate
 	depends on KEYS && CRYPTO
@@ -375,10 +377,5 @@ config SIGNATURE
 	help
 	  Digital signature verification. Currently only RSA is supported.
 	  Implementation is done using GnuPG MPI library
-
-config OID_REGISTRY
-	tristate
-	help
-	  Enable fast lookup object identifier registry.
 
 endmenu

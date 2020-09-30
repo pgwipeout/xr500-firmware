@@ -68,7 +68,6 @@ input[type=text] {
   background: transparent;
   border: none;
   color: #ffffff;
-  -webkit-appearance: none;
   text-align: inherit;
   vertical-align: bottom;
   font-family: 'Roboto', 'Noto', sans-serif;
@@ -310,7 +309,10 @@ input[name=bt_location_type]:not(:first-of-type) {
   text-overflow: ellipsis;
 }
 
-form[target="formframe"],
+form[target="formframe"]
+{
+	height:100%;
+}
 .main {
   bottom: 0 !important;
   overflow-y: auto;  
@@ -490,7 +492,7 @@ cursor:pointer;
 .liteblue{}
 
 /* WPS_status & WPS_client_status */
-#bar_td { width: 400px; margin:auto;position: relative; height:35px;}
+#bar_td { width: 400px; margin:auto;position: relative; height:100px;left:-100px;height:70px;top:40px;}
 .pic_on{  background:url(/image/buttons.gif) -350px 0 no-repeat; width:27px; height:27px;position:relative; float:left; }
 .pic_off{ background:url(/image/buttons.gif) -308px 0 no-repeat; width:27px; height:27px;position:relative; float:left; }
 #wps_bar {width: 350px; float: right; }
@@ -593,7 +595,7 @@ sterBt {
   float: left;
   height: 96%;
   margin: 4px 0 0 4px;
-  background: rgb(241,241,241);
+  background: rgb(211,211,211);
   border-radius: 8px;
 }
 .funjsq_sel{
@@ -604,7 +606,7 @@ sterBt {
   float: right;
   height: 96%;
   margin: 4px 4px 0 0;
-  background: rgb(241,241,241);
+  background: rgb(211,211,211);
   border-radius: 8px;
 }
 .funjsq_pay{
@@ -1126,3 +1128,6 @@ table#traffic_statistics td {
 	border-radius: 10px;
 	
 }
+
+
+

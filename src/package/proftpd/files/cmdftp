@@ -235,7 +235,7 @@ EOF
 print_common_head()
 {
 	cat <<EOF
-ServerName		NETGEAR-R7800
+ServerName		NETGEAR-XR500
 ServerType		standalone
 UseReverseDNS		off
 Umask			022
@@ -828,7 +828,7 @@ ftp_start() {
 		lan_ipaddr=$($config get lan_ipaddr)
 		echo "DefaultAddress    "$lan_ipaddr >> $PROFTPD_CONF
 
-		[ "x$(grep Directory $PROFTPD_CONF)" != "x" ] && /usr/sbin/proftpd -c $PROFTPD_CONF
+		[ "x$(grep Directory $PROFTPD_CONF)" != "x" ] && /usr/sbin/proftpd -c $PROFTPD_CONF -i "$($config get lan_ifname)"
 	fi
 
 	rm -f $TMP_LOCK_FILE

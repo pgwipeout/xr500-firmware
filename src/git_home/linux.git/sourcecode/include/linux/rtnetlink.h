@@ -191,7 +191,6 @@ enum {
 	RTN_THROW,		/* Not in this table		*/
 	RTN_NAT,		/* Translate this address	*/
 	RTN_XRESOLVE,		/* Use external resolver	*/
-	RTN_FAILED_POLICY,	/* Failed ingress/egress policy */
 	__RTN_MAX
 };
 

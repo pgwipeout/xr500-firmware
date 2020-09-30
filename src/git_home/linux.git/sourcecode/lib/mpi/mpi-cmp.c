@@ -39,7 +39,6 @@ int mpi_cmp_ui(MPI u, unsigned long v)
 	else
 		return -1;
 }
-EXPORT_SYMBOL_GPL(mpi_cmp_ui);
 
 int mpi_cmp(MPI u, MPI v)
 {
@@ -67,4 +66,3 @@ int mpi_cmp(MPI u, MPI v)
 		return 1;
 	return -1;
 }
-EXPORT_SYMBOL_GPL(mpi_cmp);

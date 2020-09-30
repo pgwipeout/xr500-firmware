@@ -90,12 +90,6 @@ ipt_dnat_target(struct sk_buff *skb, const struct xt_action_param *par)
 		new_port = ntohs(orig_range->min.all) + add_num;
 
 		tmp_mr_ptr->range[0].min.all = tmp_mr_ptr->range[0].max.all = htons(new_port);
-		if (net_ratelimit()) {
-			printk("[LAN access from remote] from %u.%u.%u.%u:%u to %u.%u.%u.%u:%u\n",
-				NIPQUAD(ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3),
-				ntohs(ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u.all),
-				NIPQUAD(orig_range->min_ip), new_port);
-		}
 	}
 
 #if defined(CONFIG_NF_CONNTRACK_NAT_MANAGEMENT)

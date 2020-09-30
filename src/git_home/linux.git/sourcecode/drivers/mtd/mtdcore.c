@@ -754,7 +754,7 @@ unsigned long mtd_get_unmapped_area(struct mtd_info *mtd, unsigned long len,
 }
 EXPORT_SYMBOL_GPL(mtd_get_unmapped_area);
 
-int mtd_read_raw(struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen,
+int mtd_read(struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen,
 	     u_char *buf)
 {
 	*retlen = 0;
@@ -763,17 +763,6 @@ int mtd_read_raw(struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen,
 	if (!len)
 		return 0;
 	return mtd->_read(mtd, from, len, retlen, buf);
-}
-EXPORT_SYMBOL_GPL(mtd_read_raw);
-
-int mtd_read(struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen,
-	     u_char *buf)
-{
-	int ret;
-	ret = mtd_read_raw(mtd, from, len, retlen, buf);
-	if (mtd_is_bitflip(ret))
-		return 0;
-	return ret;
 }
 EXPORT_SYMBOL_GPL(mtd_read);
 

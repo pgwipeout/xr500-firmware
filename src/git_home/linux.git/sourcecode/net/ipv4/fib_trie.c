@@ -71,6 +71,7 @@
 #include <linux/init.h>
 #include <linux/list.h>
 #include <linux/slab.h>
+#include <linux/prefetch.h>
 #include <linux/export.h>
 #include <net/net_namespace.h>
 #include <net/ip.h>
@@ -1771,8 +1772,10 @@ static struct leaf *leaf_walk_rcu(struct tnode *p, struct rt_trie_node *c)
 			if (!c)
 				continue;
 
-			if (IS_LEAF(c))
+			if (IS_LEAF(c)) {
+				prefetch(rcu_dereference_rtnl(p->child[idx]));
 				return (struct leaf *) c;
+			}
 
 			/* Rescan start scanning in new node */
 			p = (struct tnode *) c;
@@ -2346,7 +2349,6 @@ static const char *const rtn_type_names[__RTN_MAX] = {
 	[RTN_THROW] = "THROW",
 	[RTN_NAT] = "NAT",
 	[RTN_XRESOLVE] = "XRESOLVE",
-	[RTN_FAILED_POLICY] = "FAILED_POLICY",
 };
 
 static inline const char *rtn_type(char *buf, size_t len, unsigned int t)

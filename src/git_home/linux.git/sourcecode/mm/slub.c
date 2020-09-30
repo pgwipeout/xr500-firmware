@@ -936,16 +936,6 @@ static void trace(struct kmem_cache *s, struct page *page, void *object,
  * Hooks for other subsystems that check memory allocations. In a typical
  * production configuration these hooks all should produce no code at all.
  */
-static inline void kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
-{
-	kmemleak_alloc(ptr, size, 1, flags);
-}
-
-static inline void kfree_hook(const void *x)
-{
-	kmemleak_free(x);
-}
-
 static inline int slab_pre_alloc_hook(struct kmem_cache *s, gfp_t flags)
 {
 	flags &= gfp_allowed_mask;
@@ -1266,30 +1256,13 @@ static inline void inc_slabs_node(struct kmem_cache *s, int node,
 static inline void dec_slabs_node(struct kmem_cache *s, int node,
 							int objects) {}
 
-static inline void kmalloc_large_node_hook(void *ptr, size_t size, gfp_t flags)
-{
-	kmemleak_alloc(ptr, size, 1, flags);
-}
-
-static inline void kfree_hook(const void *x)
-{
-	kmemleak_free(x);
-}
-
 static inline int slab_pre_alloc_hook(struct kmem_cache *s, gfp_t flags)
 							{ return 0; }
 
 static inline void slab_post_alloc_hook(struct kmem_cache *s, gfp_t flags,
-		void *object)
-{
-	kmemleak_alloc_recursive(object, s->objsize, 1, s->flags,
-		flags & gfp_allowed_mask);
-}
+		void *object) {}
 
-static inline void slab_free_hook(struct kmem_cache *s, void *x)
-{
-	kmemleak_free_recursive(x, s->flags);
-}
+static inline void slab_free_hook(struct kmem_cache *s, void *x) {}
 
 #endif /* CONFIG_SLUB_DEBUG */
 
@@ -1541,19 +1514,15 @@ static inline void *acquire_slab(struct kmem_cache *s,
 		freelist = page->freelist;
 		counters = page->counters;
 		new.counters = counters;
-		if (mode) {
+		if (mode)
 			new.inuse = page->objects;
-			new.freelist = NULL;
-		} else {
-			new.freelist = freelist;
-		}
 
 		VM_BUG_ON(new.frozen);
 		new.frozen = 1;
 
 	} while (!__cmpxchg_double_slab(s, page,
 			freelist, counters,
-			new.freelist, new.counters,
+			NULL, new.counters,
 			"lock and freeze"));
 
 	remove_partial(n, page);
@@ -1595,6 +1564,7 @@ static void *get_partial_node(struct kmem_cache *s,
 			object = t;
 			available =  page->objects - page->inuse;
 		} else {
+			page->freelist = t;
 			available = put_cpu_partial(s, page, 0);
 			stat(s, CPU_PARTIAL_NODE);
 		}
@@ -2347,7 +2317,6 @@ redo:
 	 * reading from one cpu area. That does not matter as long
 	 * as we end up on the original cpu again when doing the cmpxchg.
 	 */
-	preempt_disable();
 	c = __this_cpu_ptr(s->cpu_slab);
 
 	/*
@@ -2357,7 +2326,7 @@ redo:
 	 * linked list in between.
 	 */
 	tid = c->tid;
-	preempt_enable();
+	barrier();
 
 	object = c->freelist;
 	if (unlikely(!object || !node_match(c, node)))
@@ -3400,7 +3369,7 @@ static void *kmalloc_large_node(size_t size, gfp_t flags, int node)
 	if (page)
 		ptr = page_address(page);
 
-	kmalloc_large_node_hook(ptr, size, flags);
+	kmemleak_alloc(ptr, size, 1, flags);
 	return ptr;
 }
 
@@ -3500,7 +3469,7 @@ void kfree(const void *x)
 	page = virt_to_head_page(x);
 	if (unlikely(!PageSlab(page))) {
 		BUG_ON(!PageCompound(page));
-		kfree_hook(x);
+		kmemleak_free(x);
 		put_page(page);
 		return;
 	}
@@ -4548,13 +4517,7 @@ static ssize_t show_slab_objects(struct kmem_cache *s,
 			page = c->partial;
 
 			if (page) {
-				node = page_to_nid(page);
-				if (flags & SO_TOTAL)
-					WARN_ON_ONCE(1);
-				else if (flags & SO_OBJECTS)
-					WARN_ON_ONCE(1);
-				else
-					x = page->pages;
+				x = page->pobjects;
 				total += x;
 				nodes[node] += x;
 			}

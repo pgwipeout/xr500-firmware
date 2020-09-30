@@ -81,10 +81,6 @@ apply_relocate(Elf32_Shdr *sechdrs, const char *strtab, unsigned int symindex,
 			return -ENOEXEC;
 		}
 
-		if ((IS_ERR_VALUE(sym->st_value) || !sym->st_value) &&
-		    ELF_ST_BIND(sym->st_info) == STB_WEAK)
-			continue;
-
 		loc = dstsec->sh_addr + rel->r_offset;
 
 		switch (ELF32_R_TYPE(rel->r_info)) {
@@ -93,7 +89,6 @@ apply_relocate(Elf32_Shdr *sechdrs, const char *strtab, unsigned int symindex,
 			break;
 
 		case R_ARM_ABS32:
-		case R_ARM_TARGET1:
 			*(u32 *)loc += sym->st_value;
 			break;
 

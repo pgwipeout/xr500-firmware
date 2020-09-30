@@ -4,7 +4,7 @@ obj-y			:= core.o bus.o dd.o syscore.o \
 			   driver.o class.o platform.o \
 			   cpu.o firmware.o init.o map.o devres.o \
 			   attribute_container.o transport_class.o \
-			   topology.o sys.o
+			   topology.o
 obj-$(CONFIG_DEVTMPFS)	+= devtmpfs.o
 obj-y			+= power/
 obj-$(CONFIG_HAS_DMA)	+= dma-mapping.o
@@ -20,9 +20,6 @@ endif
 obj-$(CONFIG_SYS_HYPERVISOR) += hypervisor.o
 obj-$(CONFIG_REGMAP)	+= regmap/
 obj-$(CONFIG_SOC_BUS) += soc.o
-
-obj-$(CONFIG_SYNC)	+= sync.o
-obj-$(CONFIG_SW_SYNC)	+= sw_sync.o
 
 ccflags-$(CONFIG_DEBUG_DRIVER) := -DDEBUG
 

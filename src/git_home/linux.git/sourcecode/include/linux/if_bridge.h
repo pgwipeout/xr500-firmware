@@ -42,11 +42,6 @@
 #define BRCTL_SET_PORT_PRIORITY 16
 #define BRCTL_SET_PATH_COST 17
 #define BRCTL_GET_FDB_ENTRIES 18
-#define BRCTL_SET_ACL_ONOFF 254
-#define BRCTL_SET_ACL_TYPE 253
-#define BRCTL_ADD_ACL_MAC 252
-#define BRCTL_CLR_ACL_MAC_LIST 251
-#define BRCTL_SET_ACL_DEBUG 250
 
 #define BR_STATE_DISABLED 0
 #define BR_STATE_LISTENING 1
@@ -107,26 +102,9 @@ struct __fdb_entry {
 #include <linux/netdevice.h>
 
 extern void brioctl_set(int (*ioctl_hook)(struct net *, unsigned int, void __user *));
-extern struct net_device *br_port_dev_get(struct net_device *dev, unsigned char *addr);
-extern void br_refresh_fdb_entry(struct net_device *dev, const char *addr);
-extern void br_dev_update_stats(struct net_device *dev, struct rtnl_link_stats64 *nlstats);
-extern bool br_fdb_has_entry(struct net_device *dev, const char *addr);
-extern void br_fdb_update_register_notify(struct notifier_block *nb);
-extern void br_fdb_update_unregister_notify(struct notifier_block *nb);
 
 typedef int br_should_route_hook_t(struct sk_buff *skb);
 extern br_should_route_hook_t __rcu *br_should_route_hook;
-
-typedef struct net_bridge_port *br_get_dst_hook_t(const struct net_bridge_port *src,
-		struct sk_buff **skb);
-extern br_get_dst_hook_t __rcu *br_get_dst_hook;
-
-typedef int (br_multicast_handle_hook_t)(const struct net_bridge_port *src,
-		struct sk_buff *skb);
-extern br_multicast_handle_hook_t __rcu *br_multicast_handle_hook;
-
-typedef void (br_notify_hook_t)(int group, int event, const void *ptr);
-extern br_notify_hook_t __rcu *br_notify_hook;
 
 #endif
 

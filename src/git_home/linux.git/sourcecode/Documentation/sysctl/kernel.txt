@@ -23,7 +23,6 @@ show up in /proc/sys/kernel:
 - auto_msgmni
 - bootloader_type	     [ X86 only ]
 - bootloader_version	     [ X86 only ]
-- boot_reason		     [ ARM only ]
 - callhome		     [ S390 only ]
 - cap_last_cap
 - core_pattern
@@ -68,7 +67,6 @@ show up in /proc/sys/kernel:
 - shmall
 - shmmax                      [ sysv ipc ]
 - shmmni
-- softirq_max_time
 - softlockup_thresh
 - stop-a                      [ SPARC only ]
 - sysrq                       ==> Documentation/sysrq.txt
@@ -141,19 +139,6 @@ file will contain the value 564 = 0x234.
 
 See the type_of_loader and ext_loader_ver fields in
 Documentation/x86/boot.txt for additional information.
-
-==============================================================
-
-boot_reason:
-
-ARM -- reason for device boot
-
-A single bit will be set in the unsigned integer value to identify the
-reason the device was booted / powered on. The value will be zero if this
-feature is not supported on the ARM device being booted.
-
-See the power-on-status field definitions in
-Documentation/arm/msm/boot.txt for Qualcomm's family of devices.
 
 ==============================================================
 
@@ -299,24 +284,13 @@ Default value is "/sbin/hotplug".
 kptr_restrict:
 
 This toggle indicates whether restrictions are placed on
-exposing kernel addresses via /proc and other interfaces.
-
-When kptr_restrict is set to (0), the default, there are no restrictions.
-
-When kptr_restrict is set to (1), kernel pointers printed using the %pK
-format specifier will be replaced with 0's unless the user has CAP_SYSLOG
-and effective user and group ids are equal to the real ids. This is
-because %pK checks are done at read() time rather than open() time, so
-if permissions are elevated between the open() and the read() (e.g via
-a setuid binary) then %pK will not leak kernel pointers to unprivileged
-users. Note, this is a temporary solution only. The correct long-term
-solution is to do the permission checks at open() time. Consider removing
-world read permissions from files that use %pK, and using dmesg_restrict
-to protect against uses of %pK in dmesg(8) if leaking kernel pointer
-values to unprivileged users is a concern.
-
-When kptr_restrict is set to (2), kernel pointers printed using
-%pK will be replaced with 0's regardless of privileges.
+exposing kernel addresses via /proc and other interfaces.  When
+kptr_restrict is set to (0), there are no restrictions.  When
+kptr_restrict is set to (1), the default, kernel pointers
+printed using the %pK format specifier will be replaced with 0's
+unless the user has CAP_SYSLOG.  When kptr_restrict is set to
+(2), kernel pointers printed using %pK will be replaced with 0's
+regardless of privileges.
 
 ==============================================================
 
@@ -593,19 +567,6 @@ need this.
 
 Note that if you change this from 0 to 1, already created segments
 without users and with a dead originative process will be destroyed.
-
-==============================================================
-
-softirq_max_time:
-
-This value can be used to set the max time limit on softirq processing
-in the function __do_softirq. This does not specify a hard limit on
-how long __do_softirq runs. Instead the time limit check is only done if
-there are pending softirqs even after the existing batch pending softirqs
-have been processed. The next batch will be processed only if the time since
-__do_softirq entry does not exceed softirq_max_time.
-
-Valid values are 1 - 100 ms.  Default value is 2 ms.
 
 ==============================================================
 

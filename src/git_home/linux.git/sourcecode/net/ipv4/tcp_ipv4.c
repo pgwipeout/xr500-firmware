@@ -176,7 +176,7 @@ int tcp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 	if (IS_ERR(rt)) {
 		err = PTR_ERR(rt);
 		if (err == -ENETUNREACH)
-			IP_INC_STATS(sock_net(sk), IPSTATS_MIB_OUTNOROUTES);
+			IP_INC_STATS_BH(sock_net(sk), IPSTATS_MIB_OUTNOROUTES);
 		return err;
 	}
 
@@ -678,11 +678,10 @@ static void tcp_v4_send_reset(struct sock *sk, struct sk_buff *skb)
 	arg.csumoffset = offsetof(struct tcphdr, check) / 2;
 	arg.flags = (sk && inet_sk(sk)->transparent) ? IP_REPLY_ARG_NOSRCCHECK : 0;
 	/* When socket is gone, all binding information is lost.
-	 * routing might fail in this case. No choice here, if we choose to force
-	 * input interface, we will misroute in case of asymmetric route.
+	 * routing might fail in this case. using iif for oif to
+	 * make sure we can deliver it
 	 */
-	if (sk)
-		arg.bound_dev_if = sk->sk_bound_dev_if;
+	arg.bound_dev_if = sk ? sk->sk_bound_dev_if : inet_iif(skb);
 
 	net = dev_net(skb_dst(skb)->dev);
 	arg.tos = ip_hdr(skb)->tos;
@@ -974,7 +973,7 @@ int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
 	struct tcp_sock *tp = tcp_sk(sk);
 	struct tcp_md5sig_info *md5sig;
 
-	key = tcp_md5_do_lookup(sk, addr, family);
+	key = tcp_md5_do_lookup(sk, (union tcp_md5_addr *)&addr, AF_INET);
 	if (key) {
 		/* Pre-existing entry - just update that one. */
 		memcpy(key->key, newkey, newkeylen);
@@ -1019,7 +1018,7 @@ int tcp_md5_do_del(struct sock *sk, const union tcp_md5_addr *addr, int family)
 	struct tcp_md5sig_key *key;
 	struct tcp_md5sig_info *md5sig;
 
-	key = tcp_md5_do_lookup(sk, addr, family);
+	key = tcp_md5_do_lookup(sk, (union tcp_md5_addr *)&addr, AF_INET);
 	if (!key)
 		return -ENOENT;
 	hlist_del_rcu(&key->node);
@@ -1524,8 +1523,10 @@ exit:
 	NET_INC_STATS_BH(sock_net(sk), LINUX_MIB_LISTENDROPS);
 	return NULL;
 put_and_exit:
-	inet_csk_prepare_forced_close(newsk);
-	tcp_done(newsk);
+	tcp_clear_xmit_timers(newsk);
+	tcp_cleanup_congestion_control(newsk);
+	bh_unlock_sock(newsk);
+	sock_put(newsk);
 	goto exit;
 }
 EXPORT_SYMBOL(tcp_v4_syn_recv_sock);
@@ -1989,49 +1990,6 @@ void tcp_v4_destroy_sock(struct sock *sk)
 	sock_release_memcg(sk);
 }
 EXPORT_SYMBOL(tcp_v4_destroy_sock);
-
-/*
- * tcp_v4_nuke_addr - destroy all sockets on the given local address
- */
-void tcp_v4_nuke_addr(__u32 saddr)
-{
-	unsigned int bucket;
-
-	for (bucket = 0; bucket < tcp_hashinfo.ehash_mask; bucket++) {
-		struct hlist_nulls_node *node;
-		struct sock *sk;
-		spinlock_t *lock = inet_ehash_lockp(&tcp_hashinfo, bucket);
-
-restart:
-		spin_lock_bh(lock);
-		sk_nulls_for_each(sk, node, &tcp_hashinfo.ehash[bucket].chain) {
-			struct inet_sock *inet = inet_sk(sk);
-
-			if (inet->inet_rcv_saddr != saddr)
-				continue;
-			if (sysctl_ip_dynaddr && sk->sk_state == TCP_SYN_SENT)
-				continue;
-			if (sock_flag(sk, SOCK_DEAD))
-				continue;
-
-			sock_hold(sk);
-			spin_unlock_bh(lock);
-
-			local_bh_disable();
-			bh_lock_sock(sk);
-			sk->sk_err = ETIMEDOUT;
-			sk->sk_error_report(sk);
-
-			tcp_done(sk);
-			bh_unlock_sock(sk);
-			local_bh_enable();
-			sock_put(sk);
-
-			goto restart;
-		}
-		spin_unlock_bh(lock);
-	}
-}
 
 #ifdef CONFIG_PROC_FS
 /* Proc filesystem TCP sock list dumping. */

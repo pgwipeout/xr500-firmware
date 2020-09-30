@@ -6,15 +6,15 @@
  *	Ville Nuorvala		<vnuorval@tcs.hut.fi>
  *	Yasuyuki Kozakai	<kozakai@linux-ipv6.org>
  *
- *	Based on:
- *	linux/net/ipv6/sit.c and linux/net/ipv4/ipip.c
+ *      Based on:
+ *      linux/net/ipv6/sit.c and linux/net/ipv4/ipip.c
  *
- *	RFC 2473
+ *      RFC 2473
  *
  *	This program is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU General Public License
- *	as published by the Free Software Foundation; either version
- *	2 of the License, or (at your option) any later version.
+ *      modify it under the terms of the GNU General Public License
+ *      as published by the Free Software Foundation; either version
+ *      2 of the License, or (at your option) any later version.
  *
  */
 
@@ -57,7 +57,6 @@
 MODULE_AUTHOR("Ville Nuorvala");
 MODULE_DESCRIPTION("IPv6 tunneling device");
 MODULE_LICENSE("GPL");
-MODULE_ALIAS_RTNL_LINK("ip6tnl");
 MODULE_ALIAS_NETDEV("ip6tnl0");
 
 #ifdef IP6_TNL_DEBUG
@@ -115,20 +114,6 @@ static struct net_device_stats *ip6_get_stats(struct net_device *dev)
 	dev->stats.tx_bytes   = sum.tx_bytes;
 	return &dev->stats;
 }
-/*
- *  Update offload stats
- */
-void ip6_update_offload_stats(struct net_device *dev, void *ptr)
-{
-	struct pcpu_tstats *tstats = per_cpu_ptr(dev->tstats, 0);
-	struct pcpu_tstats *offload_stats = (struct pcpu_tstats *)ptr;
-
-	tstats->tx_packets += offload_stats->tx_packets;
-	tstats->tx_bytes   += offload_stats->tx_bytes;
-	tstats->rx_packets += offload_stats->rx_packets;
-	tstats->rx_bytes   += offload_stats->rx_bytes;
-}
-EXPORT_SYMBOL(ip6_update_offload_stats);
 
 /*
  * Locking : hash tables are protected by RCU and RTNL
@@ -782,11 +767,6 @@ static int ip6_tnl_rcv(struct sk_buff *skb, __u16 protocol,
 
 		dscp_ecn_decapsulate(t, ipv6h, skb);
 
-		/**
-		 * Reset the skb_iif to Tunnels interface index
-		 * for Conntrack Module to trace tunnel connection
-		 */
-		skb->skb_iif = t->dev->ifindex;
 		netif_rx(skb);
 
 		rcu_read_unlock();
@@ -1003,12 +983,6 @@ static int ip6_tnl_xmit2(struct sk_buff *skb,
 	ipv6h->daddr = fl6->daddr;
 	nf_reset(skb);
 	pkt_len = skb->len;
-
-	/**
-	 * Reset the skb_iif to Tunnels interface index
-	 * for Conntrack Module to trace tunnel connection
-	 */
-	skb->skb_iif = dev->ifindex;
 	err = ip6_local_out(skb);
 
 	if (net_xmit_eval(err) == 0) {

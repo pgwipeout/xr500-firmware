@@ -18,7 +18,6 @@
 
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter/xt_DSCP.h>
-#include <net/netfilter/nf_conntrack_dscpremark_ext.h>
 
 MODULE_AUTHOR("Harald Welte <laforge@netfilter.org>");
 MODULE_DESCRIPTION("Xtables: DSCP/TOS field modification");
@@ -33,8 +32,6 @@ dscp_tg(struct sk_buff *skb, const struct xt_action_param *par)
 {
 	const struct xt_DSCP_info *dinfo = par->targinfo;
 	u_int8_t dscp = ipv4_get_dsfield(ip_hdr(skb)) >> XT_DSCP_SHIFT;
-	struct nf_conn *ct;
-	enum ip_conntrack_info ctinfo;
 
 	if (dscp != dinfo->dscp) {
 		if (!skb_make_writable(skb, sizeof(struct iphdr)))
@@ -43,11 +40,6 @@ dscp_tg(struct sk_buff *skb, const struct xt_action_param *par)
 		ipv4_change_dsfield(ip_hdr(skb), (__u8)(~XT_DSCP_MASK),
 				    dinfo->dscp << XT_DSCP_SHIFT);
 
-		ct = nf_ct_get(skb, &ctinfo);
-		if (!ct) {
-			return XT_CONTINUE;
-		}
-		nf_conntrack_dscpremark_ext_set_dscp_rule_valid(ct);
 	}
 	return XT_CONTINUE;
 }
@@ -57,8 +49,6 @@ dscp_tg6(struct sk_buff *skb, const struct xt_action_param *par)
 {
 	const struct xt_DSCP_info *dinfo = par->targinfo;
 	u_int8_t dscp = ipv6_get_dsfield(ipv6_hdr(skb)) >> XT_DSCP_SHIFT;
-	struct nf_conn *ct;
-	enum ip_conntrack_info ctinfo;
 
 	if (dscp != dinfo->dscp) {
 		if (!skb_make_writable(skb, sizeof(struct ipv6hdr)))
@@ -66,12 +56,6 @@ dscp_tg6(struct sk_buff *skb, const struct xt_action_param *par)
 
 		ipv6_change_dsfield(ipv6_hdr(skb), (__u8)(~XT_DSCP_MASK),
 				    dinfo->dscp << XT_DSCP_SHIFT);
-
-		ct = nf_ct_get(skb, &ctinfo);
-		if (!ct) {
-			return XT_CONTINUE;
-		}
-		nf_conntrack_dscpremark_ext_set_dscp_rule_valid(ct);
 	}
 	return XT_CONTINUE;
 }

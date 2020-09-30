@@ -12,7 +12,7 @@ WEB_PATH:=www
 
 include $(INCLUDE_DIR)/package.mk
 
-PKG_GIT_TREEISH:=net-cgi-dni239
+PKG_GIT_TREEISH:=game-router-gui-dni037
 
 define Package/net-cgi
   SECTION:=utils

@@ -146,6 +146,7 @@ static void del_nbp(struct net_bridge_port *p)
 	dev->priv_flags &= ~IFF_BRIDGE_PORT;
 
 	netdev_rx_handler_unregister(dev);
+	synchronize_net();
 
 	netdev_set_master(dev, NULL);
 
@@ -168,12 +169,6 @@ void br_dev_delete(struct net_device *dev, struct list_head *head)
 	list_for_each_entry_safe(p, n, &br->port_list, list) {
 		del_nbp(p);
 	}
-
-#ifdef CONFIG_BRIDGE_NETGEAR_ACL
-       br_acl_cleanup(br);
-#endif
-	
-	br_fdb_delete_by_port(br, NULL, 1);
 
 	del_timer_sync(&br->gc_timer);
 
@@ -245,7 +240,6 @@ int br_add_bridge(struct net *net, const char *name)
 		return -ENOMEM;
 
 	dev_net_set(dev, net);
-	dev->rtnl_link_ops = &br_link_ops;
 
 	res = register_netdev(dev);
 	if (res)
@@ -404,7 +398,6 @@ int br_add_if(struct net_bridge *br, struct net_device *dev)
 		netdev_err(dev, "failed insert local address bridge forwarding table\n");
 
 	kobject_uevent(&p->kobj, KOBJ_ADD);
-	call_netdevice_notifiers(NETDEV_BR_JOIN, dev);
 
 	return 0;
 
@@ -433,7 +426,6 @@ int br_del_if(struct net_bridge *br, struct net_device *dev)
 	if (!p || p->br != br)
 		return -EINVAL;
 
-	call_netdevice_notifiers(NETDEV_BR_LEAVE, dev);
 	del_nbp(p);
 
 	spin_lock_bh(&br->lock);
@@ -462,63 +454,3 @@ void __net_exit br_net_exit(struct net *net)
 	rtnl_unlock();
 
 }
-
-/*
- * br_port_dev_get()
- *	Using the given addr, identify the port to which it is reachable,
- *	returing a reference to the net device associated with that port.
- *
- * NOTE: Return NULL if given dev is not a bridge or the mac has no associated port
- */
-struct net_device *br_port_dev_get(struct net_device *dev, unsigned char *addr)
-{
-	struct net_bridge_fdb_entry *fdbe;
-	struct net_bridge *br;
-	struct net_device *netdev = NULL;
-
-	/*
-	 * Is this a bridge?
-	 */
-	if (!(dev->priv_flags & IFF_EBRIDGE)) 
-		return NULL;
-
-	br = netdev_priv(dev);
-
-	/*
-	 * Lookup the fdb entry and get reference to the port dev
-	 */
-	rcu_read_lock();
-	fdbe = __br_fdb_get(br, addr);
-	if (fdbe && fdbe->dst) {
-		netdev = fdbe->dst->dev; /* port device */
-		dev_hold(netdev);
-	}
-	rcu_read_unlock();
-
-	return netdev;
-}
-EXPORT_SYMBOL_GPL(br_port_dev_get);
-
-/* Update bridge statistics for bridge packets processed by offload engines */
-void br_dev_update_stats(struct net_device *dev, struct rtnl_link_stats64 *nlstats)
-{
-	struct net_bridge *br;
-	struct br_cpu_netstats *stats;
-
-	/*
-	 * Is this a bridge?
-	 */
-	if (!(dev->priv_flags & IFF_EBRIDGE))
-		return;
-
-	br = netdev_priv(dev);
-	stats = per_cpu_ptr(br->stats, 0);
-
-	u64_stats_update_begin(&stats->syncp);
-	stats->rx_packets += nlstats->rx_packets;
-	stats->rx_bytes += nlstats->rx_bytes;
-	stats->tx_packets += nlstats->tx_packets;
-	stats->tx_bytes += nlstats->tx_bytes;
-	u64_stats_update_end(&stats->syncp);
-}
-EXPORT_SYMBOL_GPL(br_dev_update_stats);

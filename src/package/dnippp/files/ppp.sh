@@ -188,6 +188,10 @@ if [ "x\$ipv6_wantype" = "x6to4" ]; then
 	killall net6conf
 	/etc/net6conf/net6conf stop
 fi
+
+echo 1 > /sys/kernel/debug/ecm/ecm_db/defunct_all
+echo "[DB] scripts is done" > /dev/console
+
 EOF
 }
 

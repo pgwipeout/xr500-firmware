@@ -29,7 +29,6 @@
 #include <linux/wait.h>
 #include <linux/blockgroup_lock.h>
 #include <linux/percpu_counter.h>
-#include <linux/ratelimit.h>
 #ifdef __KERNEL__
 #include <linux/compat.h>
 #endif
@@ -317,9 +316,9 @@ struct ext4_group_desc
  */
 
 struct flex_groups {
-	atomic64_t	free_clusters;
-	atomic_t	free_inodes;
-	atomic_t	used_dirs;
+	atomic_t free_inodes;
+	atomic_t free_clusters;
+	atomic_t used_dirs;
 };
 
 #define EXT4_BG_INODE_UNINIT	0x0001 /* Inode table/bitmap not in use */
@@ -752,8 +751,6 @@ do {									       \
 	if (EXT4_FITS_IN_INODE(raw_inode, einode, xtime))		       \
 		(einode)->xtime.tv_sec = 				       \
 			(signed)le32_to_cpu((raw_inode)->xtime);	       \
-	else								       \
-		(einode)->xtime.tv_sec = 0;				       \
 	if (EXT4_FITS_IN_INODE(raw_inode, einode, xtime ## _extra))	       \
 		ext4_decode_extra_time(&(einode)->xtime,		       \
 				       raw_inode->xtime ## _extra);	       \
@@ -1143,7 +1140,8 @@ struct ext4_sb_info {
 	unsigned long s_desc_per_block;	/* Number of group descriptors per block */
 	ext4_group_t s_groups_count;	/* Number of groups in the fs */
 	ext4_group_t s_blockfile_groups;/* Groups acceptable for non-extent files */
-	unsigned long s_overhead;  /* # of fs overhead clusters */
+	unsigned long s_overhead_last;  /* Last calculated overhead */
+	unsigned long s_blocks_last;    /* Last seen block count */
 	unsigned int s_cluster_ratio;	/* Number of blocks per cluster */
 	unsigned int s_cluster_bits;	/* log2 of s_cluster_ratio */
 	loff_t s_bitmap_maxbytes;	/* max bytes for bitmap files */
@@ -1268,11 +1266,6 @@ struct ext4_sb_info {
 
 	/* record the last minlen when FITRIM is called. */
 	atomic_t s_last_trim_minblks;
-
-	/* Ratelimit ext4 messages. */
-	struct ratelimit_state s_err_ratelimit_state;
-	struct ratelimit_state s_warning_ratelimit_state;
-	struct ratelimit_state s_msg_ratelimit_state;
 };
 
 static inline struct ext4_sb_info *EXT4_SB(struct super_block *sb)
@@ -1790,7 +1783,7 @@ struct mmpd_data {
 # define NORET_AND	noreturn,
 
 /* bitmap.c */
-extern unsigned int ext4_count_free(char *bitmap, unsigned numchars);
+extern unsigned int ext4_count_free(struct buffer_head *, unsigned);
 
 /* balloc.c */
 extern unsigned int ext4_block_group(struct super_block *sb,
@@ -1957,7 +1950,6 @@ extern int ext4_group_extend(struct super_block *sb,
 extern int ext4_resize_fs(struct super_block *sb, ext4_fsblk_t n_blocks_count);
 
 /* super.c */
-extern int ext4_calculate_overhead(struct super_block *sb);
 extern void *ext4_kvmalloc(size_t size, gfp_t flags);
 extern void *ext4_kvzalloc(size_t size, gfp_t flags);
 extern void ext4_kvfree(void *ptr);

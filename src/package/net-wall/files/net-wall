@@ -1,0 +1,7 @@
+#!/bin/sh
+
+lfile="/var/run/nd-net-wall.lock"
+
+lock "$lfile"
+/usr/sbin/net-wall-nolock "$@"
+lock -u "$lfile"

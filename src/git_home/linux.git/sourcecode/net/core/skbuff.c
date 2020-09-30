@@ -45,8 +45,6 @@
 #include <linux/in.h>
 #include <linux/inet.h>
 #include <linux/slab.h>
-#include <linux/tcp.h>
-#include <linux/udp.h>
 #include <linux/netdevice.h>
 #ifdef CONFIG_NET_CLS_ACT
 #include <net/pkt_sched.h>
@@ -60,7 +58,6 @@
 #include <linux/scatterlist.h>
 #include <linux/errqueue.h>
 #include <linux/prefetch.h>
-#include <linux/if.h>
 
 #include <net/protocol.h>
 #include <net/dst.h>
@@ -72,23 +69,9 @@
 #include <trace/events/skb.h>
 
 #include "kmap_skb.h"
-#include "skbuff_recycle.h"
-
-/*
-* Avoid DDoS via Wi-Fi ARP-scan. QCA-Wifi closed source lkm uses skb_copy for
-* any packets that *must* be sent to OS.	-@NETDUMA_Iain
-*/
-#define LIMIT_SKBHEAD		1
-#define LIMIT_SKBHEAD_COPY_ARP	30000	/* copy ARP packet fails if packets exceed this */
-
 
 static struct kmem_cache *skbuff_head_cache __read_mostly;
 static struct kmem_cache *skbuff_fclone_cache __read_mostly;
-
-#ifdef LIMIT_SKBHEAD
-static atomic_t skbuff_head_count = ATOMIC_INIT(0);
-#endif
-
 
 static void sock_pipe_buf_release(struct pipe_inode_info *pipe,
 				  struct pipe_buffer *buf)
@@ -210,12 +193,6 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
 	data = kmalloc_node_track_caller(size, gfp_mask, node);
 	if (!data)
 		goto nodata;
-
-#ifdef LIMIT_SKBHEAD
-	if( !fclone )
-		atomic_inc(&skbuff_head_count);
-#endif
-
 	/* kmalloc(size) might give us more room than requested.
 	 * Put skb_shared_info exactly at the end of allocated zone,
 	 * to allow max possible filling before reallocation.
@@ -292,10 +269,6 @@ struct sk_buff *build_skb(void *data)
 	if (!skb)
 		return NULL;
 
-#ifdef LIMIT_SKBHEAD
-	atomic_inc(&skbuff_head_count);
-#endif
-
 	size = ksize(data) - SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
 
 	memset(skb, 0, offsetof(struct sk_buff, tail));
@@ -335,44 +308,16 @@ EXPORT_SYMBOL(build_skb);
 struct sk_buff *__netdev_alloc_skb(struct net_device *dev,
 		unsigned int length, gfp_t gfp_mask)
 {
-	unsigned int len;
 	struct sk_buff *skb;
 
-	skb = skb_recycler_alloc(dev, length);
-
+	skb = __alloc_skb(length + NET_SKB_PAD, gfp_mask, 0, NUMA_NO_NODE);
 	if (likely(skb)) {
-		return skb;
+		skb_reserve(skb, NET_SKB_PAD);
+		skb->dev = dev;
 	}
-
-	len = SKB_RECYCLE_SIZE;
-	if (unlikely(length > SKB_RECYCLE_SIZE))
-		len = length;
-
-	skb = __alloc_skb(len + NET_SKB_PAD, gfp_mask, 0, NUMA_NO_NODE);
-	if (unlikely(skb == NULL))
-		return NULL;
-
-	skb_reserve(skb, NET_SKB_PAD);
-	skb->dev = dev;
 	return skb;
 }
 EXPORT_SYMBOL(__netdev_alloc_skb);
-
-struct sk_buff *__netdev_alloc_skb_ip_align(struct net_device *dev,
-		unsigned int length, gfp_t gfp)
-{
-	struct sk_buff *skb = __netdev_alloc_skb(dev, length + NET_IP_ALIGN, gfp);
-
-#ifdef CONFIG_ETHERNET_PACKET_MANGLE
-	if (dev->priv_flags & IFF_NO_IP_ALIGN)
-		return skb;
-#endif
-
-	if (NET_IP_ALIGN && skb)
-		skb_reserve(skb, NET_IP_ALIGN);
-	return skb;
-}
-EXPORT_SYMBOL(__netdev_alloc_skb_ip_align);
 
 void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, int off,
 		     int size, unsigned int truesize)
@@ -398,23 +343,11 @@ EXPORT_SYMBOL(skb_add_rx_frag);
  */
 struct sk_buff *dev_alloc_skb(unsigned int length)
 {
-	unsigned int len;
-
-	struct sk_buff *skb = skb_recycler_alloc(NULL, length);
-
-	if (likely(skb)) {
-		return skb;
-	}
-
-	len = SKB_RECYCLE_SIZE;
-	if (unlikely(length > SKB_RECYCLE_SIZE))
-		len = length;
-
 	/*
 	 * There is more code here than it seems:
 	 * __dev_alloc_skb is an inline
 	 */
-	return __dev_alloc_skb(len, GFP_ATOMIC);
+	return __dev_alloc_skb(length, GFP_ATOMIC);
 }
 EXPORT_SYMBOL(dev_alloc_skb);
 
@@ -444,7 +377,7 @@ static void skb_clone_fraglist(struct sk_buff *skb)
 		skb_get(list);
 }
 
-void skb_release_data(struct sk_buff *skb)
+static void skb_release_data(struct sk_buff *skb)
 {
 	if (!skb->cloned ||
 	    !atomic_sub_return(skb->nohdr ? (1 << SKB_DATAREF_SHIFT) + 1 : 1,
@@ -477,7 +410,7 @@ void skb_release_data(struct sk_buff *skb)
 /*
  *	Free an skbuff by memory without cleaning the state.
  */
-void kfree_skbmem(struct sk_buff *skb)
+static void kfree_skbmem(struct sk_buff *skb)
 {
 	struct sk_buff *other;
 	atomic_t *fclone_ref;
@@ -485,9 +418,6 @@ void kfree_skbmem(struct sk_buff *skb)
 	switch (skb->fclone) {
 	case SKB_FCLONE_UNAVAILABLE:
 		kmem_cache_free(skbuff_head_cache, skb);
-#ifdef LIMIT_SKBHEAD
-		atomic_dec(&skbuff_head_count);
-#endif
 		break;
 
 	case SKB_FCLONE_ORIG:
@@ -594,40 +524,12 @@ void consume_skb(struct sk_buff *skb)
 {
 	if (unlikely(!skb))
 		return;
-
-	prefetch(&skb->destructor);
-
 	if (likely(atomic_read(&skb->users) == 1))
 		smp_rmb();
 	else if (likely(!atomic_dec_and_test(&skb->users)))
 		return;
-
-	/*
-	 * If possible we'd like to recycle any skb rather than just free it,
-	 * but in order to do that we need to release any head state too.
-	 * We don't want to do this later because we'll be in a pre-emption
-	 * disabled state.
-	 */
-	skb_release_head_state(skb);
-
-	/*
-	 * Can we recycle this skb?  If we can then it will be much faster
-	 * for us to recycle this one later than to allocate a new one
-	 * from scratch.
-	 */
-	if (likely(skb_recycler_consume(skb))) {
-		return;
-	}
-
 	trace_consume_skb(skb);
-
-	/*
-	 * We're not recycling so now we need to do the rest of what we would
-	 * have done in __kfree_skb (above and beyond the skb_release_head_state
-	 * that we already did.
-	 */
-	skb_release_data(skb);
-	kfree_skbmem(skb);
+	__kfree_skb(skb);
 }
 EXPORT_SYMBOL(consume_skb);
 
@@ -829,7 +731,7 @@ int skb_copy_ubufs(struct sk_buff *skb, gfp_t gfp_mask)
 	skb_shinfo(skb)->tx_flags &= ~SKBTX_DEV_ZEROCOPY;
 	return 0;
 }
-EXPORT_SYMBOL_GPL(skb_copy_ubufs);
+
 
 /**
  *	skb_clone	-	duplicate an sk_buff
@@ -864,9 +766,7 @@ struct sk_buff *skb_clone(struct sk_buff *skb, gfp_t gfp_mask)
 		n = kmem_cache_alloc(skbuff_head_cache, gfp_mask);
 		if (!n)
 			return NULL;
-#ifdef LIMIT_SKBHEAD
-		atomic_inc(&skbuff_head_count);
-#endif
+
 		kmemcheck_annotate_bitfield(n, flags1);
 		kmemcheck_annotate_bitfield(n, flags2);
 		n->fclone = SKB_FCLONE_UNAVAILABLE;
@@ -918,22 +818,12 @@ static void copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
 
 struct sk_buff *skb_copy(const struct sk_buff *skb, gfp_t gfp_mask)
 {
-#ifdef LIMIT_SKBHEAD
-	if( atomic_read( &skbuff_head_count ) > LIMIT_SKBHEAD_COPY_ARP &&
-		ntohs( skb->protocol ) == ETH_P_ARP ){
-		if( printk_ratelimit() )
-			printk( KERN_INFO "ARP-scan detected\n" );
-		return NULL;
-	}
-#endif
-
 	int headerlen = skb_headroom(skb);
-	unsigned int size = skb_end_offset(skb) + skb->data_len;
+	unsigned int size = (skb_end_pointer(skb) - skb->head) + skb->data_len;
 	struct sk_buff *n = alloc_skb(size, gfp_mask);
 
-	if (!n){
+	if (!n)
 		return NULL;
-	}
 
 	/* Set the data pointer */
 	skb_reserve(n, headerlen);
@@ -1030,7 +920,7 @@ int pskb_expand_head(struct sk_buff *skb, int nhead, int ntail,
 {
 	int i;
 	u8 *data;
-	int size = nhead + skb_end_offset(skb) + ntail;
+	int size = nhead + (skb_end_pointer(skb) - skb->head) + ntail;
 	long off;
 	bool fastpath;
 
@@ -1822,7 +1712,6 @@ int skb_splice_bits(struct sk_buff *skb, unsigned int offset,
 	struct splice_pipe_desc spd = {
 		.pages = pages,
 		.partial = partial,
-		.nr_pages_max = MAX_SKB_FRAGS,
 		.flags = flags,
 		.ops = &sock_pipe_buf_ops,
 		.spd_release = sock_spd_release,
@@ -1869,7 +1758,7 @@ done:
 		lock_sock(sk);
 	}
 
-	splice_shrink_spd(&spd);
+	splice_shrink_spd(pipe, &spd);
 	return ret;
 }
 
@@ -2829,13 +2718,14 @@ struct sk_buff *skb_segment(struct sk_buff *skb, netdev_features_t features)
 			if (unlikely(!nskb))
 				goto err;
 
-			hsize = skb_end_offset(nskb);
+			hsize = skb_end_pointer(nskb) - nskb->head;
 			if (skb_cow_head(nskb, doffset + headroom)) {
 				kfree_skb(nskb);
 				goto err;
 			}
 
-			nskb->truesize += skb_end_offset(nskb) - hsize;
+			nskb->truesize += skb_end_pointer(nskb) - nskb->head -
+					  hsize;
 			skb_release_head_state(nskb);
 			__skb_push(nskb, doffset);
 		} else {
@@ -2856,6 +2746,7 @@ struct sk_buff *skb_segment(struct sk_buff *skb, netdev_features_t features)
 		tail = nskb;
 
 		__copy_skb_header(nskb, skb);
+		nskb->mac_len = skb->mac_len;
 
 		/* nskb and skb might have different headroom */
 		if (nskb->ip_summed == CHECKSUM_PARTIAL)
@@ -2865,7 +2756,6 @@ struct sk_buff *skb_segment(struct sk_buff *skb, netdev_features_t features)
 		skb_set_network_header(nskb, skb->mac_len);
 		nskb->transport_header = (nskb->network_header +
 					  skb_network_header_len(skb));
-		skb_reset_mac_len(nskb);
 		skb_copy_from_linear_data(skb, nskb->data, doffset);
 
 		if (fskb != skb_shinfo(skb)->frag_list)
@@ -2885,9 +2775,6 @@ struct sk_buff *skb_segment(struct sk_buff *skb, netdev_features_t features)
 						 skb_put(nskb, hsize), hsize);
 
 		while (pos < offset + len && i < nfrags) {
-			if (unlikely(skb_orphan_frags(skb, GFP_ATOMIC)))
-				goto err;
-
 			*frag = skb_shinfo(skb)->frags[i];
 			__skb_frag_ref(frag);
 			size = skb_frag_size(frag);
@@ -3061,7 +2948,6 @@ EXPORT_SYMBOL_GPL(skb_gro_receive);
 
 void __init skb_init(void)
 {
-
 	skbuff_head_cache = kmem_cache_create("skbuff_head_cache",
 					      sizeof(struct sk_buff),
 					      0,
@@ -3073,7 +2959,6 @@ void __init skb_init(void)
 						0,
 						SLAB_HWCACHE_ALIGN|SLAB_PANIC,
 						NULL);
-	skb_recycler_init();
 }
 
 /**
@@ -3395,28 +3280,3 @@ void __skb_warn_lro_forwarding(const struct sk_buff *skb)
 			   " while LRO is enabled\n", skb->dev->name);
 }
 EXPORT_SYMBOL(__skb_warn_lro_forwarding);
-
-/**
- * skb_gso_transport_seglen - Return length of individual segments of a gso packet
- *
- * @skb: GSO skb
- *
- * skb_gso_transport_seglen is used to determine the real size of the
- * individual segments, including Layer4 headers (TCP/UDP).
- *
- * The MAC/L2 or network (IP, IPv6) headers are not accounted for.
- */
-unsigned int skb_gso_transport_seglen(const struct sk_buff *skb)
-{
-	const struct skb_shared_info *shinfo = skb_shinfo(skb);
-
-	if (likely(shinfo->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)))
-		return tcp_hdrlen(skb) + shinfo->gso_size;
-
-	/* UFO sets gso_size to the size of the fragmentation
-	 * payload, i.e. the size of the L4 (UDP) header is already
-	 * accounted for.
-	 */
-	return shinfo->gso_size;
-}
-EXPORT_SYMBOL_GPL(skb_gso_transport_seglen);

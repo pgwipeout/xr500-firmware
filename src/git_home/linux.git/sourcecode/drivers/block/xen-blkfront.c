@@ -850,8 +850,9 @@ static int setup_blkring(struct xenbus_device *dev,
 	if (err)
 		goto fail;
 
-	err = bind_evtchn_to_irqhandler(info->evtchn, blkif_interrupt, 0,
-					"blkif", info);
+	err = bind_evtchn_to_irqhandler(info->evtchn,
+					blkif_interrupt,
+					IRQF_SAMPLE_RANDOM, "blkif", info);
 	if (err <= 0) {
 		xenbus_dev_fatal(dev, err,
 				 "bind_evtchn_to_irqhandler failed");
@@ -1302,16 +1303,13 @@ static void blkback_changed(struct xenbus_device *dev,
 	case XenbusStateReconfiguring:
 	case XenbusStateReconfigured:
 	case XenbusStateUnknown:
+	case XenbusStateClosed:
 		break;
 
 	case XenbusStateConnected:
 		blkfront_connect(info);
 		break;
 
-	case XenbusStateClosed:
-		if (dev->state == XenbusStateClosed)
-			break;
-		/* Missed the backend's Closing state -- fallthrough */
 	case XenbusStateClosing:
 		blkfront_closing(info);
 		break;
