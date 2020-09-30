@@ -28,6 +28,7 @@ appsystem_location=http://updates1.netgear.com/${12}/ww/${12}.ddf
 appsystem_os=Linux/3.4
 appsystem_product=${12}
 non_igd=${13:-0}
+serial_number=${14}
 EOF
 }
 
@@ -61,7 +62,7 @@ upnp_start() {
 	print_upnp_conf "$wan_ifname" "$listenip" "$($config get upnp_AdverTime)" "$($config get upnp_TimeToLive)" "$name" \
 		"$($config get miniupnp_modelname)" "$($config get miniupnp_modelnumber)" "$($config get miniupnp_modelurl)" \
 		"$($config get miniupnp_pnpx_hwid)" "$($config get miniupnp_devupc)" "$($config get lan_netmask)" \
-		"$(awk '{print tolower($0)}' /module_name)" "$non_igd" > $MINIUPNPD_CONF
+		"$(awk '{print tolower($0)}' /module_name)" "$non_igd" "$(artmtd -r sn | head -1 | awk -F":" '{print $2}')" > $MINIUPNPD_CONF
 
 	# wait a moment ...
 	sleep 2

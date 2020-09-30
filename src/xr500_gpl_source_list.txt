@@ -4,7 +4,7 @@ XR500
 
 2) List the version number of the firmware/software that correlates with the open source code archive.
 
-XR500-V2.3.2.18
+XR500-V2.3.2.22
 
 7) List the main HW platform utilized such as CPU, main chipset, RF chipset, DSP, Switch IC¡­etc.
 
