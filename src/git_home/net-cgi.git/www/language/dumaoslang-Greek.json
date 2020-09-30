@@ -241,7 +241,7 @@
     "dumaosName@/dumaos/apps/system/com.netdumasoftware.systeminfo/frontend/desktop/system-information.html":"Όνομα DumaOS",
     "hpt100AlertTitle@/dumaos/apps/usr/com.netdumasoftware.qos/frontend/desktop/sliders.html":"Anti-Bufferbloat",
     "received@/dumaos/apps/system/com.netdumasoftware.systeminfo/frontend/desktop/network-status.html":"Ληφθέν",
-    "step3Content@/dumaos/apps/usr/com.netdumasoftware.geofilter/frontend/desktop/tour.html":"Κάντε κλικ στο εικονίδιο "Οικία" πάνω από το χάρτη του φίλτρου γεωγραφικής περιοχής.",
+    "step3Content@/dumaos/apps/usr/com.netdumasoftware.geofilter/frontend/desktop/tour.html":"Κάντε κλικ στο εικονίδιο 'Οικία' πάνω από το χάρτη του φίλτρου γεωγραφικής περιοχής.",
     "tcpAndUdp@/dumaos/apps/system/com.netdumasoftware.settings/frontend/desktop/lan.js":"TCP και UDP",
     "step15Content@/dumaos/apps/usr/com.netdumasoftware.qos/frontend/desktop/tour.html":"By default, Traffic Prioritization is designed to automatically place all major gaming traffic (e.g. PSN, Xbox Live, PC games) to the front of the queue.",
     "destinationPort@/www/custom-elements/duma-device-selector/duma-device-selector.html":"Θύρα προορισμού",
@@ -637,7 +637,7 @@
     "upload@/dumaos/apps/system/com.netdumasoftware.networkmonitor/frontend/desktop/snapshot-graph.js":"Αποστολή",
     "wirelessStatus@/dumaos/apps/system/com.netdumasoftware.systeminfo/frontend/desktop/wireless-status.html":"Κατάσταση ασύρματης σύνδεσης",
     "gotIt@/dumaos/apps/usr/com.netdumasoftware.geofilter/frontend/desktop/allow-deny.js":"Εντάξει",
-    "step7Content@/dumaos/apps/usr/com.netdumasoftware.geofilter/frontend/desktop/tour.html":"Όταν είναι ενεργοποιημένη η επιλογή "Αυτόματο ping κεντρικού υπολογιστή" (ρύθμιση από τις επιλογές χάρτη φίλτρου γεωγραφικής περιφέρειας), θα φορτώνεται αυτόματα ένα γράφημα ping όταν βρίσκεστε σε ένα παιχνίδι. Διαφορετικά, μπορείτε να κάνετε κλικ σε οποιοδήποτε εικονίδιο στο χάρτη, για να φορτώσετε ένα γράφημα ping για τη συγκεκριμένη σύνδεση.",
+    "step7Content@/dumaos/apps/usr/com.netdumasoftware.geofilter/frontend/desktop/tour.html":"Όταν είναι ενεργοποιημένη η επιλογή 'Αυτόματο ping κεντρικού υπολογιστή' (ρύθμιση από τις επιλογές χάρτη φίλτρου γεωγραφικής περιφέρειας), θα φορτώνεται αυτόματα ένα γράφημα ping όταν βρίσκεστε σε ένα παιχνίδι. Διαφορετικά, μπορείτε να κάνετε κλικ σε οποιοδήποτε εικονίδιο στο χάρτη, για να φορτώσετε ένα γράφημα ping για τη συγκεκριμένη σύνδεση.",
     "step1Content@/dumaos/apps/system/com.netdumasoftware.systeminfo/frontend/desktop/tour.html":"Στην ενότητα 'Πληροφορίες συστήματος' παρουσιάζονται πληροφορίες σχετικά με το δρομολογητή σας, όπως η χρήση της CPU και μια λίστα με τις εγκατεστημένες εφαρμογές δρομολογητή.",
     "autoHyperlaneSubtitle@/dumaos/apps/usr/com.netdumasoftware.qos/frontend/desktop/hyper-lane.html":"Καθορισμός προτεραιότητας κυκλοφορίας αυτόματα",
     "step1Content@/dumaos/apps/usr/com.netdumasoftware.qos/frontend/desktop/tour.html":"Όταν οι συσκευές στο σπίτι σας χρησιμοποιούν όλο το εύρος ζώνης, προκύπτει συμφόρηση και τοποθέτηση σε ουρά αναμονής. Αυτό προκαλεί καθυστέρηση σε παιχνίδια και άλλες εφαρμογές με μικρό λανθάνοντα χρόνο. Η ρύθμιση 'Ποιότητα υπηρεσίας' παρέχει το πλήρες σύνολο εργαλείων για την επίλυση αυτού του προβλήματος. Το πρώτο εργαλείο για ρύθμιση είναι το Anti-Bufferbloat, το οποίο εμποδίζει τις απαιτητικές συσκευές να φτάσουν στο μέγιστο όριο χρήσης του εύρους ζώνης.",
@@ -677,7 +677,7 @@
     "emptyMessage@/dumaos/apps/system/com.netdumasoftware.desktop/frontend/desktop/index.html":"Αυτή η σελίδα είναι κενή επειδή δεν έχετε καρφιτσώσει κανένα πλαίσιο στον εξατομικευμένο Πίνακα εργαλείων σας. Κάντε κλικ στο εικονίδιο καρφίτσας στην επάνω δεξιά γωνία των αγαπημένων πλαισίων σας, για να τα βλέπετε σε αυτήν την οθόνη.",
     "dhcpLeaseTimeLabel@/dumaos/apps/system/com.netdumasoftware.settings/frontend/desktop/lan.html":"Χρόνος εκμίσθωσης DHCP",
     "noUpdateAvailable@/www/desktop/index.js":"Δεν υπάρχει διαθέσιμη ενημέρωση",
-    "step8Content@/dumaos/apps/usr/com.netdumasoftware.geofilter/frontend/desktop/tour.html":"Αν θέλετε να καταχωρίσετε μια σύνδεση στη λευκή ή στη μαύρη λίστα, κάντε κλικ στο εικονίδιό της στο χάρτη του φίλτρου γεωγραφικής περιφέρειας και ενεργοποιήστε την επιλογή "Να επιτρέπεται" ή "Να απαγορεύεται" στο πλαίσιο Ping.",
+    "step8Content@/dumaos/apps/usr/com.netdumasoftware.geofilter/frontend/desktop/tour.html":"Αν θέλετε να καταχωρίσετε μια σύνδεση στη λευκή ή στη μαύρη λίστα, κάντε κλικ στο εικονίδιό της στο χάρτη του φίλτρου γεωγραφικής περιφέρειας και ενεργοποιήστε την επιλογή 'Να επιτρέπεται' ή 'Να απαγορεύεται' στο πλαίσιο Ping.",
     "updateFirmwareTitle@/www/desktop/index.html":"Ενημέρωση υλικολογισμικού",
     "header@/dumaos/apps/system/com.netdumasoftware.systeminfo/frontend/desktop/flash-usage.html":"Χρήση flash"
 }

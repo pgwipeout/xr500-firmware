@@ -191,7 +191,7 @@ $bluebar
 </TR>
 <TR id=ssid_bc_bgn>
 	<TD nowrap>
-	<input type="checkbox" name="ssid_bc" id="enable_ssid_bc" value="1"><label for="enable_ssid_bc">$adva_wlan_ssid_broadcast</label>
+	<input type="checkbox" name="ssid_bc" id="enable_ssid_bc" value="1" onclick="sync_broadcast();"><label for="enable_ssid_bc">$adva_wlan_ssid_broadcast</label>
 	</TD>
 </TR>
 <TR id="coexistence_line">
@@ -1066,7 +1066,7 @@ function loadvalue()
 			form.textWpaeRadiusPort_an.value = get_radiusPort_a;
 		}		
 	}
-	if( mode == '1' && bgn_mode1_value == 54 )
+	if( mode == '1' && bgn_mode1_value == 54 && get_smart_connect == "0")
 		document.getElementById("wep_54").style.display="";
 	else
 		document.getElementById("wep_54").style.display="none";

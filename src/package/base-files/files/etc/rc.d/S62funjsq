@@ -1,0 +1,10 @@
+#!/bin/sh /etc/rc.common
+
+
+START=62
+
+boot() { 
+	/data/funjsq/bin/funjsq.sh init
+
+	/data/funjsq/bin/FYdaemon
+}

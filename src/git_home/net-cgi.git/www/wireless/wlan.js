@@ -274,7 +274,7 @@ function setSecurity_an(num)
 function wl_sectype_change()
 {
         var form=document.forms[0];
-        if(form.opmode.options[0].selected == true && bgn_mode1_value == 54)
+        if(form.opmode.options[0].selected == true && bgn_mode1_value == 54 && form.enable_smart_connect.checked == false)
 	{
                 document.getElementById("wep_54").style.display="";
 	}
@@ -2092,6 +2092,14 @@ function check_smart_ssid(){
                 if(cf.ssid.value==cf.ssid_an.value)
                         cf.ssid_an.value +="-5G";
         }
+        if(cf.opmode.options[0].selected == true && bgn_mode1_value == 54 && cf.enable_smart_connect.checked == false)
+	{
+                document.getElementById("wep_54").style.display="";
+	}
+        else
+	{
+                document.getElementById("wep_54").style.display="none";
+	}
 
 }
 
@@ -2187,4 +2195,12 @@ function simulate_behavior(target) {
 		target.onclick();
 	if(typeof target.onkeypress == "function")
 		target.onkeypress();
+}
+
+function sync_broadcast(){
+	var cf = document.forms[0];
+	if(cf.enable_smart_connect.checked) {
+		var flag = !!cf.ssid_bc.checked;
+		cf.ssid_bc_an.checked = flag;
+	}
 }

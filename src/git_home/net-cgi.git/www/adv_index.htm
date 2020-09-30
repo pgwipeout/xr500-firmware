@@ -99,7 +99,6 @@ var basic_dynamic_page="<% cfg_get("basic_dynamic_page") %>"
 var enable_mapt="<% cfg_get("mapt_enable") %>";
 var master = "<% cfg_get("http_loginname") %>";
 
-<% show_devices() %>
 
 var lang_select = "<% cfg_get("Language_Selection") %>";
 var browser_lang = "<% get_browser_language() %>";
@@ -151,6 +150,8 @@ function loadvalue()
 		goto_formframe("BAS_basic.htm");
 		menu_color_change('internet');
 	}
+	if(netgear_region=="PR")
+		document.getElementById("vpn_client").style.display="none";
 }
 
 </script>

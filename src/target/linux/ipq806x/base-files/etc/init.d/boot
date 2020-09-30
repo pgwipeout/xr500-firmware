@@ -252,6 +252,7 @@ start() {
 
 	# Wireless security pre-set
 	id_dft="$(/bin/config get default_ssphrase)"
+	en_smart="$(/bin/config get enable_smart_connect)"
 	if [ "$id_dft" = "1" ]; then
 		/sbin/artmtd -r ssid
 		/sbin/artmtd -r passphrase
@@ -261,7 +262,9 @@ start() {
 			ps_set=$(awk '{print $1}' /tmp/passphrase-setted)
 
 			/bin/config set wl_ssid="$id_set"
-			/bin/config set wla_ssid="$id_set-5G"
+			if [ "$en_smart" = "0" ]; then
+				/bin/config set wla_ssid="$id_set-5G"
+			fi
 			/bin/config set wl_wpa2_psk="$ps_set"
 			/bin/config set wla_wpa2_psk="$ps_set"
 			/bin/config set wl_sectype="4"

@@ -1,0 +1,36 @@
+#create myip hash:ip family inet hashsize 1024 maxelem 65536
+-N myip iphash --hashsize 1024 --probes 4 --resize 50
+-A myip 104.120.116.128
+-A myip 23.206.82.113
+-A myip 104.115.95.213
+-A myip 172.230.178.219
+-A myip 104.72.100.154
+-A myip 184.31.43.195
+-A myip 23.218.33.134
+-A myip 104.95.215.95
+-A myip 23.53.192.207
+-A myip 104.90.5.164
+-A myip 184.84.55.193
+-A myip 23.67.2.177
+-A myip 23.42.236.49
+-A myip 23.213.21.245
+-A myip 23.200.41.161
+-A myip 104.108.150.134
+-A myip 23.73.205.249
+-A myip 104.27.192.92
+-A myip 23.37.121.151
+-A myip 23.217.168.242
+-A myip 23.77.14.225
+-A myip 23.12.225.75
+-A myip 118.215.176.159
+-A myip 23.74.60.148
+-A myip 23.43.26.196
+-A myip 23.213.107.25
+-A myip 23.42.213.127
+-A myip 104.118.84.48
+-A myip 23.201.90.137
+-A myip 2.17.58.221
+-A myip 104.92.132.195
+-A myip 104.27.193.92
+-A myip 184.26.221.96
+COMMIT

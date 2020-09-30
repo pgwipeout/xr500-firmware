@@ -4,7 +4,7 @@ XR500
 
 2) List the version number of the firmware/software that correlates with the open source code archive.
 
-XR500-V2.2.1.10
+XR500-V2.3.0.8
 
 7) List the main HW platform utilized such as CPU, main chipset, RF chipset, DSP, Switch IC¡­etc.
 
@@ -74,7 +74,7 @@ dni-rip, 1.0, DNI, Yes
 
 dni-mtdoops, 2, GPL, Yes
 
-dnsmasq, 2.39, GPL, Yes
+dnsmasq, 2.76, GPL, Yes
 
 netgear-integration-api, 1, DNI, Yes
 

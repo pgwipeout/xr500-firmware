@@ -560,6 +560,32 @@ function click_disable(cf)
 }
 function click_register(cf, isRegister)
 {
+	if( cf.sysDNSProviderlist.value == 'NETGEAR' )
+	{
+		if(n_show_reset == '0')
+		{
+			if(cf.sysDNSActive.checked)
+			{
+				var keycode=cf.sysDNSHost_Netgear.value;
+				if(!(/^[0-9A-Za-z\-]+$/.test(keycode))||(keycode==""))
+				{       alert("$ddns_ntg_err_host");
+					return false;
+				}
+				var pattern= /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+				var strEmail=pattern.test(cf.sysDNSEmail_Netgear.value);
+				if((!strEmail)||cf.sysDNSEmail_Netgear.value=="")
+				{
+					alert("$ddns_ntg_err_email");
+					return false;
+				}
+				if(cf.sysDNSPassword_Netgear.value.length<6||cf.sysDNSPassword_Netgear.value.length>32)
+				{
+					alert("$ddns_ntg_err_passwd");
+					return false;
+				}
+			}
+		}
+	}
 	if(cf.sysDNSActive.checked == false)
 	{
 		if(click_disable(cf) == true)
@@ -581,14 +607,14 @@ function click_register(cf, isRegister)
 			return false;
 	}
 	if((dns_list != "NETGEAR" || (n_show_reset == "0"&&dns_list == "NETGEAR" && cf.sysDNSHost_Netgear.value != old_sysDNSHost.split('.')[0])) && vpn_enable == "1" && cf.sysDNSActive.checked == true)
-                cf.hid_vpn_detect_ddns_change.value = 1;
-        else
-                cf.hid_vpn_detect_ddns_change.value = 0;
+		cf.hid_vpn_detect_ddns_change.value = 1;
+	else
+		cf.hid_vpn_detect_ddns_change.value = 0;
 	parent.ddns_post_flag=1;
-	
+
 	cf.submit_flag.value="ddns_register";
 
-    cf.hidden_sysDNSProviderlist.value = cf.sysDNSProviderlist.value;
+	cf.hidden_sysDNSProviderlist.value = cf.sysDNSProviderlist.value;
 	if(cf.sysDNSActive.checked == true)
 		cf.ddns_enabled.value="1";
 	else

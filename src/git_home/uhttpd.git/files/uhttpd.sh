@@ -17,7 +17,7 @@ uhttpd_stop()
 
 uhttpd_start()
 {
-        $UHTTPD_BIN -I ndindex.html -h /www -r ${REALM} -x /cgi-bin -l /apps -L /www/cgi-bin/url-routing.lua -t 40  -C /etc/uhttpd.crt -K /etc/uhttpd.key -p 0.0.0.0:80 -s 0.0.0.0:443
+        $UHTTPD_BIN -D -I ndindex.html -h /www -r ${REALM} -x /cgi-bin -l /apps -L /www/cgi-bin/url-routing.lua -t 40  -C /etc/uhttpd.crt -K /etc/uhttpd.key -p 0.0.0.0:80 -s 0.0.0.0:443
 }
 
 case "$1" in

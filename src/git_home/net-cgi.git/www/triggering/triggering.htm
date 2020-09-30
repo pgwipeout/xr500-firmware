@@ -90,9 +90,9 @@ if (array_num > 0)
 		document.write('<TD nowrap align=center><input type="radio" name="serviceSelect" id="service_select'+(j+1)+'" value="'+j+'"><label for="service_select'+(j+1)+'"></label></TD><TD nowrap align=center><span class="subhead">'+i+'</span></TD>');
 		
 		if( each_info[8] == "1")
-			document.write('<TD nowrap align=center><input type="checkbox" name="enable_triggering" value="1" checked id="enable_triggering_ch"><label for="enable_triggering_ch"></label></TD>');
+			document.write('<TD nowrap align=center><input type="checkbox" name="enable_triggering" value="1" checked id="enable_triggering_ch'+i+'"><label for="enable_triggering_ch'+i+'"></label></TD>');
 		else
-			document.write('<TD nowrap align=center><input type="checkbox" name="enable_triggering" value="1" id="enable_triggering_ch"><label for="enable_triggering_ch"></label></TD>');
+			document.write('<TD nowrap align=center><input type="checkbox" name="enable_triggering" value="1" id="enable_triggering_ch'+i+'"><label for="enable_triggering_ch'+i+'"></label></TD>');
 		each_service_name=each_info[0].replace(/&harr;/g," ");
 		each_service_name=each_service_name.replace(/ /g,"&nbsp;").replace(/\</g, "&#60;").replace(/\>/g, "&#62;");
 		document.write('<TD nowrap align=center>'+each_service_name+'</TD><TD nowrap align=center>'+each_info[3]+':'+each_info[4]+ '<TD nowrap align=center>'+each_info[5]+':'+each_info[6]+'..'+each_info[7]+'<TD nowrap align=center>'+each_info[2]+'</TD></TR>');

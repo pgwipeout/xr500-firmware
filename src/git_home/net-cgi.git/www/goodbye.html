@@ -5,6 +5,26 @@
 <% echo_set("", "/tmp/AUTH_login_error") %>
 <script>
 var host_name = "<% cat_file("/hardware_version") %>";
+function loadvalue()
+{
+	/*setFooterClass();*/	
+	//setTimeout("window.close()",1200);//to fix bug32584
+	try {
+		var agent = navigator.userAgent.toLowerCase();
+		if ( agent.indexOf("msie") > -1 || agent.indexOf("trident") > -1 || agent.indexOf("edge") > -1) {
+			document.execCommand("ClearAuthenticationCache");
+		}
+		else
+		{
+			var xmlHttp = createXMLHttpRequest();
+			var url = "LGO_logout.htm?ts=" + new Date().getTime();
+			xmlHttp.open("GET",url,false,"admin","");
+			xmlHttp.send(null);
+			xmlHttp.abort();
+		}
+	} catch(e) {
+	}
+}
 function do_search()
 {
 	var key = document.getElementsByTagName("input")[0].value;
@@ -73,11 +93,25 @@ function detectEnter(type, e) //bug35984
 	else
 		return false;
 }
+function createXMLHttpRequest()
+{
+	if(typeof XMLHttpRequest == "undefined")
+		XMLHttpRequest = function(){
+			try{return new ActiveXObject("Msxml2.XMLHTTP.6.0");}
+			catch(e){}
+			try{return new ActiveXObject("Msxml2.XMLHTTP.3.0");}
+			catch(e){}
+			try{return new ActiveXObject("Msxml2.XMLHTTP");}
+			catch(e){}
+			return false;
+		}
+	return new XMLHttpRequest();
+}
 
 </script>
 </HEAD>
 
-<BODY class="background" onLoad="/*setFooterClass();*/" bgcolor=#ffffff>
+<BODY class="background" onLoad="loadvalue();" bgcolor=#ffffff>
 <div id="top">
 <div id="logo"> </div>
 <% top_hardware_version() %>

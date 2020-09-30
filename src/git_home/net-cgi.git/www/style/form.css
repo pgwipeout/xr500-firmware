@@ -586,7 +586,7 @@ sterBt {
 .funjsq_type{
   width: 560px;
   height: 380px;
-  background: rgb(141,141,141);
+  background: #7b0e13;
   margin-left: -100px;
   border-radius: 8px;
 }
@@ -595,7 +595,7 @@ sterBt {
   float: left;
   height: 96%;
   margin: 4px 0 0 4px;
-  background: rgb(211,211,211);
+  background: #260407;
   border-radius: 8px;
 }
 .funjsq_sel{
@@ -606,7 +606,7 @@ sterBt {
   float: right;
   height: 96%;
   margin: 4px 4px 0 0;
-  background: rgb(211,211,211);
+  background: #260407;
   border-radius: 8px;
 }
 .funjsq_pay{
